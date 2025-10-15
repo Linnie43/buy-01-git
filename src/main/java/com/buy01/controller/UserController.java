@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
-import com.buy01.dto.UserResponse;
-import com.buy01.dto.AdminUserResponse;
-import com.buy01.dto.UpdateUserRequest;
+import com.buy01.dto.UserResponseDTO;
+import com.buy01.dto.SellerCreateDTO;
+import com.buy01.dto.UserUpdateDTO;
 import static com.buy01.security.SecurityUtils.isAdmin;
 
 
@@ -19,34 +19,29 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    // getting all the users with id, name and email, as only admin can access this endpoint
-    @GetMapping
-    public List<UserResponse> getAllUsers() {
-        List<User> users = userService.getAllUsers();
-        return users.stream()
-                .map(user -> new AdminUserResponse(user.getId(), user.getName(), user.getEmail()))
-                .collect(Collectors.toList());
-    }
-
-    // finding user by id, only admin can access this endpoint
+    // finding user by id
     @GetMapping("/{userId}")
-    public AdminUserResponse getUserById(@PathVariable String userId) {
-        if (!isAdmin()) {
-            throw new RuntimeException("Forbidden - only admins can access this");
-        }
+    public UserResponseDTO getUserById(@PathVariable String userId) {
+
         User user = userService.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        return new AdminUserResponse(user.getId(), user.getName(), user.getEmail());
+        return new UserResponseDTO(
+                user.getName(),
+                user.getEmail()
+        );
     }
 
-    // updating user by id, only admin can access this endpoint
+    // updating user by id, only update own id
     @PutMapping("/{userId}")
-    public UserResponse updateUser(
+    public UserResponseDTO updateUser(
             @PathVariable String userId,
-            @RequestBody UpdateUserRequest request) {
+            @RequestBody UserUpdateDTO request) {
 
         User updatedUser = userService.updateUser(userId, request);
-        return new AdminUserResponse(updatedUser.getId(), updatedUser.getName(), updatedUser.getEmail());
+        return new UserResponseDTO(
+                updatedUser.getName(),
+                updatedUser.getEmail()
+        );
     }
 
 
@@ -58,10 +53,10 @@ public class UserController {
 
     // endpoint to get current logged in user details
     @GetMapping("/me")
-    public UserResponse getCurrentUser() {
+    public UserResponseDTO getCurrentUser() {
         String currentUserId = userService.getCurrentUserId();
         User user = userService.findById(currentUserId).orElseThrow();
-        return new UserResponse(user.getName(), user.getEmail());
+        return new UserResponseDTO(user.getName(), user.getEmail());
     }
 
 }

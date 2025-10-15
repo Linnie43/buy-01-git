@@ -11,8 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.util.Map;
 import jakarta.validation.Valid;
-import com.buy01.dto.SignupRequest;
-import com.buy01.dto.UserResponse;
+import com.buy01.dto.UserCreateDTO;
+import com.buy01.dto.UserResponseDTO;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -45,7 +45,7 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody @Valid SignupRequest request) {
+    public ResponseEntity<?> signup(@RequestBody @Valid UserCreateDTO request) {
         User user = new User();
         user.setName(request.getName());
         user.setEmail(request.getEmail());
@@ -53,7 +53,7 @@ public class AuthController {
         user.setRole("USER");
 
         User created = userService.createUser(user);
-        UserResponse response = new UserResponse(created.getName(), created.getEmail());
+        UserResponseDTO response = new UserResponseDTO(created.getName(), created.getEmail());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

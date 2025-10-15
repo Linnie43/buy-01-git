@@ -4,11 +4,11 @@ import com.buy01.model.Product;
 import com.buy01.service.ProductService;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-import com.buy01.dto.ProductResponse;
+import com.buy01.dto.ProductResponseDTO;
 import com.buy01.service.UserService;
 import com.buy01.security.SecurityUtils;
-import com.buy01.dto.UpdateProductRequest;
-import com.buy01.dto.CreateProductRequest;
+import com.buy01.dto.ProductUpdateDTO;
+import com.buy01.dto.ProductCreateDTO;
 import jakarta.validation.Valid;
 
 @RestController // indicates that this class is a REST controller and handles HTTP requests
@@ -25,10 +25,10 @@ public class ProductController {
 
     // add new product
     @PostMapping
-    public ProductResponse createProduct(@Valid @RequestBody CreateProductRequest request) {
+    public ProductResponseDTO createProduct(@Valid @RequestBody ProductCreateDTO request) {
         Product saved = productService.createProduct(request);
         String sellerName = userService.findByIdOrThrow(saved.getUserId()).getName();
-        return new ProductResponse(
+        return new ProductResponseDTO(
                 saved.getProductId(),
                 saved.getName(),
                 saved.getDescription(),
@@ -39,9 +39,9 @@ public class ProductController {
 
     // get all products (if admin, return productId also)
     @GetMapping
-    public List<ProductResponse> getAllProducts() {
+    public List<ProductResponseDTO> getAllProducts() {
         return productService.getAllProducts().stream()
-                .map(p -> new ProductResponse(
+                .map(p -> new ProductResponseDTO(
                         p.getProductId(),
                         p.getName(),
                         p.getDescription(),
@@ -54,10 +54,10 @@ public class ProductController {
 
     // get a specific product by ID
     @GetMapping("/{productId}")
-    public ProductResponse getProductById(@PathVariable String productId) {
+    public ProductResponseDTO getProductById(@PathVariable String productId) {
         Product p = productService.getProductById(productId);
         String sellerName = userService.findByIdOrThrow(p.getUserId()).getName();
-        return new ProductResponse(
+        return new ProductResponseDTO(
                 p.getProductId(),
                 p.getName(),
                 p.getDescription(),
@@ -67,11 +67,11 @@ public class ProductController {
 
     // get all products of the current logged-in user
     @GetMapping("/my-products")
-    public List<ProductResponse> getMyProducts() {
+    public List<ProductResponseDTO> getMyProducts() {
         String currentUserId = SecurityUtils.getCurrentUserId();
         return productService.getAllProducts().stream()
                 .filter(p -> p.getUserId().equals(currentUserId))
-                .map(p -> new ProductResponse(
+                .map(p -> new ProductResponseDTO(
                         p.getProductId(),
                         p.getName(),
                         p.getDescription(),
@@ -84,11 +84,11 @@ public class ProductController {
     // renew a specific product by ID
     @PutMapping("/{productId}")
     public Object updateProduct(@PathVariable String productId,
-                                @RequestBody UpdateProductRequest request) {
+                                @RequestBody ProductUpdateDTO request) {
         Product updated = productService.updateProduct(productId, request);
         String sellerName = userService.findByIdOrThrow(updated.getUserId()).getName();
 
-            return new ProductResponse(
+            return new ProductResponseDTO(
                     updated.getProductId(),
                     updated.getName(),
                     updated.getDescription(),

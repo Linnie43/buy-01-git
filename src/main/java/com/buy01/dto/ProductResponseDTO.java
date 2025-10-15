@@ -1,16 +1,16 @@
 package com.buy01.dto;
 
 // Product response class to send product details in responses - what the user sees after adding a product
-public class ProductResponse {
+public class ProductResponseDTO {
     private String productId;
     private String name;
     private String description;
     private double price;
     private String sellerName;
 
-    public ProductResponse() {}
+    public ProductResponseDTO() {}
 
-    public ProductResponse(String productId, String name, String description, double price, String sellerName) {
+    public ProductResponseDTO(String productId, String name, String description, double price, String sellerName) {
         this.productId = productId;
         this.name = name;
         this.description = description;

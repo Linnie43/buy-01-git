@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
 // DTO for updating an existing product - what the client sends in the request body
-public class UpdateProductRequest {
+public class ProductUpdateDTO {
     private String name;
     private String description;
 
@@ -14,7 +14,7 @@ public class UpdateProductRequest {
     @Max(value = 100000, message = "Price cannot exceed 100000")
     private Double price;
 
-    public UpdateProductRequest() {}
+    public ProductUpdateDTO() {}
 
     public String getName() { return name; }
     public String getDescription() { return description; }

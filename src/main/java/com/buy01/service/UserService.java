@@ -10,7 +10,7 @@ import java.util.Optional;
 import org.springframework.security.access.prepost.PreAuthorize;
 import com.buy01.security.SecurityUtils;
 import static com.buy01.security.SecurityUtils.isAdmin;
-import com.buy01.dto.UpdateUserRequest;
+import com.buy01.dto.UserUpdateDTO;
 
 @Service
 public class UserService {
@@ -90,11 +90,10 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
-    // method to update user, only admin can access this method
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public User updateUser(String userId, UpdateUserRequest request) {
-        if (!isAdmin()) {
-            throw new RuntimeException("Forbidden - only admins can modify users");
+    // method to update user, only updating own profile
+    public User updateUser(String userId, UserUpdateDTO request) {
+        if (!userId.equals(SecurityUtils.getCurrentUserId())) {
+            throw new RuntimeException("Forbidden - user can only modify their own profile");
         }
 
         // Fetch existing user from DB
@@ -111,8 +110,10 @@ public class UserService {
         return userRepository.save(existingUser);
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
     public void deleteUser(String userId) {
+        if (!userId.equals(SecurityUtils.getCurrentUserId())) {
+            throw new RuntimeException("Forbidden - user can only modify their own profile");
+        }
         userRepository.deleteById(userId);
     }
 }

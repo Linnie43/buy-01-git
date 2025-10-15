@@ -1,12 +1,10 @@
 package com.buy01.dto;
 
-public class UserResponse {
+public class UserResponseDTO {
     private String name;
     private String email;
 
-    public UserResponse() {}
-
-    public UserResponse(String name, String email) {
+    public UserResponseDTO(String name, String email) {
         this.name = name;
         this.email = email;
     }

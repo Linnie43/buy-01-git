@@ -1,6 +1,6 @@
 package com.buy01.dto;
 
-public class UpdateUserRequest {
+public class UserUpdateDTO {
     private String name;
     private String email;
     private String password; // the admin can only change the password

@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Max;
 
 // DTO for creating a new product - what the client sends in the request body
-public class CreateProductRequest {
+public class ProductCreateDTO {
 
     @NotBlank(message = "Name cannot be blank")
     private String name;

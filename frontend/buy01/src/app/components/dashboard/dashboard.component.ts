@@ -1,12 +1,32 @@
-import { Component } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ProductService } from '../../services/product.service';
+import { AuthService } from '../../services/auth.service';
+import { Product } from '../../models/product.model';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './dashboard.component.html',
-  styleUrl: './dashboard.component.css'
+  styleUrls: ['./dashboard.component.css']
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
+    products: Product[] = [];
+    isLoggedIn = false;
 
+    constructor(
+        @Inject(ProductService) private productService: ProductService,
+        @Inject(AuthService) private authService: AuthService
+      ) {}
+
+     ngOnInit() {
+        this.isLoggedIn = !!this.authService.currentUserValue;
+
+        // getting the products from the backend
+        this.productService.getAllProducts().subscribe({
+          next: (data: Product[]) => (this.products = data),
+          error: (err: unknown) => console.error(err)
+        });
+      }
 }

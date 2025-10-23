@@ -59,5 +59,25 @@ public class GlobalExceptionHandler {
         return Map.of("error", "Bad request");
     }
 
+    @ExceptionHandler(FileUploadException.class)
+    public ResponseEntity<Map<String, String>> handleFileUploadException(FileUploadException ex) {
+        Map<String, String> body = new HashMap<>();
+        body.put("error", ex.getMessage());
+        // 400 Bad Request is appropriate for invalid file type/size
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
 
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleNotFound(NotFoundException ex) {
+        Map<String, String> body = new HashMap<>();
+        body.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<Map<String, String>> handleForbidden(ForbiddenException ex) {
+        Map<String, String> body = new HashMap<>();
+        body.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
+    }
 }

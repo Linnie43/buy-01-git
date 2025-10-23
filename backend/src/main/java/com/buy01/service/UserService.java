@@ -32,7 +32,6 @@ public class UserService {
             }
         }
 
-
         // Check if email is unique
         private void checkEmailUniqueness(String email) {
             if (userRepository.findByEmail(email).isPresent()) {
@@ -42,8 +41,8 @@ public class UserService {
 
         // Prepare user object before saving - set default role and encode password
         private void prepareUserForSave(User user) {
-            if (user.getRole() == null || user.getRole().isEmpty()) {
-                user.setRole("USER");
+            if (user.getRole() == null) {
+                throw new IllegalArgumentException("Please select a role");
             }
 
             if (user.getPassword() == null || user.getPassword().isEmpty()) {
@@ -72,8 +71,7 @@ public class UserService {
         return SecurityUtils.getCurrentUserId();
     }
 
-    // method to find user by id, only admin can access this method
-    @PreAuthorize("hasAuthority('ADMIN')")
+    // method to find user by id, needs validation what information is sent if own profile
     public Optional<User> findById(String userId) { // optional means it may or may not contain a non-null value
         return userRepository.findById(userId);
     }

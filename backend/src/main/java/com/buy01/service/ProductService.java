@@ -1,6 +1,8 @@
 package com.buy01.service;
 
+import com.buy01.model.Media;
 import com.buy01.model.Product;
+import com.buy01.repository.MediaRepository;
 import com.buy01.repository.ProductRepository;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,12 +24,14 @@ public class ProductService {
 
     @Autowired
     private final ProductRepository productRepository;
+    private final MediaRepository mediaRepository;
 
     private final UserService userService;
 
     @Autowired
-    public ProductService(ProductRepository productRepository, UserService userService) {
+    public ProductService(ProductRepository productRepository, MediaRepository mediaRepository, UserService userService) {
         this.productRepository = productRepository;
+        this.mediaRepository = mediaRepository;
         this.userService = userService;
     }
 
@@ -75,6 +79,12 @@ public class ProductService {
     public void deleteProduct(String productId) {
         Product product = findProductOrThrow(productId);
         authorizeOwner(product);
+
+        // delete all media related to the productId
+        List<Media> media = mediaRepository.getMediaByProductId(productId);
+        for (Media mediaItem : media) {
+            mediaRepository.deleteById(mediaItem.getId());
+        }
 
         productRepository.deleteById(productId);
     }

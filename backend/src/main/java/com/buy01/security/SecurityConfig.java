@@ -37,20 +37,20 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/users/me").hasAnyAuthority("SELLER","ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/users/me").hasAnyAuthority("CLIENT", "SELLER", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/users").hasAuthority("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/users/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/users/**").hasAnyAuthority("CLIENT", "SELLER", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/products","/products/**").permitAll()
 
-                        .requestMatchers(HttpMethod.POST, "/products/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/products/**").hasAnyAuthority("SELLER","ADMIN")
 
-                        .requestMatchers(HttpMethod.PUT, "/users/me").denyAll()
+                        .requestMatchers(HttpMethod.PUT, "/users/me").hasAnyAuthority("CLIENT", "SELLER", "ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/users/**").hasAuthority("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/products/**").hasAnyAuthority("USER","ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/products/**").hasAnyAuthority("SELLER","ADMIN")
 
-                        .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasAuthority("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/users/me").denyAll()
-                        .requestMatchers(HttpMethod.DELETE, "/products/**").hasAnyAuthority("USER","ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/users/**").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/users/me").hasAnyAuthority("CLIENT", "SELLER", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/products/**").hasAnyAuthority("SELLER","ADMIN")
                 )
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) -> {

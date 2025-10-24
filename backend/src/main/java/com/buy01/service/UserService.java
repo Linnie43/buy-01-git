@@ -1,5 +1,6 @@
 package com.buy01.service;
 
+import com.buy01.model.Product;
 import com.buy01.model.User;
 import com.buy01.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+    private ProductService productService;
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
@@ -110,6 +112,11 @@ public class UserService {
     public void deleteUser(String userId) {
         if (!userId.equals(SecurityUtils.getCurrentUserId())) {
             throw new RuntimeException("Forbidden - user can only modify their own profile");
+        }
+        // delete all user's products
+        List<Product> allProducts = productService.getAllProductsByUserId(userId);
+        for (Product product : allProducts) {
+            productService.deleteProduct(product.getProductId());
         }
         userRepository.deleteById(userId);
     }

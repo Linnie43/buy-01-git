@@ -55,6 +55,10 @@ public class ProductService {
         return productRepository.findAll();
     }
 
+    public List<Product> getAllProductsByUserId(String userId) {
+        return productRepository.findAllProductsByUserId(userId);
+    }
+
     @PermitAll
     public Product getProductById(String productId) {
         return findProductOrThrow(productId);

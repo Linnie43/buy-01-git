@@ -10,9 +10,12 @@
   </div>
   <!-- Toggle -->
   <div class="d-flex justify-content-center mb-4">
-    <button class="btn btn-outline-primary me-2" [class.active]="isLogin" (click)="isLogin = true">Login</button>
-    <button class="btn btn-outline-primary" [class.active]="!isLogin" (click)="isLogin = false">Signup</button>
+  <div class="toggle-container">
+    <div class="toggle-btn" [class.active]="isLogin" (click)="isLogin = true">Login</div>
+    <div class="toggle-btn" [class.active]="!isLogin" (click)="isLogin = false">Signup</div>
   </div>
+  </div>
+
 
   <!-- Login Form -->
   <div *ngIf="isLogin">
@@ -23,7 +26,7 @@
       <div class="mb-3">
         <input type="password" class="form-control" formControlName="password" placeholder="Enter your password:">
       </div>
-      <button class="btn btn-primary w-100" type="submit" [disabled]="loginForm.invalid">Login</button>
+      <button class="btn btn-dark-green w-100" type="submit" [disabled]="loginForm.invalid">Login</button>
     </form>
   </div>
 
@@ -52,7 +55,7 @@
           <label class="form-check-label" for="roleSeller">Seller</label>
         </div>
       </div>
-      <button class="btn btn-primary w-100" type="submit" [disabled]="signupForm.invalid">Signup</button>
+      <button class="btn btn-dark-green w-100" type="submit" [disabled]="signupForm.invalid">Signup</button>
     </form>
   </div>
 </div>

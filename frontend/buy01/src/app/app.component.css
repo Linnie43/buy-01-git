@@ -34,6 +34,10 @@ header {
   border-radius: 4px;
 }
 
+.login-btn:hover {
+  background-color: #e5e7eb;
+}
+
 
 .profile-img {
   width: 4rem;

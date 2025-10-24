@@ -15,6 +15,7 @@ export class AuthService {
   private apiUrl = 'http://localhost:8080/auth';
   private currentUser: { role: string } | null = null;
 
+<<<
   constructor(private http: HttpClient) {
     const userData = localStorage.getItem('user');
     this.currentUser = userData ? JSON.parse(userData) : null;

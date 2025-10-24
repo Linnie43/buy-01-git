@@ -1,0 +1,48 @@
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: #f3f4f6;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logo {
+  font-weight: bold;
+  font-size: 1.5rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.logo:hover {
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.login-btn {
+  padding: 0.3rem 0.8rem;
+  border: 1px solid #333;
+  background-color: transparent;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+
+.profile-img {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  border: 1px solid gray;
+}
+
+.profile-container {
+  display: flex;
+  align-items: center;
+}

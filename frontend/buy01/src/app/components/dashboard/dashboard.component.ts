@@ -21,7 +21,7 @@ export class DashboardComponent implements OnInit {
       ) {}
 
      ngOnInit() {
-        this.isLoggedIn = !!this.authService.currentUserValue;
+        this.isLoggedIn = this.authService.isLoggedIn?.() ?? false;
 
         // getting the products from the backend
         this.productService.getAllProducts().subscribe({

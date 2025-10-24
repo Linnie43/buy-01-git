@@ -18,7 +18,8 @@ export class AuthComponent {
   });
 
   signupForm = this.fb.group({
-    username: ['', [Validators.required, Validators.minLength(3)]],
+    firstname: ['', [Validators.required, Validators.minLength(2)]],
+    lastname: ['', [Validators.required, Validators.minLength(2)]],
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(3)]],
     role: ['client', Validators.required]

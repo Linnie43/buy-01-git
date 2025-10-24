@@ -1,1 +1,16 @@
+<header>
+  <a routerLink="/" class="logo">FKML</a>
+
+  <div class="header-right">
+    <button *ngIf="showProfile" (click)="logout()" class="logout-btn">
+      Logout
+    </button>
+    <img *ngIf="showProfile" src="assets/default.jpg" alt="Profile" class="profile-img" />
+
+    <button *ngIf="!showProfile" routerLink="/auth" class="login-btn">
+      Login
+    </button>
+  </div>
+</header>
+
 <router-outlet></router-outlet>

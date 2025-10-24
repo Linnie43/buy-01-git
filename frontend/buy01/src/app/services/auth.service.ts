@@ -1,18 +1,40 @@
 import { Injectable } from '@angular/core';
 
-export interface User {
-  email: string;
-  role: 'seller' | 'client';
-}
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  currentUserValue: User | null = null;
+  private currentUser: { role: string } | null = null;
 
   constructor() {
-    // example user for testing
-    this.currentUserValue = { email: 'test@example.com', role: 'seller' };
+        const userData = localStorage.getItem('user');
+        this.currentUser = userData ? JSON.parse(userData) : null;
+        }
+
+   isLoggedIn(): boolean {
+       const token = localStorage.getItem('token');
+       return !!token;
+     }
+
+   getUserRole(): string | null {
+       return this.currentUser?.role ?? null;
+     }
+
+   //for testing purpose only
+   loginAsClient() {
+       this.currentUser = { role: 'client' };
+       localStorage.setItem('user', JSON.stringify(this.currentUser));
+     }
+
+    loginAsSeller() {
+       this.currentUser = { role: 'seller' };
+       localStorage.setItem('user', JSON.stringify(this.currentUser));
+     }
+
+   logout() {
+       this.currentUser = null;
+       localStorage.removeItem('user');
+     }
   }
-}
+

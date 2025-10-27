@@ -1,40 +1,65 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
+interface AuthResponse {
+  token?: string;
+  message?: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  private apiUrl = 'http://localhost:8080/auth';
   private currentUser: { role: string } | null = null;
 
-  constructor() {
-        const userData = localStorage.getItem('user');
-        this.currentUser = userData ? JSON.parse(userData) : null;
-        }
-
-   isLoggedIn(): boolean {
-       const token = localStorage.getItem('token');
-       return !!token;
-     }
-
-   getUserRole(): string | null {
-       return this.currentUser?.role ?? null;
-     }
-
-   //for testing purpose only
-   loginAsClient() {
-       this.currentUser = { role: 'client' };
-       localStorage.setItem('user', JSON.stringify(this.currentUser));
-     }
-
-    loginAsSeller() {
-       this.currentUser = { role: 'seller' };
-       localStorage.setItem('user', JSON.stringify(this.currentUser));
-     }
-
-   logout() {
-       this.currentUser = null;
-       localStorage.removeItem('user');
-     }
+  constructor(private http: HttpClient) {
+    const userData = localStorage.getItem('user');
+    this.currentUser = userData ? JSON.parse(userData) : null;
   }
 
+  isLoggedIn(): boolean {
+    const token = localStorage.getItem('token');
+    return !!token;
+  }
+
+  getUserRole(): string | null {
+    return this.currentUser?.role ?? null;
+  }
+
+  signup(userData: any): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/signup`, userData);
+  }
+
+  login(credentials: any): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(
+      tap(res => {
+        if (res.token) {
+          localStorage.setItem('token', res.token);
+          // optionally store user role if returned by backend
+          this.currentUser = { role: 'client' }; // replace with actual role from backend if available
+          localStorage.setItem('user', JSON.stringify(this.currentUser));
+        }
+      })
+    );
+  }
+
+  logout() {
+    this.currentUser = null;
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+  }
+
+  // testing helpers
+  loginAsClient() {
+    this.currentUser = { role: 'client' };
+    localStorage.setItem('user', JSON.stringify(this.currentUser));
+  }
+
+  loginAsSeller() {
+    this.currentUser = { role: 'seller' };
+    localStorage.setItem('user', JSON.stringify(this.currentUser));
+  }
+}

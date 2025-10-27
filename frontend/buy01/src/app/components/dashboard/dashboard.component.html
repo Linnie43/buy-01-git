@@ -1,6 +1,11 @@
 <div class="container mt-4">
   <h2>For sale</h2>
-  <div class="row">
+
+  <div *ngIf="products.length === 0">
+    <p>No products available</p>
+  </div>
+
+  <div class="row" *ngIf="products.length > 0">
     <div class="col-md-3" *ngFor="let product of products">
       <div class="card mb-3">
         <img [src]="product.image" class="card-img-top" alt="{{ product.name }}">

@@ -47,8 +47,9 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody @Valid UserCreateDTO request) {
+        System.out.println("Received DTO: " + request);
         User user = new User();
-        user.setName(request.getName());
+        user.setName(request.getFirstname() + " " + request.getLastname());
         user.setEmail(request.getEmail());
         user.setPassword(request.getPassword());
         user.setRole(request.getRole());

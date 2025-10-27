@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-//import { HttpClient } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 
 export interface Product {
@@ -14,19 +14,19 @@ export interface Product {
 })
 export class ProductService {
   //temp mock data
-    private mockProducts: Product[] = [
-      { name: 'Laptop', price: 999, image: 'https://via.placeholder.com/150' },
-      { name: 'Phone', price: 699, image: 'https://via.placeholder.com/150' },
-      { name: 'Headphones', price: 199, image: 'https://via.placeholder.com/150' }
-    ];
+//     private mockProducts: Product[] = [
+//       { name: 'Laptop', price: 999, image: 'https://via.placeholder.com/150' },
+//       { name: 'Phone', price: 699, image: 'https://via.placeholder.com/150' },
+//       { name: 'Headphones', price: 199, image: 'https://via.placeholder.com/150' }
+//     ];
 
-  //private apiUrl = 'http://localhost:8080/api/products'; // endpoint
+  private apiUrl = 'http://localhost:8080/products'; // endpoint
 
-  //constructor(private http: HttpClient) {}
-  constructor() {}
+  constructor(private http: HttpClient) {}
+//   constructor() {}
 
   getAllProducts(): Observable<Product[]> {
-    //return this.http.get<Product[]>(this.apiUrl);
-    return of(this.mockProducts);
+    return this.http.get<Product[]>(this.apiUrl);
+//     return of(this.mockProducts);
   }
 }

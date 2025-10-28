@@ -44,5 +44,4 @@ Thumbs.db
 # Java build
 /target/
 *.class
-.idea/
-target/
+

@@ -12,7 +12,7 @@ interface AuthResponse {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8080/auth';
+  private apiUrl = 'https://localhost:8443/auth';
   private currentUser: { role: string } | null = null;
 
   constructor(private http: HttpClient) {

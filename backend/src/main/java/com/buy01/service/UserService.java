@@ -1,6 +1,7 @@
 package com.buy01.service;
 
 import com.buy01.model.Product;
+import com.buy01.model.Role;
 import com.buy01.model.User;
 import com.buy01.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ public class UserService {
     private BCryptPasswordEncoder passwordEncoder;
 
     public User createUser(User user) {
-        checkEmailUniqueness(user.getEmail());
+        checkEmailUniqueness(user.getEmail(), user.getRole());
         prepareUserForSave(user);
 
         try {
@@ -34,8 +35,8 @@ public class UserService {
             }
         }
 
-        // Check if email is unique
-        private void checkEmailUniqueness(String email) {
+        // Check if email is unique for that role
+        private void checkEmailUniqueness(String email, Role role) {
             if (userRepository.findByEmail(email).isPresent()) {
                 throw new IllegalArgumentException("User with this email already exists");
             }

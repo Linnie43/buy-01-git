@@ -40,3 +40,9 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Java build
+/target/
+*.class
+.idea/
+target/

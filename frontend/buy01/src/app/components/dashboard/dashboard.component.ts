@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProductService } from '../../services/product.service';
 import { AuthService } from '../../services/auth.service';
@@ -16,8 +16,8 @@ export class DashboardComponent implements OnInit {
     isLoggedIn = false;
 
     constructor(
-        @Inject(ProductService) private productService: ProductService,
-        @Inject(AuthService) private authService: AuthService
+        private productService: ProductService,
+        private authService: AuthService
       ) {}
 
      ngOnInit() {

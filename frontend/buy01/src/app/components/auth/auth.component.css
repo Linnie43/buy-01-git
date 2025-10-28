@@ -1,0 +1,55 @@
+.toggle-container {
+  display: flex;
+  width: 400px;
+  background-color: #e0e0e0;
+  border-radius: 50px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  padding: 4px;
+  height: 40px;
+  margin-bottom: 20px;
+}
+
+.toggle-btn {
+  flex: 1;
+  display: flex;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 0;
+  transition: all 0.3s ease;
+  color: #333;
+  border-radius: 50px;
+  font-size: 14px;
+}
+
+.toggle-btn.active {
+  background-color: #006400;
+  color: white;
+}
+
+
+.btn-dark-green {
+  background-color: #006400;
+  color: white;
+  border: 1px solid #006400;
+}
+
+.btn-outline-dark-green {
+  background-color: transparent;
+  color: #006400;
+  border: 1px solid #006400;
+}
+
+.btn-dark-green:hover {
+  background-color: #004d00;
+  border-color: #004d00;
+}
+
+.btn-outline-dark-green:hover {
+  background-color: #004d00;
+  color: white;
+  border-color: #004d00;
+}
+

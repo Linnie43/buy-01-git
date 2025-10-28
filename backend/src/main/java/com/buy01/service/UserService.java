@@ -40,6 +40,10 @@ public class UserService {
             if (userRepository.findByEmail(email).isPresent()) {
                 throw new IllegalArgumentException("User with this email already exists");
             }
+            // checking email for that role (same email for different role profiles)
+//            if (userRepository.findByEmailAndRole(email, role).isPresent()) {
+//                throw new IllegalArgumentException("User with this email already exists, try logging in");
+//            }
         }
 
         // Prepare user object before saving - set default role and encode password

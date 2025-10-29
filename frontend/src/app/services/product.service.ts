@@ -1,32 +1,38 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-
-export interface Product {
-  name: string;
-  price: number;
-  image: string;
-  sellerId?: string;
-}
+import { Observable, of, map } from 'rxjs';
+import { Product } from '../models/product.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProductService {
-  //temp mock data
-//     private mockProducts: Product[] = [
-//       { name: 'Laptop', price: 999, image: 'https://via.placeholder.com/150' },
-//       { name: 'Phone', price: 699, image: 'https://via.placeholder.com/150' },
-//       { name: 'Headphones', price: 199, image: 'https://via.placeholder.com/150' }
-//     ];
 
   private apiUrl = 'https://localhost:8443/products'; // endpoint
 
   constructor(private http: HttpClient) {}
-//   constructor() {}
 
-  getAllProducts(): Observable<Product[]> {
-    return this.http.get<Product[]>(this.apiUrl);
-//     return of(this.mockProducts);
+ getAllProducts(): Observable<Product[]> {
+   return this.http.get<Product[]>(this.apiUrl).pipe(
+     map(products =>
+       products.map(p => ({
+         ...p,
+         image: p.image || 'assets/product_image_placeholder.png'
+       }))
+     )
+   );
+ }
+
+  getProductById(productId: string): Observable<Product> {
+    return this.http.get<Product>(`${this.apiUrl}/${productId}`).pipe(
+      map(product => ({
+        ...product,
+        image: product.image || 'assets/product_image_placeholder.png'
+      }))
+    );
+  }
+
+  updateProduct(productId: string, product: Product): Observable<Product> {
+    return this.http.put<Product>(`${this.apiUrl}/${productId}`, product);
   }
 }

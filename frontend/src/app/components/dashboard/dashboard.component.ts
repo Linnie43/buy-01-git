@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ProductService } from '../../services/product.service';
 import { AuthService } from '../../services/auth.service';
 import { Product } from '../../models/product.model';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
@@ -17,7 +18,8 @@ export class DashboardComponent implements OnInit {
 
     constructor(
         private productService: ProductService,
-        private authService: AuthService
+        private authService: AuthService,
+        private router: Router
       ) {}
 
      ngOnInit() {
@@ -29,4 +31,8 @@ export class DashboardComponent implements OnInit {
           error: (err: unknown) => console.error(err)
         });
       }
+
+    goToProduct(productId: string) {
+      this.router.navigate(['/products', productId]);
+    }
 }

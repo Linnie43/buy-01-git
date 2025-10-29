@@ -1,0 +1,17 @@
+<div *ngIf="product">
+  <h1>{{ product.name }}</h1>
+  <img [src]="product.image || 'assets/product_image_placeholder.png'" alt="{{product.name}}">
+  <p>{{ product.description }}</p>
+  <p>Price: {{ product?.price | currency:'EUR':'symbol' }}</p>
+  <p>Quantity: {{ product?.quantity }}</p>
+
+  <button *ngIf="isOwner(product)" class="btn btn-success" (click)="goToUpdateProduct(product.productId)">
+    Manage Product
+  </button>
+
+  <button *ngIf="!isOwner(product) && isLoggedIn" class="btn btn-primary">
+    Buy
+  </button>
+  <p *ngIf="!isLoggedIn" class="text-muted mt-2">Please log in to buy this product.</p>
+</div>
+

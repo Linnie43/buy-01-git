@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { Router } from '@angular/router';
+
 
 interface AuthResponse {
   token?: string;
@@ -15,9 +17,11 @@ export class AuthService {
   private apiUrl = 'https://localhost:8443/auth';
   private currentUser: { role: string } | null = null;
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private router: Router) {
+
     const userData = localStorage.getItem('user');
     this.currentUser = userData ? JSON.parse(userData) : null;
+
   }
 
   isLoggedIn(): boolean {
@@ -50,6 +54,9 @@ export class AuthService {
     this.currentUser = null;
     localStorage.removeItem('user');
     localStorage.removeItem('token');
+    this.router.navigate(['/']).then(() => {
+      window.location.reload();
+  });
   }
 
   // testing helpers
@@ -62,4 +69,12 @@ export class AuthService {
     this.currentUser = { role: 'seller' };
     localStorage.setItem('user', JSON.stringify(this.currentUser));
   }
+
+ getCurrentUserId(): string | null {
+   const user = localStorage.getItem('user');
+   if (!user) return null;
+   return JSON.parse(user).id;
+ }
+
 }
+

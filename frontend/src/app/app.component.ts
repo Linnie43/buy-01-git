@@ -6,7 +6,7 @@ import { AuthService } from './services/auth.service';
 import { Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { HttpClientModule } from '@angular/common/http'; // <--- add this
+import { HttpClientModule } from '@angular/common/http';
 
 
 @Component({

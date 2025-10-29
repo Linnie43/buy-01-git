@@ -1,0 +1,38 @@
+<div class="container mt-4 d-flex justify-content-center" *ngIf="product">
+  <div class="card p-4" style="width: 700px;">
+    <div class="row g-3">
+
+      <div class="col-md-5">
+        <img [src]="product.image || 'assets/product_image_placeholder.png'" class="img-fluid" alt="{{ product.name }}">
+      </div>
+
+      <div class="col-md-7">
+        <h3>Update Product</h3>
+        <form (ngSubmit)="updateProduct()">
+          <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input id="name" class="form-control" [(ngModel)]="product.name" name="name" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea id="description" class="form-control" [(ngModel)]="product.description" name="description" rows="3" required></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label for="price" class="form-label">Price (€)</label>
+            <input id="price" type="number" class="form-control" [(ngModel)]="product.price" name="price" step="0.01" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="quantity" class="form-label">Quantity</label>
+            <input id="quantity" type="number" class="form-control" [(ngModel)]="product.quantity" name="quantity" required>
+          </div>
+
+          <button type="submit" class="btn btn-success">Update Product</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+

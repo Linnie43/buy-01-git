@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import jwtDecode from 'jwt-decode';
 import { Router } from '@angular/router';
 
 
@@ -10,12 +11,15 @@ interface AuthResponse {
   message?: string;
 }
 
+interface DecodedToken {
+  role: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private apiUrl = 'https://localhost:8443/auth';
-  private currentUser: { role: string } | null = null;
 
   constructor(private http: HttpClient, private router: Router) {
 
@@ -30,7 +34,17 @@ export class AuthService {
   }
 
   getUserRole(): string | null {
-    return this.currentUser?.role ?? null;
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const decodedToken: DecodedToken = jwtDecode(token);
+        return decodedToken.role;
+      } catch (error) {
+        console.error('Error decoding token:', error);
+        return null;
+      }
+    }
+    return null;
   }
 
   signup(userData: any): Observable<AuthResponse> {
@@ -42,22 +56,18 @@ export class AuthService {
       tap(res => {
         if (res.token) {
           localStorage.setItem('token', res.token);
-          // optionally store user role if returned by backend
-          this.currentUser = { role: 'client' }; // replace with actual role from backend if available
-          localStorage.setItem('user', JSON.stringify(this.currentUser));
         }
       })
     );
   }
 
   logout() {
-    this.currentUser = null;
-    localStorage.removeItem('user');
     localStorage.removeItem('token');
     this.router.navigate(['/']).then(() => {
       window.location.reload();
   });
   }
+}
 
   // testing helpers
   loginAsClient() {

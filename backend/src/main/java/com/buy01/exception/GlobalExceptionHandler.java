@@ -1,5 +1,6 @@
 package com.buy01.exception;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -54,9 +55,14 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleInvalidJson(HttpMessageNotReadableException ex) {
-        return Map.of("error", "Bad request");
+    public ResponseEntity<Map<String,String>> handleInvalidJson(HttpMessageNotReadableException ex) {
+        String message = "Bad Request";
+        if (ex.getCause() instanceof InvalidFormatException invalidFormat) {
+            message = String.format("Invalid value '%s' for field '%s",
+                    invalidFormat.getValue(),
+                    invalidFormat.getPath().get(0).getFieldName());
+        }
+        return ResponseEntity.badRequest().body(Map.of("error", message));
     }
 
     @ExceptionHandler(FileUploadException.class)

@@ -81,12 +81,12 @@ src/main/java/com/letsplay
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/karusmari/letsplay.git
-   cd letsplay
+   git clone https://github.com/Linnie43/buy-01-git.git
+   cd buy-01-git
 
 2. **Set up MongoDB**
-   - spring.data.mongodb.uri=mongodb://localhost:27017/letsplay
-   - spring.data.mongodb.database=letsplay
+   - spring.data.mongodb.uri=mongodb://localhost:27017/buy01
+   - spring.data.mongodb.database=buy01
 
 3. **Build and run the application**
    ```bash
@@ -107,7 +107,8 @@ src/main/java/com/letsplay
     {
        "name": "Maria",
        "email": "maria©example.com", 
-       "password": "123"
+       "password": "123",
+        "role": "CLIENT"
     }
    ```
      
@@ -135,7 +136,8 @@ src/main/java/com/letsplay
     {
          "name": "shoes",
          "description": "Nice shoes"
-         "price": 10.0
+         "price": 10.0,
+        "quantity": 5
     }
     ```
 
@@ -146,7 +148,7 @@ src/main/java/com/letsplay
     
 6. **Using the database** (viewing, deleting)
     - Terminal: `mongosh`
-    - Switch to the database: `use database`
+    - Switch to the database: `use buy01`
     - Show collections: `show collections`
     - View users: `db.users.find().pretty()`
     - View products: `db.products.find().pretty()`
@@ -156,31 +158,3 @@ src/main/java/com/letsplay
     - Delete all users: `db.users.deleteMany({})`
     - Exit: `exit` or `quit`
    
-## Install maven or maven-wrapper
-
-### Option 1: Install Maven locally
-
-Install maven:
-
-```bash
-brew install maven
-```
-
-Run:
-```bash
-cd backend
-mvn spring-boot:run
-```
-
-### Option 2: Recreate the Maven Wrapper
-
-Install Maven temporarily:
-```bash
-cd backend
-mvn wrapper:wrapper
-```
-
-Run the program:
-```bash
-./mvnw spring-boot:run
-```

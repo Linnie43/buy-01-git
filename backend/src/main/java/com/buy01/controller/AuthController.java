@@ -55,7 +55,7 @@ public class AuthController {
         user.setRole(request.getRole());
 
         User created = userService.createUser(user);
-        UserResponseDTO response = new UserResponseDTO(created.getName(), created.getEmail());
+        UserResponseDTO response = new UserResponseDTO(created.getName(), created.getEmail(), created.getRole(), null, null);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

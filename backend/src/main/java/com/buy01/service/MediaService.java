@@ -44,20 +44,14 @@ public class MediaService {
         String extension = Objects.requireNonNull(file.getOriginalFilename())
                 .substring(file.getOriginalFilename().lastIndexOf("."));
         String fileName = UUID.randomUUID() + "." + extension;
-        String path = "uploads/" + fileName; // making sure all unique filenames
+        String path = storeFile(file, "uploads/", fileName); // making sure all unique filenames
 
-        try {
-            Files.copy(file.getInputStream(), Paths.get(path), StandardCopyOption.REPLACE_EXISTING);
+        Media media = new Media();
+        media.setPath(path);
+        media.setProductId(productId);
 
-            Media media = new Media();
-            media.setPath(path);
-            media.setProductId(productId);
+        return mediaRepository.save(media);
 
-            return mediaRepository.save(media);
-
-        } catch (IOException e) {
-            throw new FileUploadException("Failed to upload image", e);
-        }
 
     }
 
@@ -77,6 +71,27 @@ public class MediaService {
         // delete
         mediaRepository.deleteById(id);
     }
+
+    public String saveUserAvatar(MultipartFile file) {
+        validateFile(file);
+        String extension = Objects.requireNonNull(file.getOriginalFilename())
+                .substring(file.getOriginalFilename().lastIndexOf("."));
+        String fileName = UUID.randomUUID() + "." + extension;
+        return storeFile(file, "uploads/avatar/", fileName);
+    }
+
+    private String storeFile(MultipartFile file, String directory, String filename) {
+        validateFile(file);
+        try {
+            Files.createDirectories(Paths.get(directory));
+            Path filePath = Paths.get(directory).resolve(filename);
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+            return filePath.toString();
+        } catch (IOException e) {
+            throw new FileUploadException("Failed to store file", e);
+        }
+    }
+
 
     private void validateFile(MultipartFile file) {
         if (file.isEmpty()) {

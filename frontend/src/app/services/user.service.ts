@@ -1,0 +1,26 @@
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, of } from 'rxjs';
+
+export interface User {
+  name: string;
+  email: string;
+  role: string;
+  avatar: string;
+  ownProfile: boolean;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+
+export class UserService {
+
+  private apiUrl = 'https://localhost:8443/users/me'; // endpoint
+
+  constructor(private http: HttpClient) {}
+
+  getMe(): Observable<User> {
+    return this.http.get<User>(this.apiUrl);
+  }
+}

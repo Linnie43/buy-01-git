@@ -23,8 +23,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     //Exclude certain URLs from JWT validation so it doesn't check for a token on these paths
     private static final List<String> EXCLUDE_URLS = List.of(
-            "/api/auth/login",
-            "/api/auth/signup",
+            "/auth/login",
+            "/auth/signup",
             "/products"
     );
 

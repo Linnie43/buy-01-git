@@ -1,0 +1,16 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: user-service
+          uri: https://localhost:8444
+          predicates:
+            - Path=/api/users/**
+        - id: product-service
+          uri: https://localhost:8445
+          predicates:
+            - Path=/api/products/**
+        - id: media-service
+          uri: https://localhost:8446
+          predicates:
+            - Path=/api/media/**

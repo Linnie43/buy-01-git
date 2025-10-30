@@ -41,16 +41,18 @@ public class ProductController {
                 saved.getPrice(),
                 saved.getQuantity(),
                 sellerName,
-                images
+                images,
+                true
         );
     }
 
     // get all products
     @GetMapping
     public List<ProductResponseDTO> getAllProducts() {
+        String currentUserId = SecurityUtils.getCurrentUserId();
         return productService.getAllProducts().stream()
                 .map(p -> {
-                    String sellerName = userService.findByIdOrThrow(p.getUserId()).getName();
+                    String ownerId = userService.findByIdOrThrow(p.getUserId()).getId();
                     List<Media> images = mediaRepository.getMediaByProductId(p.getProductId());
                     return new ProductResponseDTO(
                             p.getProductId(),
@@ -58,8 +60,9 @@ public class ProductController {
                             p.getDescription(),
                             p.getPrice(),
                             p.getQuantity(),
-                            sellerName,
-                            images
+                            ownerId,
+                            images,
+                            ownerId.equals(currentUserId)
                     );
                 })
                 .toList();
@@ -69,8 +72,9 @@ public class ProductController {
     // get a specific product by ID
     @GetMapping("/{productId}")
     public ProductResponseDTO getProductById(@PathVariable String productId) {
+        String currentUserId = SecurityUtils.getCurrentUserId();
         Product p = productService.getProductById(productId);
-        String sellerName = userService.findByIdOrThrow(p.getUserId()).getName();
+        String ownerId = userService.findByIdOrThrow(p.getUserId()).getId();
         List<Media> images = mediaRepository.getMediaByProductId(p.getProductId());
 
         return new ProductResponseDTO(
@@ -79,8 +83,9 @@ public class ProductController {
                 p.getDescription(),
                 p.getPrice(),
                 p.getQuantity(),
-                sellerName,
-                images
+                ownerId,
+                images,
+                ownerId.equals(currentUserId)
         );
     }
 
@@ -100,7 +105,8 @@ public class ProductController {
                             p.getPrice(),
                             p.getQuantity(),
                             sellerName,
-                            images
+                            images,
+                            true
                     );
                 })
                 .toList();
@@ -121,7 +127,8 @@ public class ProductController {
                     updated.getPrice(),
                     updated.getQuantity(),
                     sellerName,
-                    images
+                    images,
+                    true
             );
     }
 

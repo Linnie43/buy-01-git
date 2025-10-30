@@ -8,5 +8,6 @@ import { Component } from '@angular/core';
   styleUrl: './sellerProfile.component.css'
 })
 export class SellerProfileComponent {
+  // check users me to authenticate
 
 }

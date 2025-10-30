@@ -9,7 +9,7 @@ import { RoleGuard } from './guards/role.guard';
 export const routes: Routes = [
   { path: '', component: DashboardComponent },
   { path: 'auth', component: AuthComponent },
-  { path: 'seller-profile', component: SellerProfileComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'seller' }  },
-  { path: 'client-profile', component: ClientProfileComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'client' }  },
+  { path: 'seller-profile', component: SellerProfileComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'SELLER' }  },
+  { path: 'client-profile', component: ClientProfileComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'CLIENT' }  },
   { path: '**', redirectTo: '/auth' }
 ];

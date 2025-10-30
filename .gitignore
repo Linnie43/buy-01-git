@@ -34,3 +34,6 @@ build/
 
 ### DS_Store ###
 .DS_Store
+
+### Node Modules ###
+frontend/node_modules/

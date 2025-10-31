@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import jwtDecode from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
+import { BASE_URL } from '../constants';
 
 interface AuthResponse {
   token?: string;
@@ -17,7 +18,7 @@ interface DecodedToken {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'https://localhost:8443/auth';
+  private apiUrl = `${BASE_URL}/auth`;
 
   constructor(private http: HttpClient) {}
 

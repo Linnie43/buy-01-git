@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
+import { BASE_URL } from '../constants';
 
 export interface Product {
   name: string;
@@ -20,7 +21,7 @@ export class ProductService {
 //       { name: 'Headphones', price: 199, image: 'https://via.placeholder.com/150' }
 //     ];
 
-  private apiUrl = 'https://localhost:8443/products'; // endpoint
+  private apiUrl = `${BASE_URL}/products`; // endpoint
 
   constructor(private http: HttpClient) {}
 //   constructor() {}

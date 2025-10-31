@@ -72,7 +72,6 @@ public class UserService {
     }
 
     // method to find user by email, used in authentication
-    @PreAuthorize("hasAuthority('ADMIN')")
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
     }

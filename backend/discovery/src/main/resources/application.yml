@@ -4,16 +4,15 @@ spring:
 
 server:
   port: 8761
-  ssl:
-     enabled: true
-     key-store: classpath:ssl/backend.p12
-     key-store-password: password
-     key-store-type: PKCS12
-     key-alias: localhost
 
 eureka:
+  instance:
+    hostname: localhost
   client:
-    register-with-eureka: false   # Discovery itself does not register
-    fetch-registry: false          # It doesn’t fetch registry from anywhere
-  server:
-    enable-self-preservation: false  # optional, simplifies local dev
+    register-with-eureka: false
+    fetch-registry: false
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    reactor.netty.http.client: DEBUG

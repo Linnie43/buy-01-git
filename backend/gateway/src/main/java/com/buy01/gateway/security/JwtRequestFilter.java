@@ -1,77 +1,70 @@
-package com.buy01.security;
+package com.buy01.gateway.security;
 
-import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.WebFilter;
+import org.springframework.web.server.WebFilterChain;
+import reactor.core.publisher.Mono;
+import io.jsonwebtoken.Claims;
 import java.util.List;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 
-
-// This filter intercepts each HTTP request to validate the JWT token and set the authentication in the security context.
 @Component
-public class JwtRequestFilter extends OncePerRequestFilter {
+public class JwtRequestFilter implements WebFilter {
 
-    //Exclude certain URLs from JWT validation so it doesn't check for a token on these paths
-    private static final List<String> EXCLUDE_URLS = List.of(
-            "api/auth/login",
-            "api/auth/signup",
-            "api/products"
-    );
-
-    @Autowired // automatically injecting JwtUtil
+    @Autowired
     private JwtUtil jwtUtil;
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-            throws ServletException, IOException {
+    private static final List<String> EXCLUDE_URLS = List.of(
+            "/api/auth/login",
+            "/api/auth/signup",
+            "/api/products"
+    );
 
-        if (isExcluded(request)) {
-            chain.doFilter(request, response);
-            return;
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+        String path = exchange.getRequest().getPath().toString();
+        System.out.println("[DEBUG] Incoming request: " + exchange.getRequest().getMethod() + " " + path);
+
+        if (EXCLUDE_URLS.stream().anyMatch(path::startsWith)) {
+            System.out.println("[DEBUG] Excluded URL, skipping JWT: " + path);
+            return chain.filter(exchange);
         }
 
-        final String authHeader = request.getHeader("Authorization");
+        String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+        System.out.println("[DEBUG] Authorization header: " + authHeader);
+
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
             try {
-                setAuthentication(request, token);
+                Claims claims = jwtUtil.extractClaims(token);
+                String userId = claims.getSubject();
+                String role = claims.get("role", String.class);
+
+                System.out.println("[DEBUG] JWT claims extracted: userId=" + userId + ", role=" + role);
+
+                if (userId != null) {
+                    var authorities = List.of(new SimpleGrantedAuthority(role));
+                    var auth = new UsernamePasswordAuthenticationToken(userId, null, authorities);
+                    return chain.filter(exchange)
+                            .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
+                } else {
+                    System.out.println("[DEBUG] JWT has no subject");
+                }
             } catch (Exception e) {
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
-                return;
+                System.out.println("[DEBUG] JWT validation failed: " + e.getMessage());
+                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                return exchange.getResponse().setComplete();
             }
+        } else {
+            System.out.println("[DEBUG] No JWT token found");
         }
 
-        chain.doFilter(request, response);
+        return chain.filter(exchange);
     }
-
-    private boolean isExcluded(HttpServletRequest request) {
-        return ("GET".equals(request.getMethod()) && EXCLUDE_URLS.contains(request.getRequestURI())) ||
-                request.getServletPath().startsWith("/api/auth");
-    }
-
-    private void setAuthentication(HttpServletRequest request, String token) {
-        Claims claims = jwtUtil.extractClaims(token);
-        String userId = claims.getSubject();
-        String role = claims.get("role", String.class);
-
-        if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            var authorities = List.of(new SimpleGrantedAuthority(role));
-            User principal = new User(userId, "", authorities);
-            var authToken = new UsernamePasswordAuthenticationToken(principal, null, authorities);
-            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(authToken);
-        }
-    }
-
 }
-

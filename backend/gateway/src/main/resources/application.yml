@@ -3,10 +3,13 @@ spring:
     name: gateway
   cloud:
     gateway:
+      loadbalancer:
+        secure: false
       routes:
         - id: user-service
           uri: lb://USER-SERVICE
           predicates:
+            - Path=/api/auth/**
             - Path=/api/users/**
         - id: product-service
           uri: lb://PRODUCT-SERVICE
@@ -27,6 +30,8 @@ server:
     key-alias: localhost
 
 eureka:
+  instance:
+    hostname: localhost
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
@@ -35,3 +40,7 @@ eureka:
 
 jwt:
   secret: very-long-secret-key-string-with-at-least-32-chars
+
+logging:
+  level:
+    org.springframework.security: DEBUG

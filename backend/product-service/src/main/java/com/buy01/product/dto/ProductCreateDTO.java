@@ -22,6 +22,8 @@ public class ProductCreateDTO {
     @Min(value = 1, message = "Quantity must be at least 1")
     private int quantity;
 
+    private String userId;
+
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
@@ -33,4 +35,7 @@ public class ProductCreateDTO {
 
     public int getQuantity() { return quantity; }
     public void setQuantity(int quantity) { this.quantity = quantity; }
+
+    public String getUserId() { return userId; }
+    public void setUserId(String userId) { this.userId = userId; }
 }

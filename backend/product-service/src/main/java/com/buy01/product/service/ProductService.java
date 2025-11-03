@@ -10,14 +10,8 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
-import static com.buy01.product.security.SecurityUtils.getCurrentUserId;
-import static com.buy01.product.security.SecurityUtils.isAdmin;
 import com.buy01.product.dto.ProductUpdateRequest;
 import com.buy01.product.dto.ProductCreateDTO;
-import com.buy01.product.security.SecurityUtils;
-import com.buy01.product.config.AppConfig;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 
@@ -45,7 +39,7 @@ public class ProductService {
         product.setQuantity(request.getQuantity());
 
         // adding current logged-in user
-        product.setUserId(SecurityUtils.getCurrentUserId());
+        product.setUserId(request.getUserId());
 
         return productRepository.save(product);
     }
@@ -80,7 +74,7 @@ public class ProductService {
 
     public void deleteProduct(String productId) {
         Product product = findProductOrThrow(productId);
-        authorizeOwner(product);
+//        authorizeOwner(product);
 
         productRepository.deleteById(productId);
     }
@@ -106,19 +100,19 @@ public class ProductService {
                 .orElseThrow(() -> new RuntimeException("Product not found"));
     }
 
-    // Authorize that the current user is either the owner of the product
-    private void authorizeOwner(Product product) {
-        String currentUserId = getCurrentUserId();
-        if (!product.getUserId().equals(currentUserId) && !isAdmin()) {
-            throw new RuntimeException("Not authorized to perform this action");
-        }
-    }
-
-    // Check if the current user is the owner of the product
-    public boolean isOwner(String productId) {
-        Product product = findProductOrThrow(productId);
-        return product.getUserId().equals(getCurrentUserId());
-    }
+//    // Authorize that the current user is either the owner of the product
+//    private void authorizeOwner(Product product) {
+//        String currentUserId = getCurrentUserId();
+//        if (!product.getUserId().equals(currentUserId) && !isAdmin()) {
+//            throw new RuntimeException("Not authorized to perform this action");
+//        }
+//    }
+//
+//    // Check if the current user is the owner of the product
+//    public boolean isOwner(String productId) {
+//        Product product = findProductOrThrow(productId);
+//        return product.getUserId().equals(getCurrentUserId());
+//    }
 
     public List<String> getProductImages(String productId) {
         try {

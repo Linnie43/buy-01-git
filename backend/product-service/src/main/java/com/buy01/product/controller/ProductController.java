@@ -1,6 +1,7 @@
 package com.buy01.product.controller;
 
 import com.buy01.product.model.Product;
+import com.buy01.product.security.JwtUtil;
 import com.buy01.product.service.ProductService;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -9,7 +10,6 @@ import com.buy01.product.security.SecurityUtils;
 import com.buy01.product.dto.ProductUpdateRequest;
 import com.buy01.product.dto.ProductCreateDTO;
 import jakarta.validation.Valid;
-import com.buy01.product.security.JwtUtil;
 
 @RestController // indicates that this class is a REST controller and handles HTTP requests
 @RequestMapping("/api/products") // base URL for all endpoints in this controller
@@ -17,16 +17,24 @@ public class ProductController {
 
     private final ProductService productService;
     private final JwtUtil jwtUtil;
+    private final SecurityUtils securityUtils;
 
-    public ProductController(ProductService productService,  JwtUtil jwtUtil) {
+    public ProductController(ProductService productService,  JwtUtil jwtUtil, SecurityUtils securityUtils) {
         this.productService = productService;
         this.jwtUtil = jwtUtil;
+        this.securityUtils = securityUtils;
     }
 
     // add new product, only sellers
     @PostMapping
-    public ProductResponseDTO createProduct(@RequestHeader("Authorization") String authHeader,
-                                            @Valid @RequestBody ProductCreateDTO request) {
+    public ProductResponseDTO createProduct(
+            @RequestHeader("Authorization") String authHeader,
+            @Valid @RequestBody ProductCreateDTO request) {
+        String currentUserId = securityUtils.getCurrentUserId(authHeader);
+        System.out.println("currentUserId:" + currentUserId);
+        if (!securityUtils.isAdmin(authHeader)) {
+            request.setUserId(currentUserId);
+        }
         Product saved = productService.createProduct(request);
         String token = jwtUtil.getToken(authHeader);
 
@@ -46,8 +54,8 @@ public class ProductController {
 
     // get all products
     @GetMapping
-    public List<ProductResponseDTO> getAllProducts() {
-        String currentUserId = SecurityUtils.getCurrentUserId();
+    public List<ProductResponseDTO> getAllProducts(@RequestHeader("Authorization") String authHeader) {
+        String currentUserId = securityUtils.getCurrentUserId(authHeader);
         return productService.getAllProducts().stream()
                 .map(p -> {
                     List<String> images = productService.getProductImages(p.getProductId());
@@ -68,8 +76,10 @@ public class ProductController {
 
     // get a specific product by ID
     @GetMapping("/{productId}")
-    public ProductResponseDTO getProductById(@PathVariable String productId) {
-        String currentUserId = SecurityUtils.getCurrentUserId();
+    public ProductResponseDTO getProductById(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable String productId) {
+        String currentUserId = securityUtils.getCurrentUserId(authHeader);
         Product p = productService.getProductById(productId);
         List<String> images = productService.getProductImages(p.getProductId());
 
@@ -87,8 +97,8 @@ public class ProductController {
 
     // get all products of the current logged-in user
     @GetMapping("/my-products")
-    public List<ProductResponseDTO> getMyProducts() {
-        String currentUserId = SecurityUtils.getCurrentUserId();
+    public List<ProductResponseDTO> getMyProducts(@RequestHeader("Authorization") String authHeader) {
+        String currentUserId = securityUtils.getCurrentUserId(authHeader);
         return productService.getAllProducts().stream()
                 .filter(p -> p.getUserId().equals(currentUserId))
                 .map(p -> {
@@ -109,8 +119,10 @@ public class ProductController {
 
     // renew a specific product by ID
     @PutMapping("/{productId}")
-    public Object updateProduct(@PathVariable String productId,
-                                @RequestBody ProductUpdateRequest request) {
+    public Object updateProduct(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable String productId,
+            @RequestBody ProductUpdateRequest request) {
         Product updated = productService.updateProduct(productId, request);
         List<String> images = productService.getProductImages(updated.getProductId());
 

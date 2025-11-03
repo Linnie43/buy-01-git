@@ -2,6 +2,7 @@ package com.buy01.gateway.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -22,16 +23,20 @@ public class JwtRequestFilter implements WebFilter {
 
     private static final List<String> EXCLUDE_URLS = List.of(
             "/user-service/api/auth/login",
-            "/user-service/api/auth/signup",
-            "/product-service/api/products"
+            "/user-service/api/auth/signup"
     );
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         String path = exchange.getRequest().getPath().toString();
+        HttpMethod method = exchange.getRequest().getMethod();
+
         System.out.println("[DEBUG] Incoming request: " + exchange.getRequest().getMethod() + " " + path);
 
-        if (EXCLUDE_URLS.stream().anyMatch(path::startsWith)) {
+        boolean isExcluded = EXCLUDE_URLS.stream().anyMatch(path::startsWith)
+                || (path.startsWith("/product-service/api/products/**") && method == HttpMethod.GET);
+
+        if (isExcluded) {
             System.out.println("[DEBUG] Excluded URL, skipping JWT: " + path);
             return chain.filter(exchange);
         }

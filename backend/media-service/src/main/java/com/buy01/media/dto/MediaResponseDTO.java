@@ -1,4 +1,4 @@
-package com.buy01.dto;
+package com.buy01.media.dto;
 
 public class MediaResponseDTO {
     private String id;

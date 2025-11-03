@@ -1,4 +1,4 @@
-package com.buy01.dto;
+package com.buy01.media.dto;
 
 import jakarta.validation.constraints.NotEmpty;
 import org.springframework.web.multipart.MultipartFile;

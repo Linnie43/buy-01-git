@@ -1,16 +1,14 @@
-package com.buy01.service;
+package com.buy01.media.service;
 
-import com.buy01.exception.ForbiddenException;
-import com.buy01.exception.NotFoundException;
-import com.buy01.model.Product;
-import com.buy01.repository.MediaRepository;
-import com.buy01.exception.FileUploadException;
-import com.buy01.repository.ProductRepository;
+import com.buy01.media.exception.ForbiddenException;
+import com.buy01.media.exception.NotFoundException;
+import com.buy01.media.repository.MediaRepository;
+import com.buy01.media.exception.FileUploadException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
-import com.buy01.model.Media;
+import com.buy01.media.model.Media;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -23,22 +21,15 @@ import java.util.UUID;
 @Service
 public class MediaService {
     private final MediaRepository mediaRepository;
-    private final ProductRepository productRepository;
 
-    public MediaService(MediaRepository mediaRepository, ProductRepository productRepository) throws IOException {
+    public MediaService(MediaRepository mediaRepository) throws IOException {
         this.mediaRepository = mediaRepository;
-        this.productRepository = productRepository;
         Path storagePath = Paths.get("uploads").toAbsolutePath().normalize();
         Files.createDirectories(storagePath);
     }
 
     public Media saveImage(MultipartFile file, String productId, String userId) {
-        // validating that product exists and product ownership
-        Product product = productRepository.findById(productId)
-        .orElseThrow(() -> new NotFoundException("Product not found"));
-        if (!product.getUserId().equals(userId)) {
-            throw new ForbiddenException("You are not the product owner");
-        }
+
         validateFile(file);
 
         String extension = Objects.requireNonNull(file.getOriginalFilename())
@@ -60,13 +51,13 @@ public class MediaService {
         Media media = mediaRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Media not found"));
 
-        // validate ownership
-        Product product = productRepository.findById(media.getProductId())
-                .orElseThrow(() -> new NotFoundException("Product not found"));
-
-        if (!product.getUserId().equals(userId)) {
-            throw new ForbiddenException("You are not the product owner");
-        }
+//        // validate ownership
+//        Product product = productRepository.findById(media.getProductId())
+//                .orElseThrow(() -> new NotFoundException("Product not found"));
+//
+//        if (!product.getUserId().equals(userId)) {
+//            throw new ForbiddenException("You are not the product owner");
+//        }
 
         // delete
         mediaRepository.deleteById(id);

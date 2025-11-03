@@ -1,5 +1,6 @@
 package com.buy01.user.security;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.security.Keys;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
@@ -31,6 +32,18 @@ public class JwtUtil {
 
     public String getToken(String authHeader) {
         return authHeader.startsWith("Bearer ") ? authHeader.substring(7) : authHeader;
+    }
+
+    public Claims extractClaims(String token) {
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (Exception e) {
+            throw new RuntimeException("Invalid JWT token", e);
+        }
     }
 
 }

@@ -1,32 +1,52 @@
-package com.buy01.security;
+package com.buy01.media.security;
 
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import com.buy01.media.security.JwtUtil;
+import io.jsonwebtoken.Claims;
+import org.springframework.stereotype.Component;
 
+@Component
 public class SecurityUtils {
 
-    public static String getCurrentUserId() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) return null;
+    private final JwtUtil jwtUtil;
 
-        Object principal = auth.getPrincipal();
-        if (principal instanceof UserDetails) {
-            return ((UserDetails) principal).getUsername();
-        } else {
-            return principal.toString();
+    public SecurityUtils(JwtUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
+    }
+
+    public String getCurrentUserId(String authHeader) {
+        String userId = null;
+
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            try {
+                Claims claims = jwtUtil.extractClaims(token); // you can use same JwtUtil as in Gateway
+                userId = claims.getSubject();
+            } catch (Exception e) {
+                throw new RuntimeException("Invalid JWT token", e);
+            }
         }
+
+        if (userId == null) {
+            throw new RuntimeException("User not authenticated");
+        }
+
+        return userId;
+
     }
 
     //if the user is admin
-    public static boolean isAdmin() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken)) {
-            return auth.getAuthorities().stream()
-                    .anyMatch(a -> a.getAuthority().equals("ADMIN"));
+    public boolean isAdmin(String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return false;
         }
-        return false;
-    }
 
+        String token = authHeader.substring(7);
+        try {
+            Claims claims = jwtUtil.extractClaims(token);
+            String role = claims.get("role", String.class);
+            return "ADMIN".equals(role);
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

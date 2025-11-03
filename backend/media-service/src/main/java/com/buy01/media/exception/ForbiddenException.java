@@ -1,4 +1,4 @@
-package com.buy01.exception;
+package com.buy01.media.exception;
 
 public class ForbiddenException extends RuntimeException {
     public ForbiddenException(String message) {

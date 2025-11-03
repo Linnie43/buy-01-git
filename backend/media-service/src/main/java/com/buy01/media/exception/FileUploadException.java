@@ -1,4 +1,4 @@
-package com.buy01.exception;
+package com.buy01.media.exception;
 
 public class FileUploadException extends RuntimeException {
     public FileUploadException(String message) {

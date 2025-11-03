@@ -1,6 +1,6 @@
-package com.buy01.repository;
+package com.buy01.media.repository;
 
-import com.buy01.model.Media;
+import com.buy01.media.model.Media;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;

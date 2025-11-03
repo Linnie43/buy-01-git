@@ -1,12 +1,12 @@
-package com.buy01.controller;
+package com.buy01.media.controller;
 
-import com.buy01.dto.MediaCreateDTO;
-import com.buy01.dto.MediaResponseDTO;
-import com.buy01.exception.NotFoundException;
-import com.buy01.model.Media;
-import com.buy01.repository.MediaRepository;
-import com.buy01.service.MediaService;
-import com.buy01.service.UserService;
+import com.buy01.media.dto.MediaCreateDTO;
+import com.buy01.media.dto.MediaResponseDTO;
+import com.buy01.media.exception.NotFoundException;
+import com.buy01.media.security.SecurityUtils;
+import com.buy01.media.model.Media;
+import com.buy01.media.repository.MediaRepository;
+import com.buy01.media.service.MediaService;
 import jakarta.validation.Valid;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -29,14 +29,22 @@ import java.util.concurrent.TimeUnit;
 @RequestMapping("/media")
 public class MediaController {
 
-    private MediaRepository mediaRepository;
-    private MediaService mediaService;
-    private UserService userService;
+    private final MediaRepository mediaRepository;
+    private final MediaService mediaService;
+    private final SecurityUtils securityUtils;
+
+    public MediaController(MediaRepository mediaRepository,MediaService mediaService,SecurityUtils securityUtils) {
+        this.mediaRepository = mediaRepository;
+        this.mediaService = mediaService;
+        this.securityUtils = securityUtils;
+    }
 
     // uploading media to the server, validating and saving metadata to database
     @PostMapping("/images")
-    public ResponseEntity<List<MediaResponseDTO>> uploadImage(@Valid @ModelAttribute MediaCreateDTO dto) {
-        String currentUserId = userService.getCurrentUserId();
+    public ResponseEntity<List<MediaResponseDTO>> uploadImage(
+            @RequestHeader("Authorization") String authHeader,
+            @Valid @ModelAttribute MediaCreateDTO dto) {
+        String currentUserId = securityUtils.getCurrentUserId(authHeader);
         String productId = dto.getProductId();
 
         // Stream files, save them and create a list of MediaResponseDTO for return

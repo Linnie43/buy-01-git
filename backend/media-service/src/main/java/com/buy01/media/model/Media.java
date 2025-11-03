@@ -1,4 +1,4 @@
-package com.buy01.model;
+package com.buy01.media.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;

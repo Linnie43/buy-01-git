@@ -2,8 +2,11 @@ package com.buy01.product.service;
 
 import com.buy01.product.model.Product;
 import com.buy01.product.repository.ProductRepository;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -12,6 +15,10 @@ import static com.buy01.product.security.SecurityUtils.isAdmin;
 import com.buy01.product.dto.ProductUpdateRequest;
 import com.buy01.product.dto.ProductCreateDTO;
 import com.buy01.product.security.SecurityUtils;
+import com.buy01.product.config.AppConfig;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 
 // service is responsible for business logic and data manipulation. It chooses how to handle data and interacts with the repository layer.
@@ -21,10 +28,12 @@ public class ProductService {
 
     @Autowired
     private final ProductRepository productRepository;
+    private final RestTemplate restTemplate;
 
     @Autowired
-    public ProductService(ProductRepository productRepository) {
+    public ProductService(ProductRepository productRepository,  RestTemplate restTemplate) {
         this.productRepository = productRepository;
+        this.restTemplate = restTemplate;
     }
 
     // Create a new product, only USER and ADMIN can create products
@@ -109,5 +118,34 @@ public class ProductService {
     public boolean isOwner(String productId) {
         Product product = findProductOrThrow(productId);
         return product.getUserId().equals(getCurrentUserId());
+    }
+
+    public List<String> getProductImages(String productId) {
+        try {
+            // Headers
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
+
+            // GET image urls via gateway
+            ResponseEntity<String> response = restTemplate.exchange(
+                    "http://gateway:8443/media-service/api/media/productId/" + productId,
+                    HttpMethod.GET,
+                    requestEntity,
+                    String.class
+            );
+
+            if (!response.getStatusCode().is2xxSuccessful()) {
+                throw new RuntimeException("Getting images for productId failed: " + response.getStatusCode());
+            }
+
+            // Deserialize JSON array into List<String>
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.readValue(response.getBody(), new TypeReference<List<String>>() {});
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error getting product images", e);
+        }
     }
 }

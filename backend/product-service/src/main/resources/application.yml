@@ -9,11 +9,11 @@ spring:
 server:
   port: 8445
   ssl:
-    enabled: true
-    key-store: classpath:ssl/backend.p12
-    key-store-password: password
-    key-store-type: PKCS12
-    key-alias: localhost
+    enabled: false
+#    key-store: classpath:ssl/backend.p12
+#    key-store-password: password
+#    key-store-type: PKCS12
+#    key-alias: localhost
 
 eureka:
   instance:

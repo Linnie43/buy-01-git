@@ -9,30 +9,36 @@ import com.buy01.product.security.SecurityUtils;
 import com.buy01.product.dto.ProductUpdateRequest;
 import com.buy01.product.dto.ProductCreateDTO;
 import jakarta.validation.Valid;
+import com.buy01.product.security.JwtUtil;
 
 @RestController // indicates that this class is a REST controller and handles HTTP requests
-@RequestMapping("/products") // base URL for all endpoints in this controller
+@RequestMapping("/api/products") // base URL for all endpoints in this controller
 public class ProductController {
 
     private final ProductService productService;
+    private final JwtUtil jwtUtil;
 
-    public ProductController(ProductService productService) {
+    public ProductController(ProductService productService,  JwtUtil jwtUtil) {
         this.productService = productService;
+        this.jwtUtil = jwtUtil;
     }
 
     // add new product, only sellers
     @PostMapping
-    public ProductResponseDTO createProduct(@Valid @RequestBody ProductCreateDTO request) {
+    public ProductResponseDTO createProduct(@RequestHeader("Authorization") String authHeader,
+                                            @Valid @RequestBody ProductCreateDTO request) {
         Product saved = productService.createProduct(request);
-        String sellerName = userService.findByIdOrThrow(saved.getUserId()).getName();
-        List <Media> images = mediaRepository.getMediaByProductId(saved.getProductId());
+        String token = jwtUtil.getToken(authHeader);
+
+//        List<String> images = productService.getProductImages(saved.getProductId());
+        List<String> images = null;
         return new ProductResponseDTO(
                 saved.getProductId(),
                 saved.getName(),
                 saved.getDescription(),
                 saved.getPrice(),
                 saved.getQuantity(),
-                sellerName,
+                saved.getUserId(),
                 images,
                 true
         );
@@ -44,17 +50,16 @@ public class ProductController {
         String currentUserId = SecurityUtils.getCurrentUserId();
         return productService.getAllProducts().stream()
                 .map(p -> {
-                    String ownerId = userService.findByIdOrThrow(p.getUserId()).getId();
-                    List<Media> images = mediaRepository.getMediaByProductId(p.getProductId());
+                    List<String> images = productService.getProductImages(p.getProductId());
                     return new ProductResponseDTO(
                             p.getProductId(),
                             p.getName(),
                             p.getDescription(),
                             p.getPrice(),
                             p.getQuantity(),
-                            ownerId,
+                            p.getUserId(),
                             images,
-                            ownerId.equals(currentUserId)
+                            p.getUserId().equals(currentUserId)
                     );
                 })
                 .toList();
@@ -66,8 +71,7 @@ public class ProductController {
     public ProductResponseDTO getProductById(@PathVariable String productId) {
         String currentUserId = SecurityUtils.getCurrentUserId();
         Product p = productService.getProductById(productId);
-        String ownerId = userService.findByIdOrThrow(p.getUserId()).getId();
-        List<Media> images = mediaRepository.getMediaByProductId(p.getProductId());
+        List<String> images = productService.getProductImages(p.getProductId());
 
         return new ProductResponseDTO(
                 p.getProductId(),
@@ -75,9 +79,9 @@ public class ProductController {
                 p.getDescription(),
                 p.getPrice(),
                 p.getQuantity(),
-                ownerId,
+                p.getUserId(),
                 images,
-                ownerId.equals(currentUserId)
+                p.getUserId().equals(currentUserId)
         );
     }
 
@@ -88,15 +92,14 @@ public class ProductController {
         return productService.getAllProducts().stream()
                 .filter(p -> p.getUserId().equals(currentUserId))
                 .map(p -> {
-                    String sellerName = userService.findByIdOrThrow(p.getUserId()).getName();
-                    List<Media> images = mediaRepository.getMediaByProductId(p.getProductId());
+                    List<String> images = productService.getProductImages(p.getProductId());
                     return new ProductResponseDTO(
                             p.getProductId(),
                             p.getName(),
                             p.getDescription(),
                             p.getPrice(),
                             p.getQuantity(),
-                            sellerName,
+                            p.getUserId(),
                             images,
                             true
                     );
@@ -109,8 +112,7 @@ public class ProductController {
     public Object updateProduct(@PathVariable String productId,
                                 @RequestBody ProductUpdateRequest request) {
         Product updated = productService.updateProduct(productId, request);
-        String sellerName = userService.findByIdOrThrow(updated.getUserId()).getName();
-        List<Media> images = mediaRepository.getMediaByProductId(updated.getProductId());
+        List<String> images = productService.getProductImages(updated.getProductId());
 
             return new ProductResponseDTO(
                     updated.getProductId(),
@@ -118,7 +120,7 @@ public class ProductController {
                     updated.getDescription(),
                     updated.getPrice(),
                     updated.getQuantity(),
-                    sellerName,
+                    updated.getUserId(),
                     images,
                     true
             );

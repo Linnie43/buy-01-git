@@ -35,8 +35,14 @@ public class GatewaySecurityConfig {
                 .httpBasic(httpBasic -> httpBasic.disable())
                 .formLogin(form -> form.disable())
                 .authorizeExchange(auth -> auth
+                        // public endpoints
                         .pathMatchers("/user-service/api/auth/**").permitAll()
                         .pathMatchers(HttpMethod.GET, "/product-service/api/products/**").permitAll()
+
+                        // User endpoints
+                        .pathMatchers(HttpMethod.GET, "/user-service/api/users/me").hasAnyRole("CLIENT", "SELLER")
+                        .pathMatchers(HttpMethod.GET, "/user-service/api/users/**").hasRole("ADMIN") // includes /users and /users/{id}
+
                         .anyExchange().authenticated()
                 )
                 .addFilterAt(jwtRequestFilter, SecurityWebFiltersOrder.AUTHENTICATION);
@@ -46,14 +52,16 @@ public class GatewaySecurityConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+        System.out.println("CorsConfigurationSource activated");
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("https://localhost:4200"));
+        config.setAllowedOrigins(List.of("http://localhost:4200"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
+        System.out.println("Source after cors: " +  source);
         return source;
     }
 }

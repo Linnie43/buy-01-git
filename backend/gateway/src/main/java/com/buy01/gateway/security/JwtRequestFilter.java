@@ -1,6 +1,7 @@
 package com.buy01.gateway.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.autoconfigure.observation.ObservationProperties;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -34,7 +35,7 @@ public class JwtRequestFilter implements WebFilter {
         System.out.println("[DEBUG] Incoming request: " + exchange.getRequest().getMethod() + " " + path);
 
         boolean isExcluded = EXCLUDE_URLS.stream().anyMatch(path::startsWith)
-                || (path.startsWith("/product-service/api/products/**") && method == HttpMethod.GET);
+                || (path.startsWith("/product-service/api/products") && (method == HttpMethod.GET || method == HttpMethod.OPTIONS));
 
         if (isExcluded) {
             System.out.println("[DEBUG] Excluded URL, skipping JWT: " + path);
@@ -54,7 +55,7 @@ public class JwtRequestFilter implements WebFilter {
                 System.out.println("[DEBUG] JWT claims extracted: userId=" + userId + ", role=" + role);
 
                 if (userId != null) {
-                    var authorities = List.of(new SimpleGrantedAuthority(role));
+                    var authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
                     var auth = new UsernamePasswordAuthenticationToken(userId, null, authorities);
                     return chain.filter(exchange)
                             .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));

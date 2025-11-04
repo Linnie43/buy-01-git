@@ -17,7 +17,7 @@ interface DecodedToken {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'https://localhost:8443/auth';
+  private apiUrl = 'http://localhost:8443/user-service/api/auth';
 
   constructor(private http: HttpClient) {}
 

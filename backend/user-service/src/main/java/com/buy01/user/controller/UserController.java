@@ -6,6 +6,7 @@ import com.buy01.user.exception.NotFoundException;
 import com.buy01.user.model.Role;
 import com.buy01.user.model.User;
 import com.buy01.user.repository.UserRepository;
+import com.buy01.user.security.SecurityUtils;
 import com.buy01.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -22,12 +23,21 @@ public class UserController {
     private UserService userService;
     private UserRepository userRepository;
     private JwtUtil jwtUtil;
+    private SecurityUtils securityUtils;
+
+    public UserController(UserRepository userRepository, JwtUtil jwtUtil, SecurityUtils securityUtils) {
+        this.userRepository = userRepository;
+        this.jwtUtil = jwtUtil;
+        this.securityUtils = securityUtils;
+    }
 
     // finding user by id
     @GetMapping("/{userId}")
-    public UserResponseDTO getUserById(@PathVariable String userId) {
+    public UserResponseDTO getUserById(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable String userId) {
         // check current user
-        String currentUserId = userService.getCurrentUserId();
+        String currentUserId = securityUtils.getCurrentUserId(authHeader);
 
         User user = userService.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -43,10 +53,11 @@ public class UserController {
     // updating user by id, only admin
     @PutMapping("/{userId}")
     public UserResponseDTO updateUser(
+            @RequestHeader("Authorization") String authHeader,
             @PathVariable String userId,
             @RequestBody UserUpdateRequest request) {
         // check current user
-        String currentUserId = userService.getCurrentUserId();
+        String currentUserId = securityUtils.getCurrentUserId(authHeader);
 
         User updatedUser = userService.updateUser(userId, request);
         return new UserResponseDTO(
@@ -78,9 +89,12 @@ public class UserController {
 
     // endpoint to get current logged-in user details (profile)
     @GetMapping("/me")
-    public UserResponseDTO getCurrentUser() {
-        String currentUserId = userService.getCurrentUserId();
+    public UserResponseDTO getCurrentUser(
+            @RequestHeader("Authorization") String authHeader
+            ) {
+        String currentUserId = securityUtils.getCurrentUserId(authHeader);
         User user = userService.findById(currentUserId).orElseThrow();
+
         return new UserResponseDTO(
                 user.getName(),
                 user.getEmail(),
@@ -92,9 +106,11 @@ public class UserController {
 
     // endpoint for seller to update their avatar
     @PutMapping("/me")
-    public UserResponseDTO updateCurrentUser(@RequestHeader("Authorization") String authHeader,
-                                             @RequestBody SellerUpdateRequest request) {
-        String currentUserId = userService.getCurrentUserId();
+    public UserResponseDTO updateCurrentUser(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestBody SellerUpdateRequest request
+    ) {
+        String currentUserId = securityUtils.getCurrentUserId(authHeader);
 
         User user = userRepository.findUserById(currentUserId)
                 .orElseThrow(() -> new NotFoundException("User not found"));
@@ -124,7 +140,7 @@ public class UserController {
 
     @DeleteMapping("/me")
     public void deleteUser(@RequestHeader("Authorization") String authHeader) {
-        String currentUserId = userService.getCurrentUserId();
+        String currentUserId = securityUtils.getCurrentUserId(authHeader);
         String token = jwtUtil.getToken(authHeader);
         userService.deleteUser(currentUserId, token);
     }

@@ -13,6 +13,9 @@ public class UserResponseDTO {
     public UserResponseDTO(String name, String email,  Role role, String avatar, Boolean ownProfile) {
         this.name = name;
         this.email = email;
+        this.role = role;
+        this.avatar = avatar;
+        this.ownProfile = ownProfile;
     }
 
     public String getName() { return name; }

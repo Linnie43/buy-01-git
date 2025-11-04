@@ -29,6 +29,7 @@ public class UserService {
     private RestTemplate restTemplate;
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
+    private SecurityUtils securityUtils;
 
     public User createUser(User user) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -57,11 +58,6 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    // method to get current logged-in user id
-    public String getCurrentUserId() {
-        return SecurityUtils.getCurrentUserId();
-    }
-
     // method to find user by id, needs validation what information is sent if own profile
     public Optional<User> findById(String userId) { // optional means it may or may not contain a non-null value
         return userRepository.findById(userId);
@@ -80,9 +76,6 @@ public class UserService {
 
     // method to update user, only admin can update currently
     public User updateUser(String userId, UserUpdateRequest request) {
-        if (!userId.equals(SecurityUtils.getCurrentUserId())) {
-            throw new RuntimeException("Forbidden - user can only modify their own profile");
-        }
 
         // Fetch existing user from DB
         User existingUser = userRepository.findById(userId).orElseThrow();
@@ -141,9 +134,7 @@ public class UserService {
 
     // sending an API call for users products to be deleted and then deletes the user
     public void deleteUser(String userId, String token) {
-        if (!userId.equals(SecurityUtils.getCurrentUserId())) {
-            throw new RuntimeException("Forbidden - user can only modify their own profile");
-        }
+
         // Delete all user's products via gateway
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + token); // forward user's JWT

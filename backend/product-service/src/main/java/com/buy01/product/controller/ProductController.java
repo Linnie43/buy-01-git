@@ -54,11 +54,11 @@ public class ProductController {
 
     // get all products
     @GetMapping
-    public List<ProductResponseDTO> getAllProducts(@RequestHeader("Authorization") String authHeader) {
-        String currentUserId = securityUtils.getCurrentUserId(authHeader);
+    public List<ProductResponseDTO> getAllProducts() {
         return productService.getAllProducts().stream()
                 .map(p -> {
-                    List<String> images = productService.getProductImages(p.getProductId());
+//                    List<String> images = productService.getProductImages(p.getProductId());
+                    List<String> images = null;
                     return new ProductResponseDTO(
                             p.getProductId(),
                             p.getName(),
@@ -67,7 +67,7 @@ public class ProductController {
                             p.getQuantity(),
                             p.getUserId(),
                             images,
-                            p.getUserId().equals(currentUserId)
+                            false
                     );
                 })
                 .toList();

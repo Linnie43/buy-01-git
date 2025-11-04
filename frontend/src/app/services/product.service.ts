@@ -20,7 +20,7 @@ export class ProductService {
 //       { name: 'Headphones', price: 199, image: 'https://via.placeholder.com/150' }
 //     ];
 
-  private apiUrl = 'https://localhost:8443/products'; // endpoint
+  private apiUrl = 'http://localhost:8443/product-service/api/products'; // endpoint
 
   constructor(private http: HttpClient) {}
 //   constructor() {}

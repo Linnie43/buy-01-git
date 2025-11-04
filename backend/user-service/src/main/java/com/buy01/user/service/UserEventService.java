@@ -1,6 +1,7 @@
 package com.buy01.user.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -10,9 +11,11 @@ public class UserEventService {
     @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
 
-    private static final String TOPIC = "user-events";
+    @Value("${kafka.topic.user-deleted}")
+    private String userDeletedTopic;
 
-    public void sendUserDeletedEvent(String userId) {
-        kafkaTemplate.send(TOPIC, "DELETE_USER:" + userId);
+    public void publishUserDeletedEvent(String userId) {
+        System.out.println("Kafka called with user deleted event");
+        kafkaTemplate.send(userDeletedTopic, userId);
     }
 }

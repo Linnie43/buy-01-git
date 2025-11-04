@@ -30,6 +30,8 @@ public class UserService {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
     private SecurityUtils securityUtils;
+    @Autowired
+    private UserEventService userEventService;
 
     public User createUser(User user) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -135,19 +137,8 @@ public class UserService {
     // sending an API call for users products to be deleted and then deletes the user
     public void deleteUser(String userId, String token) {
 
-        // Delete all user's products via gateway
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + token); // forward user's JWT
-        HttpEntity<Void> entity = new HttpEntity<>(headers);
-
-        // Call the gateway route for product deletion
-        restTemplate.exchange(
-                "https://gateway:8443/api/products/user/" + userId,
-                HttpMethod.DELETE,
-                entity,
-                Void.class
-        );
         userRepository.deleteById(userId);
+        userEventService.publishUserDeletedEvent(userId);
     }
 
 // Check if email is unique for that role, ignoring the user themselves

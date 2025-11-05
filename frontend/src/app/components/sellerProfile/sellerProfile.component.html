@@ -1,1 +1,10 @@
-<p>sellerprofile works!</p>
+<div class="seller-profile">
+  <img *ngIf="user; else loading" src="../assets/default.jpg" alt="Profile" class="profile-img" />
+  <div *ngIf="user; else loading">
+    <p>{{ user.name }}</p>
+  </div>
+
+  <ng-template #loading>
+    <p>Loading user profile...</p>
+  </ng-template>
+</div>

@@ -13,7 +13,7 @@ export const routes: Routes = [
   { path: 'auth', component: AuthComponent },
   { path: 'products/:id', component: ProductViewComponent },
   { path: 'products/update/:id', component: UpdateProductComponent },
-  { path: 'seller-profile', component: SellerProfileComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'seller' }  },
-  { path: 'client-profile', component: ClientProfileComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'client' }  },
+  { path: 'seller-profile', component: SellerProfileComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'SELLER' }  },
+  { path: 'client-profile', component: ClientProfileComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'CLIENT' }  },
   { path: '**', redirectTo: '/auth' }
 ];

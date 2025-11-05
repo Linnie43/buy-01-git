@@ -1,5 +1,6 @@
 package com.buy01.product.service;
 
+import com.buy01.product.exception.ForbiddenException;
 import com.buy01.product.model.Product;
 import com.buy01.product.repository.ProductRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -7,8 +8,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Optional;
 
 import com.buy01.product.dto.ProductUpdateRequest;
 import com.buy01.product.dto.ProductCreateDTO;
@@ -23,6 +26,8 @@ public class ProductService {
     @Autowired
     private final ProductRepository productRepository;
     private final RestTemplate restTemplate;
+    @Autowired
+    private ProductEventService productEventService;
 
     @Autowired
     public ProductService(ProductRepository productRepository,  RestTemplate restTemplate) {
@@ -32,9 +37,18 @@ public class ProductService {
 
     // Create a new product, only USER and ADMIN can create products
     public Product createProduct(ProductCreateDTO request) {
+        // validate name
+        validateProductName(request.getName());
+        // validate description
+        validateProductDescription(request.getDescription());
+        // validate price
+        validateProductPrice(request.getPrice());
+        // validate quantity
+        validateProductQuantity(request.getQuantity());
+
         Product product = new Product();
-        product.setName(request.getName());
-        product.setDescription(request.getDescription());
+        product.setName(request.getName().trim());
+        product.setDescription(request.getDescription().trim());
         product.setPrice(request.getPrice());
         product.setQuantity(request.getQuantity());
 
@@ -49,34 +63,72 @@ public class ProductService {
         return productRepository.findAll();
     }
 
-    public List<Product> getAllProductsByUserId(String userId) {
-        return productRepository.findAllProductsByUserId(userId);
-    }
-
-    @PermitAll
+    // Get product by id, public endpoint
     public Product getProductById(String productId) {
         return findProductOrThrow(productId);
     }
 
+    // Currently limited to ADMIN
+    public List<Product> getAllProductsByUserId(String userId) {
+        // validate that admin
+
+        return productRepository.findAllProductsByUserId(userId);
+    }
+
     // Update product, only ADMIN or the owner of the product can update
-    public Product updateProduct(String productId, ProductUpdateRequest request) {
+    public Product updateProduct(String productId, ProductUpdateRequest request, String userId, boolean isAdmin) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Not found"));
 
-        product.setName(request.getName());
-        product.setDescription(request.getDescription());
-        product.setPrice(request.getPrice());
-        product.setQuantity(request.getQuantity());
+        // check if the user has right to update the product (Admin or product owner)
+        if (!isAdmin || !userId.equals(product.getUserId())) {
+            throw new ForbiddenException("Only admin or product owner can update product");
+        }
+        if (request.getName() != null && !request.getName().trim().isEmpty()) {
+            validateProductName(request.getName());
+            product.setName(request.getName().trim());
+        }
+        if (request.getDescription() != null && !request.getDescription().trim().isEmpty()) {
+            validateProductDescription(request.getDescription());
+            product.setDescription(request.getDescription().trim());
+        }
+
+        if (request.getPrice() != null) {
+            validateProductPrice(request.getPrice());
+            product.setPrice(request.getPrice());
+        }
+
+        if (request.getQuantity() != null) {
+            validateProductQuantity(request.getQuantity());
+            product.setQuantity(request.getQuantity());
+        }
 
         return productRepository.save(product);
     }
 
 
-    public void deleteProduct(String productId) {
-        Product product = findProductOrThrow(productId);
-//        authorizeOwner(product);
+    // Deleting product, accessible only by ADMIN or product owner
+    public void deleteProduct(String productId, String userId, boolean isAdmin) {
+        Optional<Product> product = productRepository.findById(productId);
+
+        // validate that user has role ADMIN or is the product owner
+        if (!isAdmin || !userId.equals(product.get().getUserId())) {
+            throw new ForbiddenException("Only admin or product owner can delete product");
+        }
 
         productRepository.deleteById(productId);
+        productEventService.publishProductDeletedEvent(productId);
+    }
+
+    // Delete all products from a specific user.
+    // Called through kafka, consumer trusts that the action is already authorized and authenticated
+    public void deleteProductsByUserId(String userId) {
+        List<Product> products = productRepository.findAllProductsByUserId(userId);
+        for (Product product : products) {
+            String productId = product.getProductId();
+            productRepository.delete(product);
+            productEventService.publishProductDeletedEvent(productId); // publish the event of deleted productId
+        }
     }
 
     // Helper methods
@@ -94,25 +146,45 @@ public class ProductService {
         }
     }
 
+    private void validateProductName(String productName) {
+        if (productName == null || productName.isBlank()) {
+            throw new IllegalArgumentException("Product name is required");
+        }
+        if (productName.length() < 5 || productName.length() > 255) {
+            throw new IllegalArgumentException("Product name must be between 5 and 255 characters");
+        }
+
+        if (!productName.matches("^[A-Za-z0-9 ]+$")) {
+            throw new IllegalArgumentException("Product name must contain only alphanumeric characters");
+        }
+    }
+
+    private void validateProductDescription(String productDescription) {
+        if (productDescription.length() > 500) {
+            throw new IllegalArgumentException("Product description must be under 500 characters");
+        }
+    }
+
+    private void validateProductPrice(Double productPrice) {
+        if (productPrice == null || productPrice <= 0) {
+            throw new IllegalArgumentException("Product price must be over 0");
+        }
+        if (productPrice > 100000) {
+            throw new IllegalArgumentException("Product price must be under 100000");
+        }
+    }
+
+    private void validateProductQuantity(Integer productQuantity) {
+        if (productQuantity == null || productQuantity < 0) {
+            throw new IllegalArgumentException("Product quantity can't be negative or empty");
+        }
+    }
+
     // Find product by ID or throw exception if not found
     private Product findProductOrThrow(String productId) {
         return productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
     }
-
-//    // Authorize that the current user is either the owner of the product
-//    private void authorizeOwner(Product product) {
-//        String currentUserId = getCurrentUserId();
-//        if (!product.getUserId().equals(currentUserId) && !isAdmin()) {
-//            throw new RuntimeException("Not authorized to perform this action");
-//        }
-//    }
-//
-//    // Check if the current user is the owner of the product
-//    public boolean isOwner(String productId) {
-//        Product product = findProductOrThrow(productId);
-//        return product.getUserId().equals(getCurrentUserId());
-//    }
 
     public List<String> getProductImages(String productId) {
         try {

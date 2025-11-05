@@ -97,7 +97,9 @@ public class ProductController {
 
     // get all products of the current logged-in user
     @GetMapping("/my-products")
-    public List<ProductResponseDTO> getMyProducts(@RequestHeader("Authorization") String authHeader) {
+    public List<ProductResponseDTO> getMyProducts(
+            @RequestHeader("Authorization") String authHeader
+    ) {
         String currentUserId = securityUtils.getCurrentUserId(authHeader);
         return productService.getAllProducts().stream()
                 .filter(p -> p.getUserId().equals(currentUserId))
@@ -123,7 +125,10 @@ public class ProductController {
             @RequestHeader("Authorization") String authHeader,
             @PathVariable String productId,
             @RequestBody ProductUpdateRequest request) {
-        Product updated = productService.updateProduct(productId, request);
+        String currentUserId = securityUtils.getCurrentUserId(authHeader);
+        boolean isAdmin = securityUtils.isAdmin(authHeader);
+
+        Product updated = productService.updateProduct(productId, request, currentUserId, isAdmin);
         List<String> images = productService.getProductImages(updated.getProductId());
 
             return new ProductResponseDTO(
@@ -134,14 +139,20 @@ public class ProductController {
                     updated.getQuantity(),
                     updated.getUserId(),
                     images,
-                    true
+                    updated.getUserId().equals(currentUserId)
             );
     }
 
 
     // delete a specific product by ID
     @DeleteMapping("/{productId}")
-    public void deleteProduct(@PathVariable String productId) {
-        productService.deleteProduct(productId);
+    public void deleteProduct(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable String productId
+    ) {
+        String currentUserId = securityUtils.getCurrentUserId(authHeader);
+        boolean isAdmin = securityUtils.isAdmin(authHeader);
+
+        productService.deleteProduct(productId,  currentUserId, isAdmin);
     }
 }

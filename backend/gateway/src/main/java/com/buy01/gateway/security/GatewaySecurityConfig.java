@@ -38,10 +38,19 @@ public class GatewaySecurityConfig {
                         // public endpoints
                         .pathMatchers("/user-service/api/auth/**").permitAll()
                         .pathMatchers(HttpMethod.GET, "/product-service/api/products/**").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/media-service/api/media/images/**").permitAll()
 
                         // User endpoints
-                        .pathMatchers(HttpMethod.GET, "/user-service/api/users/me").hasAnyRole("CLIENT", "SELLER")
-                        .pathMatchers(HttpMethod.GET, "/user-service/api/users/**").hasRole("ADMIN") // includes /users and /users/{id}
+                        .pathMatchers("/user-service/api/users/me").hasAnyRole("CLIENT", "SELLER")
+                        .pathMatchers("/user-service/api/users/**").hasRole("ADMIN") // includes /users and /users/{id}
+
+                        // Product endpoints
+                        .pathMatchers("/product-service/api/products/my-products").hasRole("SELLER")
+                        .pathMatchers("/product-service/api/products/**").hasAnyRole("SELLER", "ADMIN")
+
+                        // Media endpoints
+                        .pathMatchers("/media-service/api/media/avatar/**").hasAnyRole("SELLER", "ADMIN")
+                        .pathMatchers("media-service/api/media/images/**").hasAnyRole("SELLER", "ADMIN")
 
                         .anyExchange().authenticated()
                 )

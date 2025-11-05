@@ -11,10 +11,14 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
     consumer:
-      group-id: my-group
+      group-id: product-service-group
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
+kafka:
+  topic:
+    user-deleted: USER_DELETED
+    product-deleted: PRODUCT_DELETED
 
 server:
   port: 8081

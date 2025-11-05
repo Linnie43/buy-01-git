@@ -1,26 +1,32 @@
 package com.buy01.product.dto;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.*;
 
 // DTO for updating an existing product - what the client sends in the request body
 public class ProductUpdateRequest {
+
+    @Pattern(regexp = "^[A-Za-z0-9 ]+$", message = "Product name can only contain letters, numbers, and spaces")
     private String name;
+
+    @Size(max = 500, message = "Description can be at most 500 characters")
     private String description;
 
     @Min(value = 1, message = "Price must be at least 1")
     @Max(value = 100000, message = "Price cannot exceed 100000")
     private Double price;
 
-    @Min(value = 1, message = "Price must be at least 1")
-    private int quantity;
+    @PositiveOrZero(message = "Quantity cannot be negative")
+    private Integer quantity;
+
+    private String userId;
 
     public ProductUpdateRequest() {}
-    public ProductUpdateRequest(String name, String description, Double price, int quantity) {
+    public ProductUpdateRequest(String name, String description, Double price, Integer quantity,  String userId) {
         this.name = name;
         this.description = description;
         this.price = price;
         this.quantity = quantity;
+        this.userId = userId;
     }
 
     public String getName() { return name; }
@@ -32,7 +38,10 @@ public class ProductUpdateRequest {
     public Double getPrice() { return price; }
     public void setPrice(Double price) { this.price = price; }
 
-    public int getQuantity() { return quantity; }
-    public void setQuantity(int quantity) { this.quantity = quantity; }
+    public Integer getQuantity() { return quantity; }
+    public void setQuantity(Integer quantity) { this.quantity = quantity; }
+
+    public String getUserId() { return userId; }
+    public void setUserId(String userId) { this.userId = userId; }
 }
 

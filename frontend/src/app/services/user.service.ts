@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { BASE_URL } from '../constants';
+import { BASE_URL } from '../constants/constants';
+import { HttpHeaders } from '@angular/common/http';
 
 export interface User {
   name: string;

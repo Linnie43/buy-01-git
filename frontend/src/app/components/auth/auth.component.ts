@@ -51,6 +51,7 @@ export class AuthComponent {
       next: (res) => {
         console.log('Login success:', res);
         this.router.navigate(['/']); // redirect after login
+        //does it need to be reload?       window.location.reload();
       },
       error: (err) => {
         console.error('Login error:', err);

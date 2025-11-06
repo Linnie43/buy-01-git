@@ -14,6 +14,8 @@ interface AuthResponse {
 
 interface DecodedToken {
   sub: string; // The user's unique ID
+  userId?: string;
+  id?: string;
   role: string;
   iat: number;
   exp: number;
@@ -25,6 +27,7 @@ interface DecodedToken {
 export class AuthService {
   private apiUrl = `${BASE_URL}/user-service/api/auth`;
   private decodedToken: DecodedToken | null = null;
+  private token: string | null = null;
 
   constructor(
     private http: HttpClient,
@@ -51,17 +54,26 @@ export class AuthService {
       return this.decodedToken ? this.decodedToken.role : null;
     }
 
+  // synchronous getter for interceptor and other callers
+  getToken(): string | null {
+      return this.token ?? localStorage.getItem('token');
+    }
 
   signup(userData: any): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/signup`, userData);
-  }
+    }
 
   login(credentials: any): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(
       tap(res => {
         if (res.token) {
           localStorage.setItem('token', res.token);
-          this.decodedToken = jwtDecode<DecodedToken>(res.token);
+          try {
+            this.decodedToken = jwtDecode<DecodedToken>(res.token);
+            } catch (error) {
+              console.error('Error decoding token on login:', error);}
+              this.decodedToken = null;
+
         }
       })
     );

@@ -31,7 +31,9 @@ ngOnInit(): void {
   const productId = this.route.snapshot.paramMap.get('id');
   if (productId) {
     this.productService.getProductById(productId).subscribe({
-      next: (data: Product) => (this.product = data),
+      next: (data: Product) => {
+        this.product = data;
+        },
       error: (err: unknown) => console.error('Error fetching product:', err)
     });
   }

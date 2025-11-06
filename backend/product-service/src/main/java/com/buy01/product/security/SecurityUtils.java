@@ -22,6 +22,7 @@ public class SecurityUtils {
                 Claims claims = jwtUtil.extractClaims(token); // you can use same JwtUtil as in Gateway
                 userId = claims.getSubject();
             } catch (Exception e) {
+                System.out.println("FAILS IN GET USERID");
                 throw new RuntimeException("Invalid JWT token", e);
             }
         }

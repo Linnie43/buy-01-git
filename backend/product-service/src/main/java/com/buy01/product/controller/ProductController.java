@@ -78,9 +78,15 @@ public class ProductController {
     // get a specific product by ID
     @GetMapping("/{productId}")
     public ProductResponseDTO getProductById(
-            @RequestHeader("Authorization") String authHeader,
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable String productId) {
-        String currentUserId = securityUtils.getCurrentUserId(authHeader);
+
+        String currentUserId = null;
+
+        if (authHeader != null) {
+            currentUserId = securityUtils.getCurrentUserId(authHeader);
+        }
+        System.out.println("Current user id getting product: " + currentUserId);
         Product p = productService.getProductById(productId);
 //        List<String> images = productService.getProductImages(p.getProductId());
         List<String> images = null;
@@ -93,7 +99,7 @@ public class ProductController {
                 p.getQuantity(),
                 p.getUserId(),
                 images,
-                currentUserId.equals(p.getUserId())
+                currentUserId != null && currentUserId.equals(p.getUserId())
         );
     }
 

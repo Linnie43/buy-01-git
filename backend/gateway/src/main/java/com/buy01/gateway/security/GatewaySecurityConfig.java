@@ -46,11 +46,13 @@ public class GatewaySecurityConfig {
 
                         // Product endpoints
                         .pathMatchers("/product-service/api/products/my-products").hasRole("SELLER")
-                        .pathMatchers("/product-service/api/products/**").hasAnyRole("SELLER", "ADMIN")
+                        .pathMatchers(HttpMethod.POST, "/product-service/api/products/**").hasAnyRole("SELLER", "ADMIN")
+                        .pathMatchers(HttpMethod.PUT, "/product-service/api/products/**").hasAnyRole("SELLER", "ADMIN")
+                        .pathMatchers(HttpMethod.DELETE, "/product-service/api/products/**").hasAnyRole("SELLER", "ADMIN")
 
                         // Media endpoints
                         .pathMatchers("/media-service/api/media/avatar/**").hasAnyRole("SELLER", "ADMIN")
-                        .pathMatchers("media-service/api/media/images/**").hasAnyRole("SELLER", "ADMIN")
+                        .pathMatchers("/media-service/api/media/images/**").hasAnyRole("SELLER", "ADMIN")
 
                         .anyExchange().authenticated()
                 )

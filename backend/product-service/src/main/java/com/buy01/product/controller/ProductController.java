@@ -79,7 +79,8 @@ public class ProductController {
     public ProductResponseDTO getProductById(
             @PathVariable String productId) {
         Product p = productService.getProductById(productId);
-        List<String> images = productService.getProductImages(p.getProductId());
+//        List<String> images = productService.getProductImages(p.getProductId());
+        List<String> images = null;
 
         return new ProductResponseDTO(
                 p.getProductId(),

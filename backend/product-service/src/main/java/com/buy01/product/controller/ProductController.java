@@ -77,7 +77,9 @@ public class ProductController {
     // get a specific product by ID
     @GetMapping("/{productId}")
     public ProductResponseDTO getProductById(
+            @RequestHeader("Authorization") String authHeader,
             @PathVariable String productId) {
+        String currentUserId = securityUtils.getCurrentUserId(authHeader);
         Product p = productService.getProductById(productId);
 //        List<String> images = productService.getProductImages(p.getProductId());
         List<String> images = null;
@@ -90,7 +92,7 @@ public class ProductController {
                 p.getQuantity(),
                 p.getUserId(),
                 images,
-                false
+                currentUserId.equals(p.getUserId())
         );
     }
 

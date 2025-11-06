@@ -1,9 +1,12 @@
-# LetsPlay
+# Buy-01 Backend
 
 Java and Spring Boot project that implements 
-- **user authentication**, 
-- **product management**, 
-- and role-based access (**admin vs regular users**).  
+- **discovery service (Eureka)**,
+- **gateway service**
+- **three microservices**:
+  - **user-service**, 
+  - **product-service**, 
+  - **media-service**  
 
 The project uses **MongoDB** as a database and **Spring Security** for authentication and authorization.
 
@@ -25,7 +28,7 @@ The project uses **MongoDB** as a database and **Spring Security** for authentic
 ## 📂 Project structure
 
 ```bash
-src/main/java/com/letsplay
+src/main/java/com/buy01
 ├── controller        # REST controllers
 │   ├── UserController.java
 │   └── ProductController.java
@@ -77,16 +80,19 @@ src/main/java/com/letsplay
 
 ---
 
-## ⚙️ How to run
+## ⚙️ How to run the backend
 
 1. **Clone the repository**
    ```bash
    git clone https://github.com/Linnie43/buy-01-git.git
-   cd buy-01-git
+   cd buy-01-git/backend
+   ```
 
-2. **Set up MongoDB**
-   - spring.data.mongodb.uri=mongodb://localhost:27017/buy01
-   - spring.data.mongodb.database=buy01
+2. **Start the kafka server**
+   - make sure your docker is open
+   ```bash
+   docker compose up -d
+   ```
 
 3. **Build and run the application**
    ```bash

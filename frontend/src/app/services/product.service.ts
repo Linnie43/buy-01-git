@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of, map } from 'rxjs';
 import { Product } from '../models/product.model';
 import { BASE_URL } from '../constants/constants';
+import { tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +28,10 @@ export class ProductService {
 
  // getting the product by id with the http call
   getProductById(productId: string): Observable<Product> {
-    return this.http.get<Product>(`${this.apiUrl}/${productId}`).pipe(
+    return this.http
+    .get<Product>(`${this.apiUrl}/${productId}`)
+    .pipe(
+      tap(res => console.log('[ProductService] getProductById response:', res)),
       map(product => ({
         ...product,
         image: product.image || 'assets/product_image_placeholder.png'

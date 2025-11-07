@@ -7,8 +7,8 @@
       </div>
 
       <div class="col-md-7">
-        <h3>Update Product</h3>
-        <form (ngSubmit)="updateProduct()">
+        <h3>{{ mode === 'create' ? 'Create Product' : 'Update Product' }}</h3>
+        <form (ngSubmit)="submit()">
           <div class="mb-3">
             <label for="name" class="form-label">Name</label>
             <input id="name" class="form-control" [(ngModel)]="product.name" name="name" required>
@@ -29,10 +29,14 @@
             <input id="quantity" type="number" class="form-control" [(ngModel)]="product.quantity" name="quantity" required>
           </div>
 
-          <button type="submit" class="btn btn-success">Update Product</button>
+          <button type="submit" class="btn btn-success">
+            {{ mode === 'create' ? 'Create Product' : 'Update Product' }}
+          </button>
+
         </form>
       </div>
     </div>
   </div>
 </div>
+
 

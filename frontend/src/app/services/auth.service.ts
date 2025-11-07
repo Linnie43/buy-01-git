@@ -89,22 +89,3 @@ export class AuthService {
 
 }
 
-
-  // testing helpers
-  /*loginAsClient() {
-    this.currentUser = { role: 'client' };
-    localStorage.setItem('user', JSON.stringify(this.currentUser));
-  }
-
-  loginAsSeller() {
-    this.currentUser = { role: 'seller' };
-    localStorage.setItem('user', JSON.stringify(this.currentUser));
-  }
-
- getCurrentUserId(): string | null {
-   const user = localStorage.getItem('user');
-   if (!user) return null;
-   return JSON.parse(user).id;
- }*/
-
-

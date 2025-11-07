@@ -6,13 +6,13 @@ import { ClientProfileComponent } from './components/clientProfile/clientProfile
 import { AuthGuard } from './guards/auth.guard';
 import { RoleGuard } from './guards/role.guard';
 import { ProductViewComponent } from './components/product-view/product-view.component';
-import { UpdateProductComponent } from './components/update-product/update-product.component';
+import { ManageProductsComponent } from './components/manage-products/manage-products.component';
 
 export const routes: Routes = [
   { path: '', component: DashboardComponent },
   { path: 'auth', component: AuthComponent },
   { path: 'products/:id', component: ProductViewComponent },
-  { path: 'products/update/:id', component: UpdateProductComponent },
+  { path: 'products/update/:id', component: ManageProductsComponent },
   { path: 'seller-profile', component: SellerProfileComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'SELLER' }  },
   { path: 'client-profile', component: ClientProfileComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'CLIENT' }  },
   { path: '**', redirectTo: '/auth' }

@@ -9,17 +9,21 @@ import {
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { AuthService } from '../services/auth.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-  constructor(private snackBar: MatSnackBar) {}
+  constructor(
+    private snackBar: MatSnackBar,
+    private authService: AuthService
+    ) {}
 
    // intercept method to add auth token and handle errors
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 
     // get the auth token from local storage
     const token = localStorage.getItem('token');
-    console.log('AuthInterceptor - Retrieved token:', token);
+    console.log('[AuthInterceptor] outgoing', req.method, req.url, 'token present:', !!token);
 
     // copy the request to add the authorization header
     let authReq = req;

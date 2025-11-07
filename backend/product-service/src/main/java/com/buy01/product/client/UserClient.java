@@ -2,7 +2,6 @@ package com.buy01.product.client;
 
 import com.buy01.product.dto.UserDTO;
 import com.buy01.product.exception.NotFoundException;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;

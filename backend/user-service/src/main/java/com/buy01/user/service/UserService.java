@@ -1,5 +1,7 @@
 package com.buy01.user.service;
 
+import com.buy01.user.client.ProductClient;
+import com.buy01.user.dto.ProductDTO;
 import com.buy01.user.dto.UserUpdateRequest;
 import com.buy01.user.exception.ForbiddenException;
 import com.buy01.user.model.User;
@@ -23,15 +25,21 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private RestTemplate restTemplate;
-    @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
-    private SecurityUtils securityUtils;
-    @Autowired
-    private UserEventService userEventService;
+    private final UserRepository userRepository;
+    private final RestTemplate restTemplate;
+    private final BCryptPasswordEncoder passwordEncoder;
+    private final SecurityUtils securityUtils;
+    private final UserEventService userEventService;
+    private final ProductClient productClient;
+
+    public UserService(UserRepository userRepository, RestTemplate restTemplate, BCryptPasswordEncoder passwordEncoder, SecurityUtils securityUtils, UserEventService userEventService, ProductClient productClient) {
+        this.userRepository = userRepository;
+        this.restTemplate = restTemplate;
+        this.passwordEncoder = passwordEncoder;
+        this.securityUtils = securityUtils;
+        this.userEventService = userEventService;
+        this.productClient = productClient;
+    }
 
     public User createUser(User user) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -55,8 +63,8 @@ public class UserService {
             }
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
     public List<User> getAllUsers() {
+        // validate admin role before fetching
         return userRepository.findAll();
     }
 
@@ -65,15 +73,18 @@ public class UserService {
         return userRepository.findById(userId);
     }
 
-    // method to find user by id or throw exception if not found
-    public User findByIdOrThrow(String userId) { // used for /me and for the sellerName
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-    }
-
     // method to find user by email, used in authentication
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    public List<ProductDTO> getProductsForCurrentUser(String userId, String role) {
+        // Call product-service to get products for the user
+        if (!role.equals("ADMIN") || !role.equals("SELLER")) {
+            throw new ForbiddenException("Invalid role to fetch products");
+        }
+
+        return productClient.getUsersProducts(userId);
     }
 
     // method to update user, only admin can update currently
@@ -141,39 +152,39 @@ public class UserService {
         userEventService.publishUserDeletedEvent(userId);
     }
 
-// Check if email is unique for that role, ignoring the user themselves
-private void checkEmailUniqueness(User user) {
-        Optional<User> existing = userRepository.findByEmailAndRole(user.getEmail(), user.getRole());
+    // Check if email is unique for that role, ignoring the user themselves
+    private void checkEmailUniqueness(User user) {
+            Optional<User> existing = userRepository.findByEmailAndRole(user.getEmail(), user.getRole());
 
-        if (existing.isPresent() && !existing.get().getId().equals(user.getId())) {
-            String role = user.getRole().toString().toLowerCase();
-            String message = String.format("%s with this email already exists", role);
-            throw new IllegalArgumentException(message);
-        }
+            if (existing.isPresent() && !existing.get().getId().equals(user.getId())) {
+                String role = user.getRole().toString().toLowerCase();
+                String message = String.format("%s with this email already exists", role);
+                throw new IllegalArgumentException(message);
+            }
 
-}
+    }
 
-// Validate name length (add validation for only alphabets)
-private void validateName(String name) {
-        if (name == null || name.isEmpty()) {
-            throw new IllegalArgumentException("Name cannot be null or empty");
-        }
-        if (name.length() < 2 || name.length() > 25) {
-            throw new IllegalArgumentException("Name length must be between 2 and 25 characters");
-        }
-}
+    // Validate name length (add validation for only alphabets)
+    private void validateName(String name) {
+            if (name == null || name.isEmpty()) {
+                throw new IllegalArgumentException("Name cannot be null or empty");
+            }
+            if (name.length() < 2 || name.length() > 25) {
+                throw new IllegalArgumentException("Name length must be between 2 and 25 characters");
+            }
+    }
 
-private String validatePassword(String password) {
-        if (password == null || password.isEmpty()) {
-            throw new IllegalArgumentException("Password cannot be null or empty");
-        }
-        if (password.length() < 3 || password.length() > 25) {
-            throw new IllegalArgumentException("Password length must be between 3 and 25 characters");
-        }
+    private String validatePassword(String password) {
+            if (password == null || password.isEmpty()) {
+                throw new IllegalArgumentException("Password cannot be null or empty");
+            }
+            if (password.length() < 3 || password.length() > 25) {
+                throw new IllegalArgumentException("Password length must be between 3 and 25 characters");
+            }
 
-        return passwordEncoder.encode(password);
+            return passwordEncoder.encode(password);
 
-}
+    }
 
 }
 //service is responsible for business logic and data manipulation. It chooses how to handle data and interacts with the repository layer.

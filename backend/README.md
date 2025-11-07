@@ -1,166 +1,122 @@
 # Buy-01 Backend
 
-Java and Spring Boot project that implements 
-- **discovery service (Eureka)**,
-- **gateway service**
-- **three microservices**:
-  - **user-service**, 
-  - **product-service**, 
-  - **media-service**  
+## Overview
 
-The project uses **MongoDB** as a database and **Spring Security** for authentication and authorization.
+The backend is built as a **microservice-based system** using Java, Spring Boot, Eureka for discovery, a gateway service, Kafka for asynchronous communication, and MongoDB for persistence. 
+Each service is independent, responsible for its own domain, and communicates through REST or Kafka events.
 
----
+## Architecture
 
-## 🚀 Technologies & Frameworks
+* **Gateway Service**: Single entry point for the frontend. Handles routing, security, and request filtering.
+* **Discovery Service (Eureka)**: Registers all microservices and enables dynamic service discovery.
+* **User Service**: Handles authentication, authorization, and user management.
+* **Product Service**: Manages product CRUD operations.
+* **Media Service**: Handles media uploads, storage, and retrieval.
+* **Kafka**: Used for asynchronous events (e.g., product updates, media processing, notifications).
+* **MongoDB**: Primary database for all microservices.
 
-- [Java 17+] or newer
-- [Spring Boot](https://spring.io/projects/spring-boot)
-    - spring-boot-starter-web (REST API)
-    - spring-boot-starter-security (authentication & authorization)
-    - spring-boot-starter-validation (input validation)
-- [Spring Data MongoDB](https://spring.io/projects/spring-data-mongodb) (database access)
-- [BCryptPasswordEncoder](https://docs.spring.io/spring-security/reference/features/authentication/password-storage.html) (password hashing)
-- [Maven](https://maven.apache.org/) (build tool)
+## Technologies
 
----
+* Java 17+
+* Spring Boot
+* Spring Web
+* Spring Security
+* Spring Data MongoDB
+* Spring Cloud Netflix Eureka
+* Spring Cloud Gateway
+* Kafka
+* MongoDB
+* Maven
 
-## 📂 Project structure
+## How Services Work Together
 
-```bash
-src/main/java/com/buy01
-├── controller        # REST controllers
-│   ├── UserController.java
-│   └── ProductController.java
-├── dto               # Data Transfer Objects
-│   ├── UserResponse.java
-│   ├── ProductResponse.java
-│   ├── AdminProductResponse.java
-│   └── SignupRequest.java
-├── model             # MongoDB entities
-│   ├── User.java
-│   └── Product.java
-├── repository        # Database repositories
-│   ├── UserRepository.java
-│   └── ProductRepository.java
-├── security          # Security configuration and helpers
-│   ├── SecurityConfig.java
-│   ├── SecurityUtils.java
-│   ├── JwtUtil
-│   ├── AuthController
-│   └── JwtRequestFilter
-├── service           # Service classes with business logic
-│   ├── UserService.java
-│   └── ProductService.java
-├── exception         # Global exception handling
-│   └── GlobalExceptionHandler.java
-└── LetsPlayApplication.java   # Main application class
+1. The **frontend** communicates only with the **gateway**.
+2. Gateway routes requests to the correct microservice.
+3. Microservices register with **Eureka**, so routing stays dynamic.
+4. For async tasks, services publish and listen to **Kafka topics**.
+5. Each microservice stores its own data in **MongoDB collections**.
+
+## Project Structure
+
+```
+backend/
+├─ discovery/               # Eureka service registry
+├─ gateway/                 # API gateway
+├─ user-service/
+├─ product-service/
+├─ media-service/
+├─ docker-compose.yml    # Kafka
+├─ start-backend.sh      # Script to start all services
+└─ pom.xml
 ```
 
----
+## Data Flow Example
 
-## 🔑 Features
+### User signup
 
-### Users
-- **Sign up** (`POST /auth/signup`)
-- **Login** (`POST /auth/login`)
-- **/users/me** → returns the current logged-in user (name + email only, no password/role/id)
+1. Frontend → Gateway → User Service
+2. User service creates user in MongoDB
 
-### Admin
-- A default admin account is automatically created when the app starts.
-- Admin can see **productId** for all products.
-- Admin can update or delete any product.
+## User delete
 
-### Products
-- **GET /products** → returns public product info (without productId).
-- **GET /products/{id}** → returns details of a specific product.
-- **POST /products** → creates a new product (userId is set automatically).
-- **GET /my-products** → shows products of the logged-in user (including productId so they can update/delete).
-- **PUT /products/{id}**, **DELETE /products/{id}** → users can update/delete their own products, admin can update/delete any product.
+1. Frontend → Gateway → User Service
+2. User service deletes user from MongoDB
+3. User service emits **user-deleted** event to Kafka
+4. Other services (Product, Media) listen for **user-deleted** and clean up related data
 
----
+### Product creation
 
-## ⚙️ How to run the backend
+1. Frontend → Gateway → Product Service
+2. Product service stores product in MongoDB
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/Linnie43/buy-01-git.git
-   cd buy-01-git/backend
-   ```
+### Media upload
 
-2. **Start the kafka server**
-   - make sure your docker is open
-   ```bash
-   docker compose up -d
-   ```
+1. Frontend → Gateway → Media Service
+2. Media stored locally
+3. Media service stores path to file in MongoDB
 
-3. **Build and run the application**
-   ```bash
-   mvn clean install
-   mvn spring-boot:run
-   ```
-   Or run LetsPlayApplication from IntelliJ.
+## Running the Backend
 
-4. **Test the API**
-   - Use Postman.
+### Starting MongoDB
 
-   **Example signup:**
-   - POST
-   - https://localhost:8443/api/auth/signup
-   - Content-Type: application/json
+If MongoDB is not included in your Docker setup, you can run it separately:
 
-   ```bash
-    {
-       "name": "Maria",
-       "email": "maria©example.com", 
-       "password": "123",
-        "role": "CLIENT"
-    }
-   ```
-     
-    **Example login:**
-    - POST
-    - https://localhost:8443/api/auth/login
-    - Content-Type: application/json
-   
-    ```bash
-     {
-        "email": "maria©example.com", 
-        "password": "123"
-     }
-    ```
-   
-    Login and use the returned JWT token for further requests.
+#### Option 1: Run MongoDB in Docker
 
-      **Example create product:**
-      - POST
-      - https://localhost:8443/products
-      - Content-Type: application/json
-      - Authorization: Bearer <JWT_TOKEN
-   
-    ```bash
-    {
-         "name": "shoes",
-         "description": "Nice shoes"
-         "price": 10.0,
-        "quantity": 5
-    }
-    ```
+```bash
+docker run -d \
+--name mongodb \
+-p 27017:27017 \
+-v mongo_data:/data/db \
+mongo:latest
+```
 
-5. **Default admin account**
-   - Email: admin@admin.com
-   - Password: 123
+#### Option 2: Install MongoDB locally
 
-    
-6. **Using the database** (viewing, deleting)
-    - Terminal: `mongosh`
-    - Switch to the database: `use buy01`
-    - Show collections: `show collections`
-    - View users: `db.users.find().pretty()`
-    - View products: `db.products.find().pretty()`
-    - Delete user: `db.users.deleteOne({email: "maria@example.com"})`
-    - Delete product: `db.products.deleteOne({name: "shoes"})`
-    - Delete all products: `db.products.deleteMany({})`
-    - Delete all users: `db.users.deleteMany({})`
-    - Exit: `exit` or `quit`
-   
+```bash
+brew install mongodb-community
+```
+
+Start it with:
+
+1. Start Docker services (Kafka):
+
+```bash
+docker compose up -d
+```
+
+2. Start Discovery, Gateway, and all microservices in their respective directories:
+
+```bash
+mvn spring-boot:run
+```
+
+(or run shell script `start-backend.sh`)
+
+## Notes
+
+* Each service has its own `application.yml`.
+* JWT authentication is centralized.
+* All internal communication uses service names resolved by Eureka.
+* Kafka topics are predefined for inter-service events.
+

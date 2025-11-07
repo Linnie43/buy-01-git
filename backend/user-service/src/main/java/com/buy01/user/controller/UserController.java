@@ -1,7 +1,6 @@
 package com.buy01.user.controller;
 
-import com.buy01.user.dto.SellerUpdateRequest;
-import com.buy01.user.dto.UserDTO;
+import com.buy01.user.dto.*;
 import com.buy01.user.exception.ForbiddenException;
 import com.buy01.user.exception.NotFoundException;
 import com.buy01.user.model.Role;
@@ -12,9 +11,9 @@ import com.buy01.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import com.buy01.user.dto.UserResponseDTO;
-import com.buy01.user.dto.UserUpdateRequest;
 import com.buy01.user.security.JwtUtil;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
@@ -101,7 +100,15 @@ public class UserController {
             @RequestHeader("Authorization") String authHeader
             ) {
         String currentUserId = securityUtils.getCurrentUserId(authHeader);
+        String role = jwtUtil.getToken(authHeader);
+
         User user = userService.findById(currentUserId).orElseThrow();
+
+        if (role.equals("ADMIN") || role.equals("SELLER")) {
+            // get products from product service
+            List<ProductDTO> products = userService.getProductsForCurrentUser(currentUserId, role);
+            return new SellerResponseDTO(user, products);
+        }
 
         return new UserResponseDTO(
                 user.getName(),

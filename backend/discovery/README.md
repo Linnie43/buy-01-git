@@ -3,20 +3,20 @@
 
 ## Purpose
 
-The Discovery service acts as a **central registry** for all microservices in the system. Every microservice (Product, Media, User, Gateway, etc.) registers itself with the Discovery service on startup.
+The Discovery service acts as a **central registry** for all microservices in the system. Every microservice (Product, Media, User, Gateway, etc.) registers itself with the Discovery service on startup. 
 This allows other services to find and communicate with each other dynamically, without hardcoding hostnames or ports.
 
 ---
 
 ## Benefits of a discovery service:
 
-- **Dynamic Service Discovery**: If a service’s port or host changes (e.g., after a restart or in a Docker environment), other services can still find it automatically.
+* **Dynamic Service Discovery**: If a service’s port or host changes (e.g., after a restart or in a Docker environment), other services can still find it automatically.
 
-- **Decoupling Services**: Microservices don’t need to know each other’s addresses; they query the registry instead.
+* **Decoupling Services**: Microservices don’t need to know each other’s addresses; they query the registry instead.
 
-- **Health Monitoring**: Eureka can mark instances as unavailable if they fail to send heartbeats, helping the system avoid routing traffic to down services.
+* **Health Monitoring**: Eureka can mark instances as unavailable if they fail to send heartbeats, helping the system avoid routing traffic to down services.
 
-- **Resilience**: Load balancing helps to avoid overloading a single instance and re-routes traffic if an instance would fail.
+* **Resilience**: Load balancing helps to avoid overloading a single instance and re-routes traffic if an instance would fail.
 
 ---
 
@@ -32,22 +32,22 @@ This allows other services to find and communicate with each other dynamically, 
 
 ## Key points
 
-- Runs on `localhost:8761`
-- All microservices register on startup
-- Minimal code: `DiscoveryApplication.java` + configuration
+* Runs on `localhost:8761`
+* All microservices register on startup
+* Minimal code: `DiscoveryApplication.java` + configuration
 
 ---
 
 ## Package structure
 
-```bash
+```
 backend/discovery/
-├── pom.xml
-├── README.md
 ├── src/main/java/com/buy01/discovery
-│   └── DiscoveryApplication.java
-└── src/main/resources
-    └── application.yml
+│   └── DiscoveryApplication.java       # Main Spring Boot application class
+├── src/main/resources
+│   └── application.yml                 # Configuration file for the discovery service
+├── pom.xml                             # Maven build file
+└── README.md
 ```
 
 ---
@@ -75,6 +75,6 @@ Run discovery **first** before other services.
 
 ## Key Benefits
 
-- No hardcoded URLs
-- Scales easily
-- Automatic failover to healthy instances
+* No hardcoded URLs
+* Scales easily
+* Automatic failover to healthy instances

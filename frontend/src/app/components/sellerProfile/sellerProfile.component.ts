@@ -4,12 +4,11 @@ import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
 import { User } from '../../models/user.model';
 import { Router, RouterModule } from '@angular/router';
-import { goToProduct } from '../dashboard/dashboard.component';
 
 @Component({
   selector: 'app-sellerProfile',
   standalone: true,
-  imports: [CommonModule, RouterModule, goToProduct],
+  imports: [CommonModule, RouterModule],
   templateUrl: './sellerProfile.component.html',
   styleUrl: './sellerProfile.component.css'
 })
@@ -32,5 +31,9 @@ export class SellerProfileComponent implements OnInit {
       },
       error: (err: unknown) => console.error(err),
     });
+  }
+
+  goToProduct(productId: string) {
+    this.router.navigate(['/products', productId]);
   }
 }

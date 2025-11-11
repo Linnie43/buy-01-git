@@ -5,6 +5,7 @@ import com.buy01.product.security.JwtUtil;
 import com.buy01.product.service.ProductService;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -32,7 +33,7 @@ public class ProductController {
     @PostMapping
     public ProductResponseDTO createProduct(
             @RequestHeader("Authorization") String authHeader,
-            @Valid @ModelAttribute ProductCreateDTO request) {
+            @Valid @ModelAttribute ProductCreateDTO request) throws IOException {
         System.out.println("header: " + authHeader);
 
         String currentUserId = securityUtils.getCurrentUserId(authHeader);
@@ -43,20 +44,7 @@ public class ProductController {
             request.setUserId(currentUserId);
         }
 
-        Product saved = productService.createProduct(request, role, currentUserId);
-
-//        List<String> images = productService.getProductImages(saved.getProductId());
-        List<String> images = null;
-        return new ProductResponseDTO(
-                saved.getProductId(),
-                saved.getName(),
-                saved.getDescription(),
-                saved.getPrice(),
-                saved.getQuantity(),
-                saved.getUserId(),
-                images,
-                currentUserId.equals(saved.getUserId())
-        );
+       return productService.createProduct(request, role, currentUserId);
     }
 
     // get all products

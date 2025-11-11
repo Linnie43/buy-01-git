@@ -2,6 +2,7 @@ package com.buy01.product.service;
 
 import com.buy01.product.client.MediaClient;
 import com.buy01.product.client.UserClient;
+import com.buy01.product.dto.ProductResponseDTO;
 import com.buy01.product.exception.ForbiddenException;
 import com.buy01.product.exception.NotFoundException;
 import com.buy01.product.model.Product;
@@ -10,6 +11,8 @@ import jakarta.ws.rs.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,7 +39,7 @@ public class ProductService {
     }
 
     // Create a new product, only SELLER and ADMIN can create products
-    public Product createProduct(ProductCreateDTO request, String role, String currentUserId) {
+    public ProductResponseDTO createProduct(ProductCreateDTO request, String role, String currentUserId) throws IOException {
 
         // validate that user can create products
         if (currentUserId.isEmpty() || (!role.equals("ADMIN") && !role.equals("SELLER"))) {
@@ -55,10 +58,6 @@ public class ProductService {
         // validate quantity
         validateProductQuantity(request.getQuantity());
 
-        if (request.getImagesList() != null) {
-            System.out.println("Number of images uploaded: " + request.getImagesList().size());
-        }
-
         Product product = new Product();
         product.setName(request.getName().trim());
         product.setDescription(request.getDescription().trim());
@@ -71,7 +70,37 @@ public class ProductService {
         }
         product.setUserId(productOwnerId);
 
-        return productRepository.save(product);
+        Product savedProduct = productRepository.save(product);
+        System.out.println("Saved product : " + savedProduct);
+
+        List<String> mediaIds = List.of();
+
+        if (request.getImagesList() != null) {
+            System.out.println("Number of images uploaded: " + request.getImagesList().size());
+            if (request.getImagesList().size() > 5) {
+                throw new BadRequestException("You can upload up to 5 images.");
+            }
+            try {
+                mediaIds = mediaClient.postProductImages(savedProduct.getProductId(), request.getImagesList());
+                System.out.println("Uploaded product images: " + mediaIds);
+            } catch (Exception e) {
+                System.out.println("Failed to upload images: " + e.getMessage());
+                // decide: either fail entire request or continue without images
+            }
+        }
+
+        System.out.println("Uploaded product images: " + mediaIds);
+
+        return new ProductResponseDTO(
+                savedProduct.getProductId(),
+                savedProduct.getName(),
+                savedProduct.getDescription(),
+                savedProduct.getPrice(),
+                savedProduct.getQuantity(),
+                savedProduct.getUserId(),
+                mediaIds,
+                savedProduct.getUserId().equals(currentUserId)
+        );
     }
 
     // Get all products, accessible by anyone (including unauthenticated users)

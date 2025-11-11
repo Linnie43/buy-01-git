@@ -47,6 +47,7 @@ public class MediaService {
     // saves all images and returns result, trust validation from product service
     public List<MediaResponseDTO> saveProductImages(String productId, List<MultipartFile> files) throws IOException {
 
+        System.out.println("Saving images for productId: " + productId + ", number of files: " + files.size());
         // Stream files, save them and create a list of MediaResponseDTO for return
         List<MediaResponseDTO> result = files.stream()
                 .map(file -> {
@@ -54,7 +55,7 @@ public class MediaService {
                     return new MediaResponseDTO(media.getId(), media.getProductId());
                 })
                 .toList();
-
+        System.out.println("saved images: " + result.size());
         return result;
     }
 

@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @RestController
-@RequestMapping("/media")
+@RequestMapping("/api/media")
 public class MediaController {
 
     private final MediaRepository mediaRepository;
@@ -43,6 +43,7 @@ public class MediaController {
 
         List<MediaResponseDTO> result = mediaService.saveProductImages(dto.getProductId(), dto.getFiles());
 
+        System.out.println("Responding ok from media-service: "+ result);
         return ResponseEntity.ok(result);
     }
 
@@ -75,16 +76,12 @@ public class MediaController {
     }
 
     // serves all URLS for productId
-    @GetMapping("/internal/images/productId/{id}")
+    @GetMapping("/internal/images/productId/{productId}")
     public List<MediaResponseDTO> getProductImages(
-            @PathVariable("id") String productId
+            @PathVariable String productId
     ) {
         System.out.println("Get product image requested with id: "+ productId);
         List<Media> mediaList = mediaRepository.getMediaByProductId(productId);
-
-        if(mediaList.isEmpty()){
-            return  null;
-        }
 
         return mediaList.stream()
                 .map(media -> new MediaResponseDTO(

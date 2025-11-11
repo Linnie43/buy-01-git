@@ -43,6 +43,7 @@ public class ProductService {
 
         // validate that user can create products
         if (currentUserId.isEmpty() || (!role.equals("ADMIN") && !role.equals("SELLER"))) {
+            System.out.println("Forbidden: User ID is empty or role is not allowed - Role: " + role);
             throw new ForbiddenException("Your current role cannot create a product.");
         }
 

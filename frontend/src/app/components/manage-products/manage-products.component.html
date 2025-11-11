@@ -2,8 +2,14 @@
   <div class="card p-4" style="width: 700px;">
     <div class="row g-3">
 
-      <div class="col-md-5">
-        <img [src]="product.image || 'assets/product_image_placeholder.png'" class="img-fluid" alt="{{ product.name }}">
+      <!-- Image Upload Area -->
+      <div class="col-md-5 d-flex justify-content-center">
+        <div class="position-relative">
+          <img [src]="imagePreviewUrl || (product.images && product.images.length > 0 ? product.images[0] : 'assets/product_image_placeholder.png')" class="img-fluid" alt="Product Image Preview" style="cursor: pointer; object-fit: cover; max-width: 100%; height: 250px;" (click)="fileInput.click()">
+          <div class="position-absolute top-0 start-0 p-2 text-gray" style="pointer-events: none;">
+            <i class="bi bi-images fs-1"></i>
+          </div>
+        </div>
       </div>
 
       <div class="col-md-7">
@@ -29,6 +35,9 @@
             <input id="quantity" type="number" class="form-control" [(ngModel)]="product.quantity" name="quantity" required>
           </div>
 
+          <input id="images" type="file" class="d-none" multiple (change)="onFileSelected($event)" #fileInput>
+
+
           <button type="submit" class="btn btn-success">
             {{ mode === 'create' ? 'Create Product' : 'Update Product' }}
           </button>
@@ -38,5 +47,46 @@
     </div>
   </div>
 </div>
+
+<div class="container mt-4" *ngIf="mode === 'update'">
+  <button type="button" class="btn btn-success" (click)="switchToCreateMode()">
+    Create a new listing
+  </button>
+</div>
+
+<div class="container mt-5" *ngIf="loading">
+  <p>Loading your listings…</p>
+</div>
+
+<div class="container mt-5" *ngIf="!loading && sellerProducts.length">
+  <h4>Your listings</h4>
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 mt-2">
+    <div class="col" *ngFor="let p of sellerProducts">
+      <div class="card h-100 product-card" (click)="edit(p)">
+        <img [src]="(p.images && p.images.length > 0) ? p.images[0] : 'assets/product_image_placeholder.png'"
+             class="card-img-top"
+             alt="{{p.name}}"
+             style="object-fit: cover; height: 180px;">
+        <div class="card-img-overlay d-flex justify-content-center align-items-center edit-overlay">
+          <span class="text-white fs-4">Edit</span>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title mb-1">{{p.name}}</h5>
+          <p class="card-text text-truncate mb-1">{{p.description}}</p>
+          <p class="card-text"><strong>€{{p.price}}</strong></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+<div class="container mt-4 text-muted" *ngIf="!loading && sellerProducts.length === 0">
+  <p>No listings yet. Create your first product above.</p>
+</div>
+
+<div class="container mt-4 text-danger" *ngIf="error">
+  <p>{{error}}</p>
+</div>
+
 
 

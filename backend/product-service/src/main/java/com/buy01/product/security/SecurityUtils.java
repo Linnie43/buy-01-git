@@ -44,7 +44,7 @@ public class SecurityUtils {
         String token = authHeader.substring(7);
         try {
             Claims claims = jwtUtil.extractClaims(token);
-            return claims.get("ROLE_", String.class);
+            return claims.get("role", String.class);
         } catch (Exception e) {
             return "";
         }

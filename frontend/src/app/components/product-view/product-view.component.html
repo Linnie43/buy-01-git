@@ -1,17 +1,18 @@
-<div *ngIf="product">
-  <h1>{{ product.name }}</h1>
-  <img [src]="product.image || 'assets/product_image_placeholder.png'" alt="{{product.name}}">
-  <p>{{ product.description }}</p>
-  <p>Price: {{ product?.price | currency:'EUR':'symbol' }}</p>
-  <p>Quantity: {{ product?.quantity }}</p>
+<div class="container mt-4">
+  <div *ngIf="product" class="border p-4 rounded">
+    <h1 class="text-center">{{ product.name }}</h1>
+    <img [src]="(product.images && product.images.length > 0) ? product.images[0] : 'assets/product_image_placeholder.png'" class="img-fluid d-block mx-auto mb-3" alt="{{product.name}}">
+    <p>{{ product.description }}</p>
+    <p><strong>Price:</strong> {{ product?.price | currency:'EUR':'symbol' }}</p>
+    <p><strong>Quantity:</strong> {{ product?.quantity }}</p>
 
-  <button *ngIf="product.isProductOwner && isLoggedIn" class="btn btn-success" (click)="goToUpdateProduct(product.productId)">
-    Manage Product
-  </button>
+    <button *ngIf="product.isProductOwner && isLoggedIn" class="btn btn-success" (click)="goToUpdateProduct(product.productId)">
+      Manage Product
+    </button>
 
-  <button *ngIf="!product.isProductOwner && isLoggedIn" class="btn btn-primary">
-    Buy
-  </button>
-  <p *ngIf="!isLoggedIn" class="text-muted mt-2">Please log in to buy this product.</p>
+    <button *ngIf="!product.isProductOwner && isLoggedIn" class="btn btn-primary">
+      Buy
+    </button>
+    <p *ngIf="!isLoggedIn" class="text-muted mt-2">Please log in to buy this product.</p>
+  </div>
 </div>
-

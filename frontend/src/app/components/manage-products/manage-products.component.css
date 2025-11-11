@@ -1,0 +1,14 @@
+.product-card {
+  cursor: pointer;
+  position: relative;
+}
+
+.product-card .edit-overlay {
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.product-card:hover .edit-overlay {
+  opacity: 1;
+}

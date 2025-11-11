@@ -39,19 +39,27 @@ export class AuthInterceptor implements HttpInterceptor {
       }
 
     // handle errors
-    return next.handle(authReq).pipe(
-      catchError((error: HttpErrorResponse) => {
-        let errorMsg = 'Something went wrong';
-        if (error.status === 0) {
-          errorMsg = 'Cannot reach server';
-        } else if (error.status >= 400 && error.status < 500) {
-          errorMsg = error.error?.message || 'Client error';
-        } else if (error.status >= 500) {
-          errorMsg = 'Server error occurred';
-        }
+      return next.handle(authReq).pipe(
+            catchError((error: HttpErrorResponse) => {
+              let errorMsg = 'Something went wrong';
+
+              // Only trigger logout for 401/403 on non-login API calls
+              if (error.status === 401 && !req.url.includes('/login')) {
+                errorMsg = 'Your session has expired. Please log in again.';
+                this.authService.logout();
+              } else if (error.status === 403) {
+                errorMsg = 'Access Denied: You do not have permission to perform this action.';
+              } else if (error.status === 0) {
+                errorMsg = 'Cannot reach server';
+              } else if (error.status >= 400 && error.status < 500) {
+                console.log('AuthInterceptor - Client error response', error);
+                errorMsg = error.error?.message || 'Client error';
+              } else if (error.status >= 500) {
+                errorMsg = 'Server error occurred';
+              }
 
         // show the error message in a snackbar
-        this.snackBar.open(errorMsg, 'Close', { duration: 3000 });
+        this.snackBar.open(errorMsg, 'Close', { duration: 5000 });
 
         return throwError(() => error);
       })

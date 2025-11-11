@@ -14,39 +14,54 @@ export class ProductService {
 
   constructor(private http: HttpClient) {}
 
-  // getting all products with the http call
- getAllProducts(): Observable<Product[]> {
-   return this.http.get<Product[]>(this.apiUrl).pipe(
-     map(products =>
-       products.map(p => ({
-         ...p,
-         image: p.image || 'assets/product_image_placeholder.png'
-       }))
-     )
-   );
- }
+  private mapProduct(item: any): Product {
+      const imagePaths = (item?.images || []).map((imgId: string) => {
+        if (imgId && !imgId.startsWith('http') && !imgId.startsWith('/')) {
+          return `/media/images/${imgId}`;
+        }
+        return imgId;
+      }).filter(Boolean);
 
- // getting the product by id with the http call
-  getProductById(productId: string): Observable<Product> {
-    return this.http
-    .get<Product>(`${this.apiUrl}/${productId}`)
-    .pipe(
-      tap(res => console.log('[ProductService] getProductById response:', res)),
-      map(product => ({
-        ...product,
-        image: product.image || 'assets/product_image_placeholder.png'
-      }))
-    );
+      return {
+        productId: item.productId,
+        name: item.name,
+        description: item.description,
+        price: item.price,
+        quantity: item.quantity,
+        ownerId: item.ownerId,
+        images: imagePaths.length > 0 ? imagePaths : ['assets/product_image_placeholder.png'],
+        isProductOwner: item.isProductOwner
+      };
+    }
+
+    // getting all products with the http call
+    getAllProducts(): Observable<Product[]> {
+      return this.http.get<any[]>(this.apiUrl).pipe(
+        map(products => products.map(p => this.mapProduct(p)))
+      );
+    }
+
+
+    // getting the product by id with the http call
+   getProductById(productId: string): Observable<Product> {
+      return this.http.get<any>(`${this.apiUrl}/${productId}`).pipe(
+        map(product => this.mapProduct(product))
+      );
+    }
+
+    // updating the product with the http call
+   updateProduct(productId: string, formData: FormData): Observable<Product> {
+      return this.http.put<any>(`${this.apiUrl}/${productId}`, formData).pipe(
+        map(response => this.mapProduct(response))
+      );
+    }
+
+   createProduct(formData: FormData): Observable<Product> {
+      return this.http.post<any>(`${this.apiUrl}`, formData).pipe(
+        map(response => this.mapProduct(response))
+      );
+    }
   }
 
- // updating the product with the http call
-  updateProduct(productId: string, product: Product): Observable<Product> {
-    return this.http.put<Product>(`${this.apiUrl}/${productId}`, product);
-  }
-
-  createProduct(product: Product): Observable<Product> {
-    return this.http.post<Product>(`${this.apiUrl}`, product);
-  }
 
 
-}

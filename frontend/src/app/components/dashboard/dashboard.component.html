@@ -8,7 +8,7 @@
   <div class="row" *ngIf="products.length > 0">
     <div class="col-md-3" *ngFor="let product of products">
       <div class="card mb-3">
-        <img [src]="product.image" class="card-img-top" alt="{{ product.name }}" (click)="goToProduct(product.productId)" style="cursor: pointer;">
+        <img [src]="(product.images && product.images.length > 0) ? product.images[0] : 'assets/product_image_placeholder.png'" class="card-img-top" alt="{{ product.name }}" (click)="goToProduct(product.productId)" style="cursor: pointer;">
         <div class="card-body">
           <h5 class="card-title">{{ product.name }}</h5>
           <p class="card-text">{{ product.price | currency:'EUR':'symbol' }}</p>

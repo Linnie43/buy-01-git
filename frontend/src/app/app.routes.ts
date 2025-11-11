@@ -11,8 +11,9 @@ import { ManageProductsComponent } from './components/manage-products/manage-pro
 export const routes: Routes = [
   { path: '', component: DashboardComponent },
   { path: 'auth', component: AuthComponent },
-  { path: 'products/:id', component: ProductViewComponent },
+  { path: 'products/manage', component: ManageProductsComponent, canActivate: [AuthGuard]  },
   { path: 'products/update/:id', component: ManageProductsComponent },
+  { path: 'products/:id', component: ProductViewComponent },
   { path: 'seller-profile', component: SellerProfileComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'SELLER' }  },
   { path: 'client-profile', component: ClientProfileComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'CLIENT' }  },
   { path: '**', redirectTo: '/auth' }

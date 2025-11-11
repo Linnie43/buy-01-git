@@ -34,8 +34,11 @@ public class ProductController {
     public ProductResponseDTO createProduct(
             @RequestHeader("Authorization") String authHeader,
             @Valid @ModelAttribute ProductCreateDTO request) throws IOException {
+        System.out.println("header: " + authHeader);
+
         String currentUserId = securityUtils.getCurrentUserId(authHeader);
-        String role = securityUtils.getRole(currentUserId);
+        String role = securityUtils.getRole(authHeader);
+        System.out.println("Creating product for user ID: " + currentUserId + " with role: " + role);
 
         if (!role.equals("ADMIN") || request.getUserId().isEmpty()) {
             request.setUserId(currentUserId);

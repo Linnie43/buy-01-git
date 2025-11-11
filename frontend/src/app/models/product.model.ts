@@ -5,6 +5,6 @@ export interface Product {
   price: number;
   quantity: number;
   ownerId: string;
-  image?: string;
+  images?: string[];
   isProductOwner?: boolean;
 }

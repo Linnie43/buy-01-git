@@ -61,6 +61,10 @@ export class ProductService {
         map(response => this.mapProduct(response))
       );
     }
+
+   deleteProduct(id: string): Observable<void> {
+       return this.http.delete<void>(`${this.apiUrl}/${id}`);
+     }
   }
 
 

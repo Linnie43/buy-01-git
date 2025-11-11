@@ -125,6 +125,20 @@ export class ManageProductsComponent implements OnInit {
               }
           }
 
+      onDelete(): void {
+              if (confirm('Are you sure you want to delete this product?')) {
+                this.productService.deleteProduct(this.productId).subscribe({
+                  next: () => {
+                    this.onSuccess();
+                  },
+                  error: (err) => {
+                    console.error('Delete failed', err);
+                    this.error = 'Failed to delete the product.';
+                  }
+                });
+              }
+            }
+
       private onSuccess() {
         this.loadMyProducts();
         this.switchToCreateMode(); // Reset form after success

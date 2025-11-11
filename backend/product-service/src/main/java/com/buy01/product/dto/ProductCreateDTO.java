@@ -1,6 +1,9 @@
 package com.buy01.product.dto;
 
 import jakarta.validation.constraints.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 // DTO for creating a new product - what the client sends in the request body
 public class ProductCreateDTO {
@@ -21,6 +24,9 @@ public class ProductCreateDTO {
     @PositiveOrZero(message = "Quantity cannot be negative")
     private Integer quantity;
 
+    @Size(max = 5, message = "You can upload up to 5 images")
+    private List<MultipartFile> imagesList;
+
     private String userId;
 
     public String getName() { return name; }
@@ -34,6 +40,9 @@ public class ProductCreateDTO {
 
     public Integer getQuantity() { return quantity; }
     public void setQuantity(Integer quantity) { this.quantity = quantity; }
+
+    public List<MultipartFile> getImagesList() { return imagesList; }
+    public void setImagesList(List<MultipartFile> imagesList) { this.imagesList = imagesList; }
 
     public String getUserId() { return userId; }
     public void setUserId(String userId) { this.userId = userId; }

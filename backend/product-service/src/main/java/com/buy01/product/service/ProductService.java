@@ -54,6 +54,10 @@ public class ProductService {
         // validate quantity
         validateProductQuantity(request.getQuantity());
 
+        if (request.getImagesList() != null) {
+            System.out.println("Number of images uploaded: " + request.getImagesList().size());
+        }
+
         Product product = new Product();
         product.setName(request.getName().trim());
         product.setDescription(request.getDescription().trim());

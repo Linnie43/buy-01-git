@@ -163,24 +163,14 @@ public class ProductController {
     public Object updateProduct(
             @RequestHeader("Authorization") String authHeader,
             @PathVariable String productId,
-            @RequestBody ProductUpdateRequest request) {
+            @Valid @ModelAttribute ProductUpdateRequest request) throws IOException {
 
         String currentUserId = securityUtils.getCurrentUserId(authHeader);
-        String role = securityUtils.getRole(currentUserId);
+        String role = securityUtils.getRole(authHeader);
 
-        Product updated = productService.updateProduct(productId, request, currentUserId, role);
-        List<String> images = productService.getProductImageIds(updated.getProductId());
+        ProductResponseDTO updated = productService.updateProduct(productId, request, currentUserId, role);
 
-            return new ProductResponseDTO(
-                    updated.getProductId(),
-                    updated.getName(),
-                    updated.getDescription(),
-                    updated.getPrice(),
-                    updated.getQuantity(),
-                    updated.getUserId(),
-                    images,
-                    updated.getUserId().equals(currentUserId)
-            );
+            return updated;
     }
 
 

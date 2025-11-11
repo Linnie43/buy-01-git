@@ -64,7 +64,7 @@ public class MediaService {
 
         String extension = Objects.requireNonNull(file.getOriginalFilename())
                 .substring(file.getOriginalFilename().lastIndexOf("."));
-        String fileName = UUID.randomUUID() + "." + extension;
+        String fileName = UUID.randomUUID() + extension;
         String path = storeFile(file, storagePath.toString(), fileName); // making sure all unique filenames
 
         Media media = new Media();

@@ -36,12 +36,14 @@
           </div>
 
           <input id="images" type="file" class="d-none" multiple (change)="onFileSelected($event)" #fileInput>
-
-
+          <div class="d-flex">
           <button type="submit" class="btn btn-success">
             {{ mode === 'create' ? 'Create Product' : 'Update Product' }}
           </button>
-
+          <button *ngIf="mode === 'update'" type="button" class="btn btn-danger ms-2" (click)="onDelete()">
+            Delete Product
+          </button>
+          </div>
         </form>
       </div>
     </div>

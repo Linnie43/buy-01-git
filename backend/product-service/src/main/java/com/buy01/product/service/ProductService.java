@@ -54,6 +54,10 @@ public class ProductService {
         // validate quantity
         validateProductQuantity(request.getQuantity());
 
+        if (request.getImagesList() != null) {
+            System.out.println("Number of images uploaded: " + request.getImagesList().size());
+        }
+
         Product product = new Product();
         product.setName(request.getName().trim());
         product.setDescription(request.getDescription().trim());
@@ -202,7 +206,8 @@ public class ProductService {
 
     // Call for mediaClient to get all product image ids
     public List<String> getProductImageIds(String productId) {
-        return Optional.ofNullable(mediaClient.getProductImageIds(productId)).orElse(List.of());
+        return List.of();
+//        return Optional.ofNullable(mediaClient.getProductImageIds(productId)).orElse(List.of());
     }
 
     // Authenticates the product owner (or ADMIN), otherwise throws an error

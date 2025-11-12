@@ -15,3 +15,16 @@
     font-size: 1.5em;
     margin: 0;
 }
+
+@media (max-width: 768px) {
+    .seller-profile {
+        flex-direction: column;
+        align-items: center;
+        margin-top: 3.125rem;
+        margin-left: 0;
+    }
+    .seller-profile img {
+        margin-right: 0;
+        margin-bottom: 1rem;
+    }
+}

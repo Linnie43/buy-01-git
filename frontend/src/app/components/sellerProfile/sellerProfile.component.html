@@ -1,5 +1,5 @@
 <div class="seller-profile">
-  <img *ngIf="user; else loading" src="../assets/default.jpg" alt="Profile" class="profile-img" />
+  <img *ngIf="user; else loading" src="assets/default.jpg" alt="Profile" class="profile-img" />
   <div *ngIf="user; else loading">
     <p>{{ user.name }}</p>
   </div>
@@ -8,18 +8,27 @@
   </ng-template>
 </div>
 
-<div class="container mt-4">
-  <h2>Your Listings</h2>
+<div *ngIf="user" class="container mt-5">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Your Listings</h2>
+    <button class="btn btn-success" routerLink="/products/manage">Manage Products</button>
+  </div>
 
-  <div *ngIf="user?.products?.length === 0">
+  <div *ngIf="!user.products || user.products.length === 0; else productGrid">
     <p>You have no products listed for sale.</p>
   </div>
 
-  <div *ngIf="user?.products as products">
-  <div *ngIf="products.length > 0" class="row">
-    <div class="col-md-3" *ngFor="let product of products">
-      {{ product.name }}
+  <ng-template #productGrid>
+    <div class="row">
+      <div class="col-md-3 mb-3" *ngFor="let product of user.products">
+        <div class="card">
+          <img [src]="(product.images && product.images.length > 0) ? product.images[0] : 'assets/product_image_placeholder.png'" class="card-img-top" alt="{{ product.name }}" (click)="goToProduct(product.productId)" style="cursor: pointer;">
+          <div class="card-body">
+            <h5 class="card-title">{{ product.name }}</h5>
+            <p class="card-text">{{ product.price | currency:'EUR' }}</p>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
+  </ng-template>
 </div>

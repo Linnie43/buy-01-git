@@ -85,6 +85,7 @@ export class ManageProductsComponent implements OnInit {
           this.userService.getMe().subscribe({
             next: (user: User) => {
               this.sellerProducts = user.products || [];
+              console.log(this.sellerProducts);
               this.loading = false;
             },
             error: (err: HttpErrorResponse) => {

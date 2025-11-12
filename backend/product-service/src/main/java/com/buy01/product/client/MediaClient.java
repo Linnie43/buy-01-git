@@ -30,18 +30,25 @@ public class MediaClient {
         String url = mediaServiceBaseUrl + "/internal/images/productId/" + productId;
         System.out.println("Request url: " + url);
 
-        ResponseEntity<List> response = restTemplate.exchange(
+        ResponseEntity<List<MediaResponseDTO>> response = restTemplate.exchange(
                 url,
                 HttpMethod.GET,
                 null, // no headers needed for internal calls
-                List.class
+                new ParameterizedTypeReference<List<MediaResponseDTO>>() {}
         );
 
         if (!response.getStatusCode().is2xxSuccessful()) {
             throw new RuntimeException("Failed to get images: " + response.getStatusCode());
         }
 
-        return response.getBody();
+        List<MediaResponseDTO> mediaList = response.getBody();
+        if (mediaList == null) {
+            return List.of();
+        }
+
+        return mediaList.stream()
+                .map(MediaResponseDTO::getId)
+                .collect(Collectors.toList());
     }
 
     public List<String> postProductImages(String productId, List<MultipartFile> images) throws IOException {

@@ -5,7 +5,7 @@
       <!-- Image Upload Area -->
       <div class="col-md-5 d-flex justify-content-center">
         <div class="position-relative">
-          <img [src]="imagePreviewUrl || (product.images && product.images.length > 0 ? product.images[0] : 'assets/product_image_placeholder.png')" class="img-fluid" alt="Product Image Preview" style="cursor: pointer; object-fit: cover; max-width: 100%; height: 250px;" (click)="fileInput.click()">
+          <img [src]="imagePreviewUrl || (product.images && product.images.length > 0 ? (product.images[0] | imageUrl) : 'assets/product_image_placeholder.png')" class="img-fluid" alt="Product Image Preview" style="cursor: pointer; object-fit: cover; max-width: 100%; height: 250px;" (click)="fileInput.click()">
           <div class="position-absolute top-0 start-0 p-2 text-gray" style="pointer-events: none;">
             <i class="bi bi-images fs-1"></i>
           </div>

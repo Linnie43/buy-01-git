@@ -48,7 +48,7 @@ export class ManageProductsComponent implements OnInit {
             this.productService.getProductById(this.productId).subscribe({
               next: (data: Product) => {
                 (this.product = data);
-                this.imagePreviewUrl = (data.images && data.images.length > 0) ? data.images[0] : null;
+                // this.imagePreviewUrl = (data.images && data.images.length > 0) ? data.images[0] : null;
                 },
               error: (err: any) => console.error('Failed to load product for editing', err)
             });

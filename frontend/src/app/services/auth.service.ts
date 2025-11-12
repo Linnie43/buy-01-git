@@ -63,21 +63,25 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.apiUrl}/signup`, userData);
     }
 
-  login(credentials: any): Observable<AuthResponse> {
+login(credentials: any): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(
       tap(res => {
         if (res.token) {
           localStorage.setItem('token', res.token);
           try {
             this.decodedToken = jwtDecode<DecodedToken>(res.token);
-            } catch (error) {
-              console.error('Error decoding token on login:', error);}
-              this.decodedToken = null;
-
+            this.router.navigate(['/']).then(() => {
+              window.location.reload();
+            });
+          } catch (error) {
+            console.error('Error decoding token on login:', error);
+            this.decodedToken = null;
+          }
         }
       })
     );
   }
+
 
   logout() {
     localStorage.removeItem('token');

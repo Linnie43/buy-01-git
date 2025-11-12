@@ -1,0 +1,15 @@
+.card-img-top {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+}
+
+.card-body {
+  height: 80px;
+}
+
+/* Implement max width for product cards */
+
+.card {
+  max-width: 200px;
+}

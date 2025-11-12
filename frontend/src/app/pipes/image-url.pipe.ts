@@ -8,9 +8,12 @@ import { MEDIA_BASE_URL } from '../constants/constants';
 // Pipe to transform image IDs into full URLs or return a placeholder
 export class ImageUrlPipe implements PipeTransform {
   transform(imageId: string | undefined | null, placeholder: string = 'assets/product_image_placeholder.png'): string {
-    if (imageId) {
-      return `${MEDIA_BASE_URL}/${imageId}`;
+    if (imageId && imageId.startsWith('assets/')) {
+      return imageId;
     }
-    return placeholder;
+
+      console.log('Transforming imageId:', imageId);
+      return `${MEDIA_BASE_URL}/${imageId}`;
+
   }
 }

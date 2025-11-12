@@ -4,11 +4,12 @@ import { ProductService } from '../../services/product.service';
 import { AuthService } from '../../services/auth.service';
 import { Product } from '../../models/product.model';
 import { Router } from '@angular/router';
+import { ImageUrlPipe } from '../../pipes/image-url.pipe';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ImageUrlPipe],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
@@ -30,6 +31,7 @@ export class DashboardComponent implements OnInit {
           next: (data: Product[]) => (this.products = data),
           error: (err: unknown) => console.error(err)
         });
+      console.log(this.products);
       }
 
     goToProduct(productId: string) {

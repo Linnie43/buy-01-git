@@ -56,8 +56,7 @@ public class ProductController {
 
         return productService.getAllProducts().stream()
                 .map(p -> {
-//                    List<String> images = productService.getProductImages(p.getProductId());
-                    List<String> images = null;
+                    List<String> images = productService.getProductImageIds(p.getProductId());
                     return new ProductResponseDTO(
                             p.getProductId(),
                             p.getName(),

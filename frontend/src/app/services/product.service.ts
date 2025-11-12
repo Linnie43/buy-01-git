@@ -17,7 +17,7 @@ export class ProductService {
   private mapProduct(item: any): Product {
       const imagePaths = (item?.images || []).map((imgId: string) => {
         if (imgId && !imgId.startsWith('http') && !imgId.startsWith('/')) {
-          return `/media/images/${imgId}`;
+          return `${imgId}`;
         }
         return imgId;
       }).filter(Boolean);

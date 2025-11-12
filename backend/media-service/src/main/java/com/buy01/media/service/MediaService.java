@@ -64,7 +64,7 @@ public class MediaService {
 
         String extension = Objects.requireNonNull(file.getOriginalFilename())
                 .substring(file.getOriginalFilename().lastIndexOf("."));
-        String fileName = UUID.randomUUID() + "." + extension;
+        String fileName = UUID.randomUUID() + extension;
         String path = storeFile(file, storagePath.toString(), fileName); // making sure all unique filenames
 
         Media media = new Media();
@@ -84,6 +84,16 @@ public class MediaService {
         mediaRepository.deleteById(id);
     }
 
+    // delete all media by product id, called by kafka consumer
+    public void deleteMediaByProductId(String productId) {
+        List<Media> mediaList = mediaRepository.getMediaByProductId(productId);
+        for (Media media : mediaList) {
+            deleteFile(media.getPath());
+            mediaRepository.delete(media);
+        }
+    }
+
+    // saves user avatar to server and returns path to file
     public String saveUserAvatar(MultipartFile file) {
         String extension = Objects.requireNonNull(file.getOriginalFilename())
                 .substring(file.getOriginalFilename().lastIndexOf("."));
@@ -91,12 +101,12 @@ public class MediaService {
         return storeFile(file, avatarPath.toString(), fileName);
     }
 
+    // delete user avatar from server
     public void deleteAvatar(String path) {
         deleteFile(path);
     }
 
-
-    // validating the file before storing
+    // validating the file before storing file to server
     private String storeFile(MultipartFile file, String directory, String filename) {
         validateFile(file);
         try {
@@ -123,7 +133,7 @@ public class MediaService {
         }
     }
 
-    // delete file from server
+    // delete file from server by path
     private void deleteFile(String filePathStr) {
         Path filePath = Paths.get(filePathStr).toAbsolutePath();
         try {

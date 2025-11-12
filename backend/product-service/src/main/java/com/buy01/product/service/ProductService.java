@@ -125,7 +125,7 @@ public class ProductService {
     }
 
     // Update product, only ADMIN or the owner of the product can update
-    public Product updateProduct(String productId, ProductUpdateRequest request, String userId, String role) {
+    public ProductResponseDTO updateProduct(String productId, ProductUpdateRequest request, String userId, String role) throws IOException {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new NotFoundException(productId));
 
@@ -151,7 +151,32 @@ public class ProductService {
             product.setQuantity(request.getQuantity());
         }
 
-        return productRepository.save(product);
+        if (request.getDeletedImageIds() != null) {
+            System.out.println("Deleted image ids: " + request.getDeletedImageIds());
+            for (String imageId : request.getDeletedImageIds()) {
+                mediaClient.deleteImage( imageId);
+            }
+        }
+
+        List<String> newMediaIds = List.of();
+
+        if (request.getImages() != null) {
+            System.out.println("New images to upload: " + request.getImages().size());
+            newMediaIds = mediaClient.postProductImages(productId, request.getImages());
+        }
+
+        Product updatedProduct = productRepository.save(product);
+
+        return new ProductResponseDTO(
+                updatedProduct.getProductId(),
+                updatedProduct.getName(),
+                updatedProduct.getDescription(),
+                updatedProduct.getPrice(),
+                updatedProduct.getQuantity(),
+                updatedProduct.getUserId(),
+                newMediaIds,
+                updatedProduct.getUserId().equals(userId)
+        );
     }
 
 

@@ -36,5 +36,5 @@ build/
 .DS_Store
 
 ### Image files in uploads ###
-backend/media-service/uploads/*
-backend/media-service/uploads/avatar/*
+media-service/uploads/
+media-service/uploads/avatar/

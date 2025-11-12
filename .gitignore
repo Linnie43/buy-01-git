@@ -37,3 +37,7 @@ build/
 
 ### Node Modules ###
 frontend/node_modules/
+
+### Image files in uploads ###
+backend/media-service/uploads/
+backend/media-service/uploads/avatar/

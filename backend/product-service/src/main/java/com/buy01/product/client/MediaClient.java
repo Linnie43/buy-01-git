@@ -86,4 +86,22 @@ public class MediaClient {
                 .collect(Collectors.toList());
     }
 
+    public void deleteImage(String imageId) {
+        String url = mediaServiceBaseUrl + "/internal/images/" + imageId;
+        System.out.println("Request url: " + url);
+
+        ResponseEntity<Void> response = restTemplate.exchange(
+                url,
+                HttpMethod.DELETE,
+                null, // no headers needed for internal calls
+                Void.class
+        );
+
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            throw new RuntimeException("Failed to delete image: " + response.getStatusCode());
+        }
+
+        System.out.println("Deleted image with id: " + imageId);
+    }
+
 }

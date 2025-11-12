@@ -35,7 +35,7 @@ public class JwtRequestFilter implements WebFilter {
         System.out.println("[DEBUG] Incoming request: " + exchange.getRequest().getMethod() + " " + path);
 
         boolean isExcluded = EXCLUDE_URLS.stream().anyMatch(path::startsWith)
-                || ((path.startsWith("/product-service/api/products") || path.startsWith("/media-service/api/media/images")) && (method == HttpMethod.GET || method == HttpMethod.OPTIONS));
+                || ((path.startsWith("/product-service/api/products") || path.startsWith("/media-service/api/media")) && (method == HttpMethod.GET || method == HttpMethod.OPTIONS));
 
         if (isExcluded) {
             System.out.println("[DEBUG] Excluded URL, skipping JWT: " + path);

@@ -40,13 +40,12 @@ public class MediaClient {
         if (!response.getStatusCode().is2xxSuccessful()) {
             throw new RuntimeException("Failed to get images: " + response.getStatusCode());
         }
-
-        List<MediaResponseDTO> mediaList = response.getBody();
-        if (mediaList == null) {
+        List<MediaResponseDTO> mediaResponses = response.getBody();
+        if (mediaResponses == null) {
             return List.of();
         }
 
-        return mediaList.stream()
+        return mediaResponses.stream()
                 .map(MediaResponseDTO::getId)
                 .collect(Collectors.toList());
     }

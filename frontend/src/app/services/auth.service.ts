@@ -5,6 +5,7 @@ import { tap } from 'rxjs/operators';
 import { jwtDecode } from 'jwt-decode';
 import { Router } from '@angular/router';
 import { BASE_URL } from '../constants/constants';
+import { AppComponent } from '../app.component';
 
 
 interface AuthResponse {
@@ -28,6 +29,7 @@ export class AuthService {
   private apiUrl = `${BASE_URL}/user-service/api/auth`;
   private decodedToken: DecodedToken | null = null;
   private token: string | null = null;
+  public appComponent!: AppComponent;
 
   constructor(
     private http: HttpClient,
@@ -63,13 +65,16 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.apiUrl}/signup`, userData);
     }
 
-  login(credentials: any): Observable<AuthResponse> {
+login(credentials: any): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(
       tap(res => {
         if (res.token) {
           localStorage.setItem('token', res.token);
           try {
             this.decodedToken = jwtDecode<DecodedToken>(res.token);
+            this.router.navigate(['/dashboard']).then(() => {
+              window.location.reload();
+            });
             } catch (error) {
               console.error('Error decoding token on login:', error);}
               this.decodedToken = null;

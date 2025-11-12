@@ -9,11 +9,14 @@ import { RouterModule } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { UserService } from '../../services/user.service';
 import { User } from '../../models/user.model';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmationDialogComponent } from '../shared/confirmation-dialog.component';
+import { ImageUrlPipe } from '../../pipes/image-url.pipe';
 
 @Component({
   selector: 'app-manage-products',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, ImageUrlPipe],
   templateUrl: './manage-products.component.html',
   styleUrls: ['./manage-products.component.css']
 })
@@ -32,7 +35,8 @@ export class ManageProductsComponent implements OnInit {
       private route: ActivatedRoute,
       private productService: ProductService,
       private router: Router,
-      private userService: UserService
+      private userService: UserService,
+      public dialog: MatDialog
     ) {}
 
   ngOnInit() {
@@ -44,7 +48,7 @@ export class ManageProductsComponent implements OnInit {
             this.productService.getProductById(this.productId).subscribe({
               next: (data: Product) => {
                 (this.product = data);
-                this.imagePreviewUrl = (data.images && data.images.length > 0) ? data.images[0] : null;
+                // this.imagePreviewUrl = (data.images && data.images.length > 0) ? data.images[0] : null;
                 },
               error: (err: any) => console.error('Failed to load product for editing', err)
             });
@@ -85,7 +89,7 @@ export class ManageProductsComponent implements OnInit {
           this.userService.getMe().subscribe({
             next: (user: User) => {
               this.sellerProducts = user.products || [];
-              console.log(this.sellerProducts);
+              console.log('getMyProducts: success', this.sellerProducts);
               this.loading = false;
             },
             error: (err: HttpErrorResponse) => {
@@ -127,18 +131,29 @@ export class ManageProductsComponent implements OnInit {
           }
 
       onDelete(): void {
-              if (confirm('Are you sure you want to delete this product?')) {
-                this.productService.deleteProduct(this.productId).subscribe({
-                  next: () => {
-                    this.onSuccess();
-                  },
-                  error: (err) => {
-                    console.error('Delete failed', err);
-                    this.error = 'Failed to delete the product.';
-                  }
-                });
+        const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+          width: '350px',
+          data: {
+            title: 'Delete Product',
+            message: 'Are you sure you want to delete this product?'
+          }
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+          // The user confirmed the deletion
+          if (result) {
+            this.productService.deleteProduct(this.productId).subscribe({
+              next: () => {
+                this.onSuccess();
+              },
+              error: (err) => {
+                console.error('Delete failed', err);
+                this.error = 'Failed to delete the product.';
               }
-            }
+            });
+          }
+        });
+      }
 
       private onSuccess() {
         this.loadMyProducts();

@@ -1,18 +1,9 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
-
-export function passwordsMatchValidator(control: AbstractControl): ValidationErrors | null {
-  const password = control.get('password');
-  const confirmPassword = control.get('confirmPassword');
-
-  if (password && confirmPassword && password.value !== confirmPassword.value) {
-    return { passwordsMismatch: true };
-  }
-  return null;
-}
+import { AvatarService } from '../../services/avatar.service';
 
 @Component({
   selector: 'app-auth',
@@ -22,7 +13,8 @@ export function passwordsMatchValidator(control: AbstractControl): ValidationErr
   styleUrls: ['./auth.component.css']
 })
 export class AuthComponent {
-  isLogin = true; // toggle: true = login, false = signup
+  isLogin = true;
+  selectedAvatar: File | null = null;
 
   loginForm = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
@@ -30,47 +22,60 @@ export class AuthComponent {
   });
 
   signupForm = this.fb.group({
-      firstname: ['', [Validators.required, Validators.minLength(2)]],
-      lastname: ['', [Validators.required, Validators.minLength(2)]],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(3)]],
-      confirmPassword: ['', Validators.required],
-      role: ['CLIENT', Validators.required]
-    }, { validators: passwordsMatchValidator });
+    firstname: ['', [Validators.required, Validators.minLength(2)]],
+    lastname: ['', [Validators.required, Validators.minLength(2)]],
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required, Validators.minLength(3)]],
+    confirmPassword: ['', Validators.required],
+    role: ['CLIENT', Validators.required]
+  }, { validators: (group) => {
+      const p = group.get('password')?.value;
+      const c = group.get('confirmPassword')?.value;
+      return p && c && p !== c ? { passwordsMismatch: true } : null;
+    }});
 
-  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {}
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private avatarService: AvatarService,
+    private router: Router
+  ) {}
 
-  toggleForm() {
-    this.isLogin = !this.isLogin;
+  onAvatarSelected(e: Event) {
+    const input = e.target as HTMLInputElement;
+    if (input.files && input.files.length) {
+      this.selectedAvatar = input.files[0];
+    }
   }
 
   onLoginSubmit() {
     if (!this.loginForm.valid) return;
-
-    this.authService.login(this.loginForm.value).subscribe({
-      next: (res) => {
-        console.log('Login success:', res);
-        this.router.navigate(['/']); // redirect after login
-        //does it need to be reload?       window.location.reload();
-      },
-      error: (err) => {
-        console.error('Login error:', err);
-      }
-    });
+    this.authService.login(this.loginForm.value).subscribe();
   }
 
   onSignupSubmit() {
     if (!this.signupForm.valid) return;
 
-    console.log('Sending payload: ', this.signupForm.value);
+    const { email, password } = this.signupForm.value;
     this.authService.signup(this.signupForm.value).subscribe({
-      next: (res) => {
-        console.log('Signup success:', res);
-        this.toggleForm(); // switch to login after signup
+      next: () => {
+        // auto login
+        this.authService.loginNoReload({ email, password }).subscribe({
+          next: () => {
+            const userId = this.authService.getUserId();
+            if (userId && this.selectedAvatar) {
+              this.avatarService.uploadAvatar(this.selectedAvatar, userId).subscribe({
+                next: () => window.location.reload(),
+                error: () => window.location.reload()
+              });
+            } else {
+              window.location.reload();
+            }
+          },
+          error: () => this.isLogin = true
+        });
       },
-      error: (err) => {
-        console.error('Signup error:', err);
-      }
+      error: () => {}
     });
   }
 }

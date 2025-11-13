@@ -167,6 +167,7 @@ public class ProductService {
 
         Product updatedProduct = productRepository.save(product);
 
+        // return the full, current list of images for the product (existing minus deleted + newly uploaded)
         return new ProductResponseDTO(
                 updatedProduct.getProductId(),
                 updatedProduct.getName(),

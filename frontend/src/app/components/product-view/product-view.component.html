@@ -1,7 +1,10 @@
 <div class="container mt-4">
   <div *ngIf="product" class="border p-4 rounded">
     <h1 class="text-center">{{ product.name }}</h1>
-    <img [src]="(product.images && product.images.length > 0) ? product.images[0] : 'assets/product_image_placeholder.png'" class="img-fluid d-block mx-auto mb-3" alt="{{product.name}}">
+
+    <div class="image-container mx-auto mb-3">
+      <app-image-carousel [images]="product.images || []"></app-image-carousel>
+    </div>
     <p>{{ product.description }}</p>
     <p><strong>Price:</strong> {{ product?.price | currency:'EUR':'symbol' }}</p>
     <p><strong>Quantity:</strong> {{ product?.quantity }}</p>

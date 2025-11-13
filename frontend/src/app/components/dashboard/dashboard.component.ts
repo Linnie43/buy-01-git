@@ -5,11 +5,12 @@ import { AuthService } from '../../services/auth.service';
 import { Product } from '../../models/product.model';
 import { Router } from '@angular/router';
 import { ImageUrlPipe } from '../../pipes/image-url.pipe';
+import { ImageCarouselComponent } from '../shared/image-carousel/image-carousel.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, ImageUrlPipe],
+  imports: [CommonModule, ImageUrlPipe, ImageCarouselComponent],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })

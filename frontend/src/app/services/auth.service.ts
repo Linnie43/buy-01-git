@@ -48,7 +48,6 @@ export class AuthService {
      }
 
   isLoggedIn(): boolean {
-      // Check if token exists and is not expired
       return !!this.decodedToken && this.decodedToken.exp * 1000 > Date.now();
     }
 
@@ -56,41 +55,57 @@ export class AuthService {
       return this.decodedToken ? this.decodedToken.role : null;
     }
 
-  // synchronous getter for interceptor and other callers
   getToken(): string | null {
       return this.token ?? localStorage.getItem('token');
     }
+
+  getExpiration(): number | null {
+      const token = this.getToken();
+      if (!token) return null;
+
+      try {
+        const decodedToken: { exp: number } = jwtDecode(token);
+        return decodedToken.exp;
+      } catch (e) {
+        return null;
+      }
+    }
+
 
   signup(userData: any): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/signup`, userData);
     }
 
-login(credentials: any): Observable<AuthResponse> {
+  login(credentials: any): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(
       tap(res => {
         if (res.token) {
           localStorage.setItem('token', res.token);
           try {
             this.decodedToken = jwtDecode<DecodedToken>(res.token);
-            this.router.navigate(['/dashboard']).then(() => {
+            this.router.navigate(['/']).then(() => {
               window.location.reload();
             });
-            } catch (error) {
-              console.error('Error decoding token on login:', error);}
-              this.decodedToken = null;
-
+          } catch (error) {
+            console.error('Error decoding token on login:', error);
+            this.decodedToken = null;
+          }
         }
       })
     );
   }
 
   logout() {
+    const currentUrl = this.router.url;
     localStorage.removeItem('token');
     this.decodedToken = null;
-    this.router.navigate(['/']).then(() => {
-      window.location.reload();
-  });
+     if (currentUrl.includes('/seller-profile') || currentUrl.includes('/client-profile')) {
+          this.router.navigate(['/']).then(() => {
+            window.location.reload();
+          });
+        } else {
+          window.location.reload();
+        }
   }
 
 }
-

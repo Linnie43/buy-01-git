@@ -4,6 +4,7 @@ import { Observable, of, map } from 'rxjs';
 import { Product } from '../models/product.model';
 import { BASE_URL } from '../constants/constants';
 import { tap } from 'rxjs/operators';
+import { MEDIA_BASE_URL } from '../constants/constants';
 
 @Injectable({
   providedIn: 'root'
@@ -65,6 +66,10 @@ export class ProductService {
    deleteProduct(id: string): Observable<void> {
        return this.http.delete<void>(`${this.apiUrl}/${id}`);
      }
+
+   getProductImages(productId: string): Observable<string[]> {
+     return this.http.get<string[]>(`${MEDIA_BASE_URL}/${productId}`);
+   }
   }
 
 

@@ -3,13 +3,25 @@
     <div class="row g-3">
 
       <!-- Image Upload Area -->
-      <div class="col-md-5 d-flex justify-content-center">
-        <div class="position-relative">
-          <img [src]="imagePreviewUrl || (product.images && product.images.length > 0 ? (product.images[0] | imageUrl) : 'assets/product_image_placeholder.png')" class="img-fluid" alt="Product Image Preview" style="cursor: pointer; object-fit: cover; max-width: 100%; height: 250px;" (click)="fileInput.click()">
+      <div class="col-md-5 d-flex flex-column align-items-center">
+        <!-- Main image preview -->
+        <div class="position-relative mb-2">
+          <img [src]="imagePreviews.length > 0 ? (imagePreviews[0].isNew ? imagePreviews[0].url : (imagePreviews[0].url | imageUrl)) : 'assets/product_image_placeholder.png'" class="img-fluid" alt="Product Image Preview" style="cursor: pointer; object-fit: cover; width: 250px; height: 250px;" (click)="fileInput.click()">
           <div class="position-absolute top-0 start-0 p-2 text-gray" style="pointer-events: none;">
             <i class="bi bi-images fs-1"></i>
           </div>
         </div>
+
+        <!-- existing images with delete buttons -->
+        <div *ngIf="imagePreviews.length > 1" class="d-flex flex-wrap justify-content-center">
+          <div *ngFor="let preview of imagePreviews.slice(1); let i = index" class="position-relative m-1">
+            <img [src]="preview.isNew ? preview.url : (preview.url | imageUrl)" class="img-thumbnail" alt="Product image {{i + 2}}" style="width: 60px; height: 60px; object-fit: cover;">
+            <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0" style="line-height: 0.5; padding: .2rem .4rem;" (click)="removeImagePreview(preview)">
+              &times;
+            </button>
+          </div>
+        </div>
+        <small class="text-muted mt-1">Click main image to add new images (max 5).</small>
       </div>
 
       <div class="col-md-7">
@@ -35,7 +47,7 @@
             <input id="quantity" type="number" class="form-control" [(ngModel)]="product.quantity" name="quantity" required>
           </div>
 
-          <input id="images" type="file" class="d-none" multiple (change)="onFileSelected($event)" #fileInput>
+          <input id="images" type="file" class="d-none" multiple accept="image/*" (change)="onFileSelected($event)" #fileInput>
           <div class="d-flex">
           <button type="submit" class="btn btn-success">
             {{ mode === 'create' ? 'Create Product' : 'Update Product' }}
@@ -80,6 +92,7 @@
       </div>
     </div>
   </div>
+</div>
 
 
 <div class="container mt-4 text-muted" *ngIf="!loading && sellerProducts.length === 0">
@@ -89,6 +102,3 @@
 <div class="container mt-4 text-danger" *ngIf="error">
   <p>{{error}}</p>
 </div>
-
-
-

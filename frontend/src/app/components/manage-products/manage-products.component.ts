@@ -13,6 +13,12 @@ import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../shared/confirmation-dialog.component';
 import { ImageUrlPipe } from '../../pipes/image-url.pipe';
 
+interface ImagePreview {
+  url: string;
+  isNew: boolean; // To distinguish between existing (id) and new (file)
+  identifier: string | File; // imageId or File object
+}
+
 @Component({
   selector: 'app-manage-products',
   standalone: true,
@@ -28,7 +34,8 @@ export class ManageProductsComponent implements OnInit {
     loading = false;
     error: string | null = null;
     selectedFiles: File[] = [];
-    imagePreviewUrl: string | null = null;
+    imagePreviews: ImagePreview[] = [];
+    deletedImageIds: string[] = []; // track images user removed during edit
 
 
     constructor(
@@ -48,7 +55,10 @@ export class ManageProductsComponent implements OnInit {
             this.productService.getProductById(this.productId).subscribe({
               next: (data: Product) => {
                 (this.product = data);
-                // this.imagePreviewUrl = (data.images && data.images.length > 0) ? data.images[0] : null;
+                // ensure images array exists
+                if (!this.product.images) this.product.images = [];
+                this.resetStagedChanges();
+                this.updateImagePreviews();
                 },
               error: (err: any) => console.error('Failed to load product for editing', err)
             });
@@ -73,15 +83,31 @@ export class ManageProductsComponent implements OnInit {
 
        onFileSelected(event: Event): void {
                const input = event.target as HTMLInputElement;
-               if (input.files && input.files.length > 0) {
-                 this.selectedFiles = Array.from(input.files);
-                 const reader = new FileReader();
-                 reader.onload = () => {
-                   this.imagePreviewUrl = reader.result as string;
-                 };
-                 reader.readAsDataURL(this.selectedFiles[0]);
+               if (!input.files || input.files.length === 0) {
+                   return;
                }
-           }
+
+               this.error = null;
+               const totalCurrentImageCount = this.imagePreviews.length;
+               const allowedNewFiles = 5 - totalCurrentImageCount;
+
+               if (allowedNewFiles <= 0) {
+                   this.error = 'You have already reached the maximum of 5 images.';
+                   return;
+               }
+
+               const filesToProcess = Array.from(input.files).slice(0, allowedNewFiles);
+
+               if (input.files.length > allowedNewFiles) {
+                   this.error = `You can only add ${allowedNewFiles} more image(s). ${filesToProcess.length} were added.`;
+               }
+
+                filesToProcess.forEach(file => {
+                                           this.selectedFiles.push(file);
+                                       });
+                                this.updateImagePreviews();
+                                input.value = '';
+                   }
 
       loadMyProducts() {
           this.loading = true;
@@ -112,19 +138,31 @@ export class ManageProductsComponent implements OnInit {
               formData.append('description', this.product.description);
               formData.append('price', this.product.price.toString());
               formData.append('quantity', this.product.quantity.toString());
-              this.selectedFiles.forEach(file => {
-                 formData.append('imagesList', file);
-              });
 
               if (this.mode === 'create') {
+                  // create endpoint expects key 'imagesList'
+                  this.selectedFiles.forEach(file => {
+                     formData.append('imagesList', file);
+                  });
+
                   this.productService.createProduct(formData).subscribe({
                     next: () => this.onSuccess(),
                     error: (err) => console.error('Create failed', err)
                   });
               } else {
-                  // Note: This requires backend changes to accept multipart/form-data
+                  // update: include deletedImageIds and new files under key 'images'
+                  this.deletedImageIds.forEach(id => formData.append('deletedImageIds', id));
+                  this.selectedFiles.forEach(file => {
+                     formData.append('images', file);
+                  });
+
                   this.productService.updateProduct(this.productId, formData).subscribe({
-                    next: () => this.onSuccess(),
+                    next: () => {
+                      // clear staging
+                      this.deletedImageIds = [];
+                      this.selectedFiles = [];
+                      this.onSuccess();
+                    },
                     error: (err) => console.error('Update failed', err)
                   });
               }
@@ -155,6 +193,26 @@ export class ManageProductsComponent implements OnInit {
         });
       }
 
+      removeImagePreview(previewToRemove: ImagePreview) {
+              if (previewToRemove.isNew) {
+                this.removeNewImage(previewToRemove.identifier as File);
+              } else {
+                this.removeExistingImage(previewToRemove.identifier as string);
+              }
+            }
+
+      // remove an already uploaded image (mark for deletion and remove from view)
+      private removeExistingImage(imageId: string) {
+              this.product.images = (this.product.images || []).filter(i => i !== imageId);
+              this.deletedImageIds.push(imageId);
+              this.updateImagePreviews();
+      }
+      // remove a newly selected image before upload
+      private removeNewImage(fileToRemove: File) {
+              this.selectedFiles = this.selectedFiles.filter(f => f !== fileToRemove);
+              this.updateImagePreviews();
+            }
+
       private onSuccess() {
         this.loadMyProducts();
         this.switchToCreateMode(); // Reset form after success
@@ -167,10 +225,32 @@ export class ManageProductsComponent implements OnInit {
       switchToCreateMode() {
               this.mode = 'create';
               this.product = this.getInitialProductState();
-              this.imagePreviewUrl = null;
-              this.selectedFiles = [];
+              this.resetStagedChanges();
               if (this.router.url !== '/products/manage') {
                   this.router.navigate(['/products/manage']);
               }
           }
+      private resetStagedChanges() {
+        this.deletedImageIds = [];
+        this.imagePreviews = [];
+        this.selectedFiles = [];
+      }
+
+       private updateImagePreviews() {
+                      const existing = (this.product.images || []).map(id => ({
+                          url: id,
+                          isNew: false,
+                          identifier: id
+                      }));
+
+                      const newFiles = this.selectedFiles.map(file => {
+                          return {
+                              url: URL.createObjectURL(file),
+                              isNew: true,
+                              identifier: file
+                          };
+                      });
+
+                      this.imagePreviews = [...existing, ...newFiles];
+              }
 }

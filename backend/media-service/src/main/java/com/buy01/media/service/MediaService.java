@@ -26,16 +26,14 @@ import java.util.UUID;
 @Service
 public class MediaService {
     private final MediaRepository mediaRepository;
-    private final ProductClient productClient;
     private final Path storagePath;
     private final Path avatarPath;
 
     private static final String UPLOAD_DIR = "uploads";
     private static final String AVATAR_DIR = "avatar";
 
-    public MediaService(MediaRepository mediaRepository, ProductClient productClient) throws IOException {
+    public MediaService(MediaRepository mediaRepository) throws IOException {
         this.mediaRepository = mediaRepository;
-        this.productClient = productClient;
 
         this.storagePath = Paths.get(UPLOAD_DIR).toAbsolutePath().normalize();
         Files.createDirectories(storagePath);
@@ -61,6 +59,7 @@ public class MediaService {
 
     // creates path and saves the image to uploads
     public Media saveImage(MultipartFile file, String productId) {
+        validateFile(file);
 
         String extension = Objects.requireNonNull(file.getOriginalFilename())
                 .substring(file.getOriginalFilename().lastIndexOf("."));
@@ -95,6 +94,7 @@ public class MediaService {
 
     // saves user avatar to server and returns path to file
     public String saveUserAvatar(MultipartFile file) {
+        validateFile(file);
         String extension = Objects.requireNonNull(file.getOriginalFilename())
                 .substring(file.getOriginalFilename().lastIndexOf("."));
         String fileName = UUID.randomUUID() + "." + extension;
@@ -108,7 +108,6 @@ public class MediaService {
 
     // validating the file before storing file to server
     private String storeFile(MultipartFile file, String directory, String filename) {
-        validateFile(file);
         try {
             Files.createDirectories(Paths.get(directory));
             Path filePath = Paths.get(directory).resolve(filename);

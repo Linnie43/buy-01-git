@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import com.buy01.user.model.Role;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
+import org.springframework.web.multipart.MultipartFile;
 
 
 // DTO for user signup requests with validation annotations
@@ -37,13 +38,16 @@ public class UserCreateDTO {
     @Field(targetType = FieldType.STRING)
     private Role role;
 
+    private MultipartFile avatar;
+
     public UserCreateDTO() {}
-    public UserCreateDTO(String firstname, String lastname, String email, String password, Role role) {
+    public UserCreateDTO(String firstname, String lastname, String email, String password, Role role, MultipartFile avatar) {
         this.firstname = firstname;
         this.lastname = lastname;
         this.email = email;
         this.password = password;
         this.role = role;
+        this.avatar = avatar;
     }
 
     public String getFirstname() { return firstname; }
@@ -60,6 +64,10 @@ public class UserCreateDTO {
 
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
+
+    public MultipartFile getAvatar() { return avatar; }
+    public void setAvatar(MultipartFile avatar) { this.avatar = avatar;}
+
 }
 
 

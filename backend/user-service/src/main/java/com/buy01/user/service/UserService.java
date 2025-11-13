@@ -1,22 +1,25 @@
 package com.buy01.user.service;
 
+import com.buy01.user.client.MediaClient;
 import com.buy01.user.client.ProductClient;
+import com.buy01.user.dto.AvatarCreateDTO;
+import com.buy01.user.dto.AvatarResponseDTO;
 import com.buy01.user.dto.ProductDTO;
 import com.buy01.user.dto.UserUpdateRequest;
 import com.buy01.user.exception.ForbiddenException;
+import com.buy01.user.model.Role;
 import com.buy01.user.model.User;
 import com.buy01.user.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.security.access.prepost.PreAuthorize;
-import com.buy01.user.security.SecurityUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -28,26 +31,21 @@ public class UserService {
     private final UserRepository userRepository;
     private final RestTemplate restTemplate;
     private final BCryptPasswordEncoder passwordEncoder;
-    private final SecurityUtils securityUtils;
     private final UserEventService userEventService;
     private final ProductClient productClient;
+    private final MediaClient mediaClient;
 
-    public UserService(UserRepository userRepository, RestTemplate restTemplate, BCryptPasswordEncoder passwordEncoder, SecurityUtils securityUtils, UserEventService userEventService, ProductClient productClient) {
+    public UserService(UserRepository userRepository, RestTemplate restTemplate, BCryptPasswordEncoder passwordEncoder, UserEventService userEventService, ProductClient productClient, MediaClient mediaClient) {
         this.userRepository = userRepository;
         this.restTemplate = restTemplate;
         this.passwordEncoder = passwordEncoder;
-        this.securityUtils = securityUtils;
         this.userEventService = userEventService;
         this.productClient = productClient;
+        this.mediaClient = mediaClient;
     }
 
-    public User createUser(User user) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        // If someone is logged in (and not an anonymous user)
-        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
-            throw new ForbiddenException("Logged-in users cannot create new accounts");
-        }
+    // method to create user with validations
+    public User createUser(User user, MultipartFile avatar) throws IOException {
 
         checkEmailUniqueness(user);
         validateName(user.getName());
@@ -56,16 +54,21 @@ public class UserService {
             throw new IllegalArgumentException("Please select a role");
         }
 
+        if (avatar != null && !avatar.isEmpty() && user.getRole() == Role.SELLER) {
+            System.out.println("avatar received in user service: " + avatar.getOriginalFilename());
+            // avatar upload to media server, user avatarCreateDTO
+            AvatarResponseDTO avatarResponseDTO = mediaClient.saveAvatar(new AvatarCreateDTO(avatar, user.getId()));
+            // avatar saved to the user URL
+            if (avatarResponseDTO != null) {
+                user.setAvatarUrl(avatarResponseDTO.getAvatarUrl());
+            }
+        }
+
         try {
             return userRepository.save(user);
         } catch (Exception e) {
             throw new IllegalArgumentException(e.getMessage());
             }
-    }
-
-    public List<User> getAllUsers() {
-        // validate admin role before fetching
-        return userRepository.findAll();
     }
 
     // method to find user by id, needs validation what information is sent if own profile

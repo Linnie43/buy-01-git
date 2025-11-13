@@ -266,7 +266,7 @@ public class ProductService {
 
     // Authenticates the product owner (or ADMIN), otherwise throws an error
     public void authProductOwner(Product product, String userId, String role) {
-        if (!product.getUserId().equals(userId) || !role.equals("ADMIN")) {
+        if (!product.getUserId().equals(userId) && !role.equals("ADMIN")) {
             throw new ForbiddenException("Only admin or product owner can update product");
         }
     }

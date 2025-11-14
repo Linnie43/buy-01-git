@@ -13,3 +13,16 @@
 .card {
   max-width: 200px;
 }
+
+.image-container {
+  position: relative;
+}
+
+.sold-out-card .card-img-top {
+  opacity: 0.5;
+}
+
+.sold-out-text {
+  color: #dc3545;
+  font-weight: bold;
+}

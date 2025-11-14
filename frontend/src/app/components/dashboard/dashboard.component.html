@@ -7,14 +7,16 @@
 
   <div class="row" *ngIf="products.length > 0">
     <div class="col-md-3" *ngFor="let product of products">
-      <div class="card mb-3">
-        <img [src]="product.images?.[0] | imageUrl" class="card-img-top" alt="{{ product.name }}" (click)="goToProduct(product.productId)" style="cursor: pointer;">
+      <div class="card mb-3" [class.sold-out-card]="product.quantity === 0">
+        <div class="image-container">
+          <img [src]="product.images?.[0] | imageUrl" class="card-img-top" alt="{{ product.name }}" (click)="product.quantity > 0 && goToProduct(product.productId)" [style.cursor]="product.quantity > 0 ? 'pointer' : 'default'">
+        </div>
         <div class="card-body d-flex flex-column">
           <h5 class="card-title">{{ product.name }}</h5>
-          <p class="card-text mt-auto">{{ product.price | currency:'EUR':'symbol' }}</p>
+          <p *ngIf="product.quantity > 0" class="card-text mt-auto">{{ product.price | currency:'EUR':'symbol' }}</p>
+          <p *ngIf="product.quantity === 0" class="card-text mt-auto sold-out-text">Sold Out</p>
         </div>
       </div>
     </div>
   </div>
 </div>
-

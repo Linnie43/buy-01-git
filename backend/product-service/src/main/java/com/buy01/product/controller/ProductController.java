@@ -85,8 +85,8 @@ public class ProductController {
         }
         System.out.println("Current user id getting product: " + currentUserId);
         Product p = productService.getProductById(productId);
-//        List<String> images = productService.getProductImages(p.getProductId());
-        List<String> images = null;
+        List<String> images = productService.getProductImageIds(p.getProductId());
+        if (images == null) images = Collections.emptyList();
 
         return new ProductResponseDTO(
                 p.getProductId(),

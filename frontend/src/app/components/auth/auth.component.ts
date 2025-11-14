@@ -63,7 +63,18 @@ export class AuthComponent {
     if (!this.signupForm.valid) return;
 
     console.log('Sending payload: ', this.signupForm.value);
-    this.authService.signup(this.signupForm.value).subscribe({
+    const formValue = this.signupForm.value;
+
+    const formData = new FormData();
+    formData.append("firstname", formValue.firstname!);
+    formData.append("lastname", formValue.lastname!);
+    formData.append("email", formValue.email!);
+    formData.append("password", formValue.password!); 
+    formData.append("role", formValue.role!);
+
+    // add avatar file here
+
+    this.authService.signup(formData).subscribe({
       next: (res) => {
         console.log('Signup success:', res);
         this.toggleForm(); // switch to login after signup

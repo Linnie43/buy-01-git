@@ -1,0 +1,15 @@
+<div class="image-carousel position-relative">
+  <img [src]="currentImageSrc | imageUrl" class="img-fluid" alt="Product Image">
+
+  <!-- Carousel Controls -->
+  <ng-container *ngIf="images && images.length > 1">
+    <button class="carousel-control-prev" type="button" (click)="previousImage($event)">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" (click)="nextImage($event)">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </ng-container>
+</div>

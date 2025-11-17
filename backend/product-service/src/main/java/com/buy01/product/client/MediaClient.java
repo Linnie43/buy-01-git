@@ -92,22 +92,68 @@ public class MediaClient {
                 .collect(Collectors.toList());
     }
 
-    public void deleteImage(String imageId) {
-        String url = mediaServiceBaseUrl + "/internal/images/" + imageId;
+    // updates product images by deleting specified ones and adding new ones
+    public List<String> updateProductImages(
+            String productId,
+            List<String> imagesToDelete,
+            List<MultipartFile> newImages
+    ) throws IOException {
+        String url = mediaServiceBaseUrl + "/internal/images/productId/" + productId;
         System.out.println("Request url: " + url);
 
-        ResponseEntity<Void> response = restTemplate.exchange(
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        for (String id : imagesToDelete) {
+            body.add("imagesToDelete", id);
+        }
+
+        for (MultipartFile file : newImages) {
+            ByteArrayResource resource = new ByteArrayResource(file.getBytes()) {
+                @Override
+                public String getFilename() {
+                    return file.getOriginalFilename(); // keep original filename
+                }
+            };
+            body.add("newImages", resource);
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+        ResponseEntity<List<MediaResponseDTO>> response = restTemplate.exchange(
                 url,
-                HttpMethod.DELETE,
-                null, // no headers needed for internal calls
-                Void.class
+                HttpMethod.PUT,
+                requestEntity,
+                new ParameterizedTypeReference<List<MediaResponseDTO>>() {}
         );
 
         if (!response.getStatusCode().is2xxSuccessful()) {
-            throw new RuntimeException("Failed to delete image: " + response.getStatusCode());
+            throw new RuntimeException("Failed to update images: " + response.getStatusCode());
         }
 
-        System.out.println("Deleted image with id: " + imageId);
+        List<MediaResponseDTO> mediaIds = response.getBody();
+        return mediaIds.stream()
+                .map(MediaResponseDTO::getId)
+                .collect(Collectors.toList());
     }
+
+//    public void deleteImage(String imageId) {
+//        String url = mediaServiceBaseUrl + "/internal/images/" + imageId;
+//        System.out.println("Request url: " + url);
+//
+//        ResponseEntity<Void> response = restTemplate.exchange(
+//                url,
+//                HttpMethod.DELETE,
+//                null, // no headers needed for internal calls
+//                Void.class
+//        );
+//
+//        if (!response.getStatusCode().is2xxSuccessful()) {
+//            throw new RuntimeException("Failed to delete image: " + response.getStatusCode());
+//        }
+//
+//        System.out.println("Deleted image with id: " + imageId);
+//    }
 
 }

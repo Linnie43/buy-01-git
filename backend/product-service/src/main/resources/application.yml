@@ -14,10 +14,6 @@ spring:
       group-id: product-service-group
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-  servlet:
-    multipart:
-      max-file-size: 2MB
-      max-request-size: 11MB
 
 kafka:
   topic:
@@ -40,4 +36,3 @@ eureka:
 
 jwt:
   secret: very-long-secret-key-string-with-at-least-32-chars
-

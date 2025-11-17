@@ -3,6 +3,7 @@ package com.buy01.product.dto;
 import jakarta.validation.constraints.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 // DTO for updating an existing product - what the client sends in the request body
@@ -21,10 +22,10 @@ public class ProductUpdateRequest {
     @PositiveOrZero(message = "Quantity cannot be negative")
     private Integer quantity;
 
-    private List<String> deletedImageIds;
+    private List<String> deletedImageIds = new ArrayList<>();
 
     @Size(max = 5, message = "You can upload up to 5 images")
-    private List<MultipartFile> images;
+    private List<MultipartFile> images = new ArrayList<>();
 
     private String userId;
 

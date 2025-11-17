@@ -5,15 +5,15 @@
     <p>No products available</p>
   </div>
 
-  <div class="row" *ngIf="products.length > 0">
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
     <div class="col" *ngFor="let product of products">
-      <div class="card mb-3" [ngClass]="{'sold-out-card': product.quantity === 0}" (click)="goToProduct(product.productId)" style="cursor: pointer;">
-        <div class="card-img-top-container">
+      <div class="product-card-uniform" [ngClass]="{'sold-out-card': product.quantity === 0}" (click)="goToProduct(product.productId)" style="cursor: pointer;">
+        <div class="card-img-container">
           <app-image-carousel [images]="product.images || []"></app-image-carousel>
         </div>
-        <div class="card-body d-flex flex-column">
-          <h5 class="card-title">{{ product.name }}</h5>
-          <div class="card-text mt-auto price-container">
+        <div class="card-body">
+          <h5 class="card-title text-truncate">{{ product.name }}</h5>
+          <div class="card-text price-container">
             <ng-container *ngIf="product.quantity > 0; else soldOutPrice">
               {{ product.price | currency:'EUR':'symbol' }}
             </ng-container>

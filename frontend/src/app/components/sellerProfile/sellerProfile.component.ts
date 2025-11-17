@@ -5,11 +5,12 @@ import { UserService } from '../../services/user.service';
 import { User } from '../../models/user.model';
 import { Router, RouterModule } from '@angular/router';
 import { ImageUrlPipe } from '../../pipes/image-url.pipe';
+import { ImageCarouselComponent } from '../shared/image-carousel/image-carousel.component';
 
 @Component({
   selector: 'app-sellerProfile',
   standalone: true,
-  imports: [CommonModule, RouterModule, ImageUrlPipe],
+  imports: [CommonModule, RouterModule, ImageUrlPipe, ImageCarouselComponent],
   templateUrl: './sellerProfile.component.html',
   styleUrl: './sellerProfile.component.css'
 })

@@ -1,42 +1,47 @@
-<div class="seller-profile">
-  <img *ngIf="user; else loading" src="assets/default.jpg" alt="Profile" class="profile-img" />
+<div class="container mt-4">
   <div *ngIf="user; else loading">
-    <p>{{ user.name }}</p>
-  </div>
-  <ng-template #loading>
-    <p>Loading user profile...</p>
-  </ng-template>
-</div>
+    <!-- user profile section with avatar and name -->
+    <div class="d-flex flex-column flex-md-row align-items-center mb-4">
+      <img src="assets/default.jpg" alt="Profile of {{ user.name }}" class="profile-img mb-3 mb-md-0 me-md-3" />
+      <h1 class="h3 mb-0">{{ user.name }}</h1>
+    </div>
 
-<div *ngIf="user" class="container mt-5">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>Your Listings</h2>
-    <button class="btn btn-success" routerLink="/products/manage">Manage Products</button>
-  </div>
+    <!--listings section -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2>Your Listings</h2>
+      <button class="btn btn-success" routerLink="/products/manage">Manage Products</button>
+    </div>
 
-  <div *ngIf="!user.products || user.products.length === 0; else productGrid">
-    <p>You have no products listed for sale.</p>
-  </div>
+    <div *ngIf="!user.products || user.products.length === 0; else productGrid">
+      <p>You have no products listed for sale.</p>
+    </div>
 
-  <ng-template #productGrid>
-    <div class="row">
-      <div class="col-md-3 mb-3" *ngFor="let product of user.products">
-        <div class="card" [ngClass]="{'sold-out-card': product.quantity === 0}" (click)="goToProduct(product.productId)" style="cursor: pointer;">
-          <img [src]="product.images && product.images.length > 0 ? (product.images[0] | imageUrl) : 'assets/product_image_placeholder.png'" class="card-img-top" alt="{{ product.name }}">
-          <div class="card-body">
-            <h5 class="card-title">{{ product.name }}</h5>
-            <div class="card-text price-container">
-              <ng-container *ngIf="product.quantity > 0; else soldOutPrice">
-                {{ product.price | currency:'EUR' }}
-              </ng-container>
-              <ng-template #soldOutPrice>
-                <span class="original-price-strikethrough">{{ product.price | currency:'EUR' }}</span>
-                <span class="sold-out-label">Sold Out</span>
-              </ng-template>
+    <ng-template #productGrid>
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+        <div class="col" *ngFor="let product of user.products">
+          <div class="product-card-uniform" [ngClass]="{'sold-out-card': product.quantity === 0}" (click)="goToProduct(product.productId)" style="cursor: pointer;">
+            <div class="card-img-container">
+              <app-image-carousel [images]="product.images || []"></app-image-carousel>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title text-truncate">{{ product.name }}</h5>
+              <div class="card-text price-container">
+                <ng-container *ngIf="product.quantity > 0; else soldOutPrice">
+                  {{ product.price | currency:'EUR' }}
+                </ng-container>
+                <ng-template #soldOutPrice>
+                  <span class="original-price-strikethrough">{{ product.price | currency:'EUR' }}</span>
+                  <span class="sold-out-label">Sold Out</span>
+                </ng-template>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </ng-template>
+  </div>
+
+  <ng-template #loading>
+    <p>Loading user profile...</p>
   </ng-template>
 </div>

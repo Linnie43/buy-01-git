@@ -75,19 +75,18 @@
 
 <div class="container mt-5" *ngIf="!loading && sellerProducts.length">
   <h4>Your listings</h4>
-  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3 mt-2">
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 mt-2">
     <div class="col" *ngFor="let p of sellerProducts">
-      <div class="card h-100 product-card" [ngClass]="{'sold-out-card': p.quantity === 0}" (click)="edit(p)">
-        <img [src]="p.images && p.images.length > 0 ? (p.images[0] | imageUrl) : 'assets/product_image_placeholder.png'"
-             class="card-img-top"
-             alt="{{p.name}}"
-             style="object-fit: cover; height: 180px;">
+      <div class="product-card-uniform" [ngClass]="{'sold-out-card': p.quantity === 0}" (click)="edit(p)" style="cursor: pointer; position: relative;">
+        <!-- The "Edit" overlay from your original design -->
         <div class="card-img-overlay d-flex justify-content-center align-items-center edit-overlay">
           <span class="text-white fs-4">Edit</span>
         </div>
+        <div class="card-img-container">
+          <img [src]="p.images && p.images.length > 0 ? (p.images[0] | imageUrl) : 'assets/product_image_placeholder.png'" alt="{{p.name}}">
+        </div>
         <div class="card-body">
-          <h5 class="card-title mb-1">{{p.name}}</h5>
-          <p class="card-text text-truncate mb-1">{{p.description}}</p>
+          <h5 class="card-title text-truncate">{{p.name}}</h5>
           <div class="card-text price-container">
             <ng-container *ngIf="p.quantity > 0; else soldOutPrice">
               <strong>€{{p.price}}</strong>

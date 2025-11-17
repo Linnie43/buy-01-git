@@ -1,10 +1,48 @@
-/* You can add global styles to this file, and also import other style files */
-
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
+.product-card-uniform {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: #fff;
+  border: 1px solid rgba(0,0,0,.125);
+  border-radius: .25rem;
+  overflow: hidden;
+}
+
+.product-card-uniform .card-img-container {
+  height: 250px;
+  width: 100%;
+  position: relative;
+  background-color: #f8f9fa;
+}
+
+.product-card-uniform .card-img-container img,
+.product-card-uniform .card-img-container app-image-carousel {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-card-uniform .card-body {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; /* Allows body to fill remaining space */
+  padding: 1rem;
+}
+
+.product-card-uniform .card-title {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.product-card-uniform .card-text {
+  margin-top: auto;
+}
+
 .sold-out-card {
-  opacity: 0.75; /* Makes the card slightly faded without blurring */
+  opacity: 0.75;
 }
 
 .price-container .original-price-strikethrough {
@@ -13,6 +51,6 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 }
 
 .price-container .sold-out-label {
-  color: #dc3545; /* Bootstrap's danger red */
+  color: #dc3545;
   font-weight: bold;
 }

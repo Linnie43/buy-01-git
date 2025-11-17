@@ -25,7 +25,6 @@ import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/api/media")
-@CrossOrigin(origins = "*")
 public class MediaController {
 
     private final MediaRepository mediaRepository;

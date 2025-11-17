@@ -53,6 +53,10 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
 
+  cloud:
+    gateway:
+      max-in-memory-size: 15MB   # must cover total multipart + form overhead
+
 logging:
   level:
     org.springframework.cloud.gateway: DEBUG

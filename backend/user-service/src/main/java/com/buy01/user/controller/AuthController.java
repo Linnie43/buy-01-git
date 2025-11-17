@@ -45,31 +45,55 @@ public class AuthController {
         }
 
         String token = jwtUtil.generateToken(user);
-        return ResponseEntity.ok(Map.of("token", token));
+
+        Map<String, Object> response = Map.of(
+                "token", token,
+                "avatar", user.getAvatarUrl() != null ? user.getAvatarUrl() : null
+        );
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(
-            @RequestHeader(value = "Authorization", required = false) String authHeader ,
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
             @ModelAttribute UserCreateDTO request // accepting avatar at signup
     ) throws IOException {
+        // Prevent logged-in users from creating new accounts
         final String currentUserId = (authHeader != null) ? securityUtils.getCurrentUserId(authHeader) : null;
-
         if (currentUserId != null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Logged-in users cannot create new accounts");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Logged-in users cannot create new accounts");
         }
 
         System.out.println("Received DTO: " + request);
+
+        // Create the user entity
         User user = new User();
         user.setName(request.getFirstname() + " " + request.getLastname());
         user.setEmail(request.getEmail());
         user.setPassword(request.getPassword());
         user.setRole(request.getRole());
 
+        // Save the user and avatar (if provided)
         User created = userService.createUser(user, request.getAvatar());
-        UserResponseDTO response = new UserResponseDTO(created.getName(), created.getEmail(), created.getRole(), null, null);
+
+        // Safely set avatarUrl — if no avatar, use empty string or a default path
+        String avatarUrl = (created.getAvatarUrl() != null && !created.getAvatarUrl().isEmpty())
+                ? created.getAvatarUrl()
+                : "/api/media/avatar/default.png"; // optional: default avatar
+
+        // Construct the response DTO
+        UserResponseDTO response = new UserResponseDTO(
+                created.getName(),
+                created.getEmail(),
+                created.getRole(),
+                avatarUrl,
+                true // the new user owns their profile
+        );
+
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
 
 
 

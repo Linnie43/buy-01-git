@@ -9,6 +9,8 @@ import com.buy01.media.model.Media;
 import com.buy01.media.repository.MediaRepository;
 import com.buy01.media.service.MediaService;
 import jakarta.validation.Valid;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.CacheControl;
@@ -116,30 +118,34 @@ public class MediaController {
     }
 
     // serve the avatar url from the server
-    @GetMapping("/avatar/{path}")
-    public ResponseEntity<Resource> getAvatar(
-            @PathVariable String path
-    ) throws IOException {
-        System.out.println("Avatar requested with path: "+ path);
+    @GetMapping("/avatar/**")
+    public ResponseEntity<Resource> getAvatar() throws IOException {
+        // get the full request URI
+        String uri = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+                .getRequest()
+                .getRequestURI();
 
-        Path filePath = Paths.get(path).toAbsolutePath();
+        // extract everything after the last slash
+        String filename = uri.substring(uri.lastIndexOf("/") + 1);
+
+        Path filePath = Paths.get(filename).toAbsolutePath();
         Resource resource = new UrlResource(filePath.toUri());
 
         if (!resource.exists() || !resource.isReadable()) {
-            System.out.println("Resource doesn't exist or is not readable");
             throw new NotFoundException("Image file not found");
         }
 
-        System.out.println("Resource found:" + resource);
-
         String contentType = Files.probeContentType(filePath);
-        MediaType mediaType = (contentType != null) ? MediaType.parseMediaType(contentType) : MediaType.APPLICATION_OCTET_STREAM;
+        MediaType mediaType = (contentType != null)
+                ? MediaType.parseMediaType(contentType)
+                : MediaType.APPLICATION_OCTET_STREAM;
 
         return ResponseEntity.ok()
                 .contentType(mediaType)
                 .cacheControl(CacheControl.maxAge(30, TimeUnit.DAYS).cachePublic())
                 .body(resource);
     }
+
 
     // delete avatar from server
     @DeleteMapping("/internal/avatar/{path}")

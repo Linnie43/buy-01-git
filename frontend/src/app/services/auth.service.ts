@@ -5,8 +5,9 @@ import { Observable, tap } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
 import { Router } from '@angular/router';
 import { BASE_URL } from '../constants/constants';
+import { User } from './user.service';
 
-interface AuthResponse { token?: string; message?: string; }
+interface AuthResponse { token?: string; message?: string; avatar?: string; }
 interface DecodedToken { sub?: string; userId?: string; id?: string; role: string; exp: number; }
 
 @Injectable({ providedIn: 'root' })
@@ -59,8 +60,12 @@ export class AuthService {
         if (res.token) {
           localStorage.setItem('token', res.token);
           this.safeDecode(res.token);
-          this.router.navigate(['/']).then(() => window.location.reload());
+
         }
+        if (res.avatar) {
+          this.setAvatar(res.avatar);  // store avatar in the service
+        }
+      this.router.navigate(['/']).then(() => window.location.reload());
       })
     );
   }
@@ -80,5 +85,8 @@ export class AuthService {
     localStorage.removeItem('token');
     this.decodedToken = null;
     window.location.reload();
+  }
+  getCurrentUser(): Observable<User> {
+    return this.http.get<User>(`${BASE_URL}/user-service/api/users/me`);
   }
 }

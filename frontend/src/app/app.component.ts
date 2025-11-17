@@ -42,10 +42,15 @@ export class AppComponent {
     const url = this.router.url ?? '';
     this.showProfile = this.isLoggedIn && !url.includes('auth');
 
-      const avatarPath = this.auth.getAvatar(); // e.g., "/api/media/avatar/7d049140-0b48-4cb0-9891-a111697ca084.png"
-      this.profileImageUrl = avatarPath
-        ? `${BASE_URL}${avatarPath}`  // prepend domain
-        : 'assets/default.jpg';
+    if (this.isLoggedIn) {
+        this.auth.getCurrentUser().subscribe(user => {
+          this.profileImageUrl = user.avatar
+            ? `${BASE_URL}/media-service${user.avatar}`
+            : 'assets/default.jpg';
+        });
+      } else {
+        this.profileImageUrl = 'assets/default.jpg';
+      }
   }
 
   logout() {

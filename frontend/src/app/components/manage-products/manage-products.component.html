@@ -1,7 +1,6 @@
 <div class="container mt-4 d-flex justify-content-center" *ngIf="product">
   <div class="card p-4" style="width: 700px;">
     <div class="row g-3">
-
       <!-- Image Upload Area -->
       <div class="col-md-5 d-flex flex-column align-items-center">
         <!-- Main image preview -->
@@ -11,7 +10,6 @@
             <i class="bi bi-images fs-1"></i>
           </div>
         </div>
-
         <!-- existing images with delete buttons -->
         <div *ngIf="imagePreviews.length > 1" class="d-flex flex-wrap justify-content-center">
           <div *ngFor="let preview of imagePreviews.slice(1); let i = index" class="position-relative m-1">
@@ -23,7 +21,6 @@
         </div>
         <small class="text-muted mt-1">Click main image to add new images (max 5).</small>
       </div>
-
       <div class="col-md-7">
         <h3>{{ mode === 'create' ? 'Create Product' : 'Update Product' }}</h3>
         <form (ngSubmit)="submit()">
@@ -62,6 +59,10 @@
   </div>
 </div>
 
+<div class="container mt-4 text-danger" *ngIf="error">
+  <p>{{error}}</p>
+</div>
+
 <div class="container mt-4" *ngIf="mode === 'update'">
   <button type="button" class="btn btn-success" (click)="switchToCreateMode()">
     Create a new listing
@@ -76,7 +77,7 @@
   <h4>Your listings</h4>
   <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3 mt-2">
     <div class="col" *ngFor="let p of sellerProducts">
-      <div class="card h-100 product-card" (click)="edit(p)">
+      <div class="card h-100 product-card" [ngClass]="{'sold-out-card': p.quantity === 0}" (click)="edit(p)">
         <img [src]="p.images && p.images.length > 0 ? (p.images[0] | imageUrl) : 'assets/product_image_placeholder.png'"
              class="card-img-top"
              alt="{{p.name}}"
@@ -87,7 +88,15 @@
         <div class="card-body">
           <h5 class="card-title mb-1">{{p.name}}</h5>
           <p class="card-text text-truncate mb-1">{{p.description}}</p>
-          <p class="card-text"><strong>€{{p.price}}</strong></p>
+          <div class="card-text price-container">
+            <ng-container *ngIf="p.quantity > 0; else soldOutPrice">
+              <strong>€{{p.price}}</strong>
+            </ng-container>
+            <ng-template #soldOutPrice>
+              <strong class="original-price-strikethrough">€{{p.price}}</strong>
+              <span class="sold-out-label">Sold Out</span>
+            </ng-template>
+          </div>
         </div>
       </div>
     </div>
@@ -97,8 +106,4 @@
 
 <div class="container mt-4 text-muted" *ngIf="!loading && sellerProducts.length === 0">
   <p>No listings yet. Create your first product above.</p>
-</div>
-
-<div class="container mt-4 text-danger" *ngIf="error">
-  <p>{{error}}</p>
 </div>

@@ -2,3 +2,17 @@
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.sold-out-card {
+  opacity: 0.75; /* Makes the card slightly faded without blurring */
+}
+
+.price-container .original-price-strikethrough {
+  text-decoration: line-through;
+  margin-right: 8px;
+}
+
+.price-container .sold-out-label {
+  color: #dc3545; /* Bootstrap's danger red */
+  font-weight: bold;
+}

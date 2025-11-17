@@ -21,11 +21,19 @@
   <ng-template #productGrid>
     <div class="row">
       <div class="col-md-3 mb-3" *ngFor="let product of user.products">
-        <div class="card">
-          <img [src]="product.images && product.images.length > 0 ? (product.images[0] | imageUrl) : 'assets/product_image_placeholder.png'" class="card-img-top" alt="{{ product.name }}" (click)="goToProduct(product.productId)" style="cursor: pointer;">
+        <div class="card" [ngClass]="{'sold-out-card': product.quantity === 0}" (click)="goToProduct(product.productId)" style="cursor: pointer;">
+          <img [src]="product.images && product.images.length > 0 ? (product.images[0] | imageUrl) : 'assets/product_image_placeholder.png'" class="card-img-top" alt="{{ product.name }}">
           <div class="card-body">
             <h5 class="card-title">{{ product.name }}</h5>
-            <p class="card-text">{{ product.price | currency:'EUR' }}</p>
+            <div class="card-text price-container">
+              <ng-container *ngIf="product.quantity > 0; else soldOutPrice">
+                {{ product.price | currency:'EUR' }}
+              </ng-container>
+              <ng-template #soldOutPrice>
+                <span class="original-price-strikethrough">{{ product.price | currency:'EUR' }}</span>
+                <span class="sold-out-label">Sold Out</span>
+              </ng-template>
+            </div>
           </div>
         </div>
       </div>

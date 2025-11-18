@@ -9,7 +9,7 @@
     <!--listings section -->
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h2>Your Listings</h2>
-      <button class="btn btn-success" routerLink="/products/manage">Manage Products</button>
+      <button class="btn btn-success" routerLink="/products/manage" title="Create, update or delete my product listings">Product Dashboard</button>
     </div>
 
     <div *ngIf="!user.products || user.products.length === 0; else productGrid">

@@ -5,8 +5,8 @@ spring:
   cloud:
     discovery:
       enabled: true
-
     gateway:
+      max-in-memory-size: 15MB   # must cover total multipart + form overhead
       discovery:
         locator:
           enabled: true

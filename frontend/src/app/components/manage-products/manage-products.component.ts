@@ -52,10 +52,10 @@ export class ManageProductsComponent implements OnInit {
       public dialog: MatDialog
     ) {
       this.productForm = this.fb.group({
-            name: ['', [Validators.required]],
+            name: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(255)]],
             description: ['', [Validators.required]],
-            price: [0, [Validators.required, Validators.min(0)]],
-            quantity: [1, [Validators.required, Validators.min(0)]]
+            price: [1, [Validators.required, Validators.min(1)]],
+            quantity: [1, [Validators.required, Validators.min(1)]]
           });
       }
 
@@ -195,17 +195,21 @@ export class ManageProductsComponent implements OnInit {
                     }
 
       private handleError(err: HttpErrorResponse, action: 'Create' | 'Update') {
-         console.error(`${action} failed`, err);
-         if (err.status === 400 && err.error && typeof err.error === 'object') {
-           if (err.error.error === 'Invalid file type') {
-             this.error = 'One or more images have an unsupported file type. Please use JPG, PNG, or GIF.';
-           } else {
-             this.formErrors = err.error;
-           }
-         } else if (err.status !== 401 && err.status !== 403) {
-           this.error = `Failed to ${action.toLowerCase()} the product. Please try again.`;
-         }
-       }
+          console.error(`${action} failed`, err);
+          if (err.status === 400 && err.error && typeof err.error === 'object') {
+            // Handle specific name length error from the server
+            if (err.error.error && typeof err.error.error === 'string' && err.error.error.includes('Product name must be between')) {
+              this.formErrors['name'] = err.error.error;
+            } else if (err.error.error === 'Invalid file type') {
+              this.error = 'One or more images have an unsupported file type. Please use JPG, PNG, or GIF.';
+            } else {
+              // Assign other field-specific errors
+              this.formErrors = err.error;
+            }
+          } else if (err.status !== 401 && err.status !== 403) {
+            this.error = `Failed to ${action.toLowerCase()} the product. Please try again.`;
+          }
+        }
 
       onDelete(): void {
         const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
@@ -236,18 +240,6 @@ export class ManageProductsComponent implements OnInit {
           this.updateImagePreviews(currentImages.filter(id => id !== previewToRemove.identifier));
         }
 
-
-      // remove an already uploaded image (mark for deletion and remove from view)
-      /*private removeExistingImage(imageId: string) {
-              this.product.images = (this.product.images || []).filter(i => i !== imageId);
-              this.deletedImageIds.push(imageId);
-              this.updateImagePreviews();
-      }
-      // remove a newly selected image before upload
-      private removeNewImage(fileToRemove: File) {
-              this.selectedFiles = this.selectedFiles.filter(f => f !== fileToRemove);
-              this.updateImagePreviews();
-            } */
 
       private onSuccess() {
         this.loadMyProducts();

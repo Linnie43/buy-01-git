@@ -30,40 +30,42 @@
         <form [formGroup]="productForm" (ngSubmit)="submit()">
           <div class="mb-3">
             <label for="name" class="form-label">Name</label>
-            <input id="name" class="form-control" formControlName="name" [class.is-invalid]="productForm.get('name')?.invalid && (productForm.get('name')?.dirty || productForm.get('name')?.touched)">
-            <div *ngIf="productForm.get('name')?.invalid && (productForm.get('name')?.dirty || productForm.get('name')?.touched)" class="invalid-feedback">
+            <input id="name" class="form-control" formControlName="name" [class.is-invalid]="(productForm.get('name')?.invalid && (productForm.get('name')?.dirty || productForm.get('name')?.touched)) || formErrors['name']">
+            <div *ngIf="(productForm.get('name')?.invalid && (productForm.get('name')?.dirty || productForm.get('name')?.touched)) || formErrors['name']" class="invalid-feedback">
               <div *ngIf="productForm.get('name')?.errors?.['required']">Name is required.</div>
+              <div *ngIf="productForm.get('name')?.errors?.['minlength']">Name must be at least 5 characters long.</div>
+              <div *ngIf="productForm.get('name')?.errors?.['maxlength']">Name cannot be more than 255 characters long.</div>
+              <div *ngIf="formErrors['name']">{{ formErrors['name'] }}</div>
             </div>
-            <div *ngIf="formErrors['name']" class="text-danger mt-1">{{ formErrors['name'] }}</div>
           </div>
 
           <div class="mb-3">
             <label for="description" class="form-label">Description</label>
-            <textarea id="description" class="form-control" formControlName="description" rows="3" [class.is-invalid]="productForm.get('description')?.invalid && (productForm.get('description')?.dirty || productForm.get('description')?.touched)"></textarea>
-            <div *ngIf="productForm.get('description')?.invalid && (productForm.get('description')?.dirty || productForm.get('description')?.touched)" class="invalid-feedback">
+            <textarea id="description" class="form-control" formControlName="description" rows="3" [class.is-invalid]="(productForm.get('description')?.invalid && (productForm.get('description')?.dirty || productForm.get('description')?.touched)) || formErrors['description']"></textarea>
+            <div *ngIf="(productForm.get('description')?.invalid && (productForm.get('description')?.dirty || productForm.get('description')?.touched)) || formErrors['description']" class="invalid-feedback">
               <div *ngIf="productForm.get('description')?.errors?.['required']">Description is required.</div>
+              <div *ngIf="formErrors['description']">{{ formErrors['description'] }}</div>
             </div>
-            <div *ngIf="formErrors['description']" class="text-danger mt-1">{{ formErrors['description'] }}</div>
           </div>
 
           <div class="mb-3">
             <label for="price" class="form-label">Price (€)</label>
-            <input id="price" type="number" class="form-control" formControlName="price" step="0.01" [class.is-invalid]="productForm.get('price')?.invalid && (productForm.get('price')?.dirty || productForm.get('price')?.touched)">
-            <div *ngIf="productForm.get('price')?.invalid && (productForm.get('price')?.dirty || productForm.get('price')?.touched)" class="invalid-feedback">
+            <input id="price" type="number" class="form-control" formControlName="price" step="0.01" [class.is-invalid]="(productForm.get('price')?.invalid && (productForm.get('price')?.dirty || productForm.get('price')?.touched)) || formErrors['price']">
+            <div *ngIf="(productForm.get('price')?.invalid && (productForm.get('price')?.dirty || productForm.get('price')?.touched)) || formErrors['price']" class="invalid-feedback">
               <div *ngIf="productForm.get('price')?.errors?.['required']">Price is required.</div>
-              <div *ngIf="productForm.get('price')?.errors?.['min']">Price cannot be negative.</div>
+              <div *ngIf="productForm.get('price')?.errors?.['min']">Price must be at least 1.</div>
+              <div *ngIf="formErrors['price']">{{ formErrors['price'] }}</div>
             </div>
-            <div *ngIf="formErrors['price']" class="text-danger mt-1">{{ formErrors['price'] }}</div>
           </div>
 
           <div class="mb-3">
             <label for="quantity" class="form-label">Quantity</label>
-            <input id="quantity" type="number" class="form-control" formControlName="quantity" [class.is-invalid]="productForm.get('quantity')?.invalid && (productForm.get('quantity')?.dirty || productForm.get('quantity')?.touched)">
-            <div *ngIf="productForm.get('quantity')?.invalid && (productForm.get('quantity')?.dirty || productForm.get('quantity')?.touched)" class="invalid-feedback">
+            <input id="quantity" type="number" class="form-control" formControlName="quantity" [class.is-invalid]="(productForm.get('quantity')?.invalid && (productForm.get('quantity')?.dirty || productForm.get('quantity')?.touched)) || formErrors['quantity']">
+            <div *ngIf="(productForm.get('quantity')?.invalid && (productForm.get('quantity')?.dirty || productForm.get('quantity')?.touched)) || formErrors['quantity']" class="invalid-feedback">
               <div *ngIf="productForm.get('quantity')?.errors?.['required']">Quantity is required.</div>
               <div *ngIf="productForm.get('quantity')?.errors?.['min']">Quantity cannot be negative.</div>
+              <div *ngIf="formErrors['quantity']">{{ formErrors['quantity'] }}</div>
             </div>
-            <div *ngIf="formErrors['quantity']" class="text-danger mt-1">{{ formErrors['quantity'] }}</div>
           </div>
 
           <input id="images" type="file" class="d-none" multiple accept="image/*" (change)="onFileSelected($event)" #fileInput>

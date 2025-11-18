@@ -6,7 +6,7 @@
         <!-- Main image preview -->
         <div class="position-relative mb-2">
           <img [src]="imagePreviews.length > 0 ? (imagePreviews[0].isNew ? imagePreviews[0].url : (imagePreviews[0].url | imageUrl)) : 'assets/product_image_placeholder.png'" class="img-fluid" alt="Product Image Preview" style="cursor: pointer; object-fit: cover; width: 250px; height: 250px;" (click)="fileInput.click()">
-          <button *ngIf="imagePreviews.length > 0" type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0" style="line-height: 0.5; padding: .2rem .4rem; z-index: 10;" (click)="removeImagePreview(imagePreviews[0]); $event.stopPropagation()">
+          <button *ngIf="imagePreviews.length > 0 && imagePreviews[0].url !== 'assets/product_image_placeholder.png'" type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0" style="line-height: 0.5; padding: .2rem .4rem; z-index: 10;" (click)="removeImagePreview(imagePreviews[0]); $event.stopPropagation()">
             &times;
           </button>
           <div *ngIf="imagePreviews.length === 0" class="position-absolute top-0 start-0 p-2 text-gray" style="pointer-events: none;">

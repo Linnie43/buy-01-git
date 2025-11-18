@@ -99,7 +99,7 @@ export class AuthService {
     const currentUrl = this.router.url;
     localStorage.removeItem('token');
     this.decodedToken = null;
-     if (currentUrl.includes('/seller-profile') || currentUrl.includes('/client-profile')) {
+     if (!currentUrl.includes('/products/*')) {
           this.router.navigate(['/']).then(() => {
             window.location.reload();
           });

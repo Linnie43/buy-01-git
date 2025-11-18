@@ -30,6 +30,10 @@ export class AuthService {
     return localStorage.getItem('token');
   }
 
+ getCurrentUser(): Observable<User> {
+    return this.http.get<User>(`${BASE_URL}/user-service/api/users/me`);
+  }
+
   getUserId(): string | null {
     return this.decodedToken?.userId || this.decodedToken?.id || this.decodedToken?.sub || null;
   }

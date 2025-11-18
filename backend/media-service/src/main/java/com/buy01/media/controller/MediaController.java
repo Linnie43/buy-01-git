@@ -1,9 +1,7 @@
 package com.buy01.media.controller;
 
 import com.buy01.media.dto.AvatarCreateDTO;
-import com.buy01.media.dto.AvatarResponseDTO;
-import com.buy01.media.dto.MediaCreateDTO;
-import com.buy01.media.dto.MediaResponseDTO;
+import com.buy01.media.dto.*;
 import com.buy01.media.exception.NotFoundException;
 import com.buy01.media.model.Media;
 import com.buy01.media.repository.MediaRepository;

@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { BASE_URL } from '../constants/constants';
+import { AVATAR_BASE_URL } from '../constants/constants';
 
 interface AvatarResponse { avatarUrl: string; }
 
 @Injectable({ providedIn: 'root' })
 export class AvatarService {
-  private apiUrl = `${BASE_URL}/media-service/api/media/internal/avatar`;
+  private apiUrl = `${AVATAR_BASE_URL}`;
 
   constructor(private http: HttpClient) {}
 

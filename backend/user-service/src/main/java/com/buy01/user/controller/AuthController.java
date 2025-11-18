@@ -57,7 +57,7 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<?> signup(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
-            @ModelAttribute UserCreateDTO request // accepting avatar at signup
+            @ModelAttribute @Valid UserCreateDTO request
     ) throws IOException {
         // Prevent logged-in users from creating new accounts
         final String currentUserId = (authHeader != null) ? securityUtils.getCurrentUserId(authHeader) : null;
@@ -75,13 +75,13 @@ public class AuthController {
         user.setPassword(request.getPassword());
         user.setRole(request.getRole());
 
-        // Save the user and avatar (if provided)
+        // Save the user and avatar
         User created = userService.createUser(user, request.getAvatar());
 
-        // Safely set avatarUrl — if no avatar, use empty string or a default path
+        // Set avatarUrl — if no avatar, use empty string
         String avatarUrl = (created.getAvatarUrl() != null && !created.getAvatarUrl().isEmpty())
                 ? created.getAvatarUrl()
-                : "/api/media/avatar/default.png"; // optional: default avatar
+                : "";
 
         // Construct the response DTO
         UserResponseDTO response = new UserResponseDTO(

@@ -57,11 +57,10 @@ public class UserService {
             throw new IllegalArgumentException("Please select a role");
         }
 
-        // 1. Save user first so it gets a valid ID
         User savedUser = userRepository.save(user);
 
         // 2. Only upload avatar if provided
-        if (avatar != null && !avatar.isEmpty()) {
+        if (avatar != null && !avatar.isEmpty() && savedUser.getRole().equals(Role.SELLER)) {
             System.out.println("Avatar received in user service: " + avatar.getOriginalFilename());
 
             // Call media-service through MediaClient

@@ -7,7 +7,7 @@ import { Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
-import { BASE_URL } from './constants/constants';
+import { AVATAR_BASE_URL } from './constants/constants';
 
 @Component({
   selector: 'app-root',
@@ -50,7 +50,7 @@ export class AppComponent {
     if (this.isLoggedIn) {
         this.auth.getCurrentUser().subscribe(user => {
           this.profileImageUrl = user.avatar
-            ? `${BASE_URL}/media-service${user.avatar}`
+            ? `${AVATAR_BASE_URL}/${user.avatar}`
             : 'assets/default.jpg';
         });
       } else {

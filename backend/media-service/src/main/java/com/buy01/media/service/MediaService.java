@@ -168,7 +168,7 @@ public class MediaService {
         storeFile(file, avatarPath.toString(), fileName);
 
         // return relative URL usable by frontend
-        return "/api/media/avatar/" + fileName;
+        return fileName;
     }
 
     // delete user avatar from server

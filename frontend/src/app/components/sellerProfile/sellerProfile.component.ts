@@ -29,6 +29,9 @@ export class SellerProfileComponent implements OnInit {
 
     this.userService.getMe().subscribe({
       next: (data: User) => {
+        if (data && data.products) {
+                  data.products.reverse();
+                }
         this.user = data;
       },
       error: (err: unknown) => console.error(err),

@@ -144,7 +144,7 @@ export class ManageProductsComponent implements OnInit {
           this.error = null;
           this.userService.getMe().subscribe({
             next: (user: User) => {
-              this.sellerProducts = user.products || [];
+              this.sellerProducts = (user.products || []).reverse();
               console.log('getMyProducts: success', this.sellerProducts);
               this.loading = false;
             },
@@ -166,8 +166,8 @@ export class ManageProductsComponent implements OnInit {
               const formData = new FormData();
               formData.append('name', this.product.name);
               formData.append('description', this.product.description);
-              formData.append('price', this.product.price.toString());
-              formData.append('quantity', this.product.quantity.toString());
+              formData.append('price', (this.product.price ?? 0).toString());
+              formData.append('quantity', (this.product.quantity ?? 0).toString());
 
               if (this.mode === 'create') {
                   // create endpoint expects key 'imagesList'
@@ -180,7 +180,6 @@ export class ManageProductsComponent implements OnInit {
                     error: (err) => console.error('Create failed', err)
                   });
               } else {
-                  // update: include deletedImageIds and new files under key 'images'
                   this.deletedImageIds.forEach(id => formData.append('deletedImageIds', id));
                   this.selectedFiles.forEach(file => {
                      formData.append('images', file);

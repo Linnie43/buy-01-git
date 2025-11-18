@@ -185,6 +185,7 @@ public class MediaService {
         }
         String contentType = file.getContentType();
         if (contentType == null || !contentType.startsWith("image/")) {
+            System.out.println("Invalid content type: " + contentType);
             throw new FileUploadException("Invalid file type");
         }
     }

@@ -38,6 +38,7 @@ export class AuthInterceptor implements HttpInterceptor {
     }
 
     return next.handle(authReq).pipe(
+      // catch error block
       catchError((error: HttpErrorResponse) => {
         let errorMsg = 'Something went wrong';
 
@@ -54,14 +55,16 @@ export class AuthInterceptor implements HttpInterceptor {
           }
         } else if (error.status === 0) {
           errorMsg = 'Cannot reach server';
-        } else if (error.status >= 400 && error.status < 500) {
+        } else if (error.status > 400 && error.status < 500) {
           console.log('AuthInterceptor - Client error response', error);
           errorMsg = error.error?.message || 'Client error';
         } else if (error.status >= 500) {
           errorMsg = 'Server error occurred';
         }
 
-        this.snackBar.open(errorMsg, 'Close', { duration: 5000 });
+         if (error.status !== 400) {
+                  this.snackBar.open(errorMsg, 'Close', { duration: 5000 });
+                }
 
         return throwError(() => error);
       })

@@ -1,4 +1,5 @@
 package com.buy01.user.controller;
+import com.buy01.user.exception.NotFoundException;
 import com.buy01.user.security.JwtUtil;
 import com.buy01.user.security.SecurityUtils;
 import com.buy01.user.service.UserService;
@@ -37,7 +38,7 @@ public class AuthController {
         String password = loginData.get("password");
 
         User user = userService.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
 
         // in case password does not match
         if (!passwordEncoder.matches(password, user.getPassword())) {

@@ -2,6 +2,7 @@ package com.buy01.user.client;
 
 import com.buy01.user.dto.AvatarCreateDTO;
 import com.buy01.user.dto.AvatarResponseDTO;
+import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.*;
@@ -53,7 +54,7 @@ public class MediaClient {
         );
 
         if (!response.getStatusCode().is2xxSuccessful()) {
-            throw new RuntimeException("Failed to upload avatar: " + response.getStatusCode());
+            throw new FileUploadException("Failed to upload avatar: " + response.getStatusCode());
         }
 
         return response.getBody();

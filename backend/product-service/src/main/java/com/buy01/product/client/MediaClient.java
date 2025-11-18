@@ -1,6 +1,7 @@
 package com.buy01.product.client;
 
 import com.buy01.product.dto.MediaResponseDTO;
+import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.*;
@@ -86,7 +87,7 @@ public class MediaClient {
 
         if (!response.getStatusCode().is2xxSuccessful()) {
             System.out.println("Failed to save images: " + response.getStatusCode());
-            throw new RuntimeException("Failed to upload images: " + response.getStatusCode());
+            throw new FileUploadException("Failed to upload images: " + response.getStatusCode());
         }
 
         return mediaIds.stream()

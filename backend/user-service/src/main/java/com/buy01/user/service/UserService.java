@@ -6,10 +6,12 @@ import com.buy01.user.dto.AvatarCreateDTO;
 import com.buy01.user.dto.AvatarResponseDTO;
 import com.buy01.user.dto.ProductDTO;
 import com.buy01.user.dto.UserUpdateRequest;
+import com.buy01.user.exception.FileUploadException;
 import com.buy01.user.exception.ForbiddenException;
 import com.buy01.user.model.Role;
 import com.buy01.user.model.User;
 import com.buy01.user.repository.UserRepository;
+import jakarta.ws.rs.InternalServerErrorException;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
@@ -138,13 +140,13 @@ public class UserService {
             );
 
             if (!response.getStatusCode().is2xxSuccessful()) {
-                throw new RuntimeException("Avatar update failed: " + response.getStatusCode());
+                throw new FileUploadException("Avatar update failed: " + response.getStatusCode());
             }
 
             return response.getBody();
 
         } catch (Exception e) {
-            throw new RuntimeException("Error updating avatar", e);
+            throw new InternalServerErrorException("Error updating avatar", e);
         }
     }
 

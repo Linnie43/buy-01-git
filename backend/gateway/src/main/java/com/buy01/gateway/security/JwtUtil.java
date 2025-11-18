@@ -5,6 +5,7 @@ import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Claims;
+import jakarta.ws.rs.ForbiddenException;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -25,7 +26,7 @@ public class JwtUtil {
                     .parseClaimsJws(token)
                     .getBody();
         } catch (Exception e) {
-            throw new RuntimeException("Invalid JWT token", e);
+            throw new ForbiddenException("Invalid JWT token", e);
         }
     }
 

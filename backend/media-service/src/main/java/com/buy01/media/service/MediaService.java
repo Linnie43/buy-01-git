@@ -6,6 +6,7 @@ import com.buy01.media.exception.ForbiddenException;
 import com.buy01.media.exception.NotFoundException;
 import com.buy01.media.repository.MediaRepository;
 import com.buy01.media.exception.FileUploadException;
+import jakarta.ws.rs.InternalServerErrorException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -199,7 +200,7 @@ public class MediaService {
                 System.out.println("File not found: " + filePath);
             }
         } catch (IOException e) {
-            throw new RuntimeException("Failed to delete file: " + filePath, e);
+            throw new InternalServerErrorException("Failed to delete file: " + filePath, e);
         }
     }
 

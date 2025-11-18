@@ -82,11 +82,15 @@ export class AuthService {
   }
 
   logout() {
-    localStorage.removeItem('token');
-    this.decodedToken = null;
-    window.location.reload();
-  }
-  getCurrentUser(): Observable<User> {
-    return this.http.get<User>(`${BASE_URL}/user-service/api/users/me`);
-  }
+      const currentUrl = this.router.url;
+      localStorage.removeItem('token');
+      this.decodedToken = null;
+       if (!currentUrl.includes('/products/*')) {
+            this.router.navigate(['/']).then(() => {
+              window.location.reload();
+            });
+          } else {
+            window.location.reload();
+          }
+    }
 }

@@ -1,11 +1,9 @@
-import { Component } from '@angular/core';
-import { OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../../services/product.service';
 import { Product } from '../../models/product.model';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
-import { Router } from '@angular/router';
 import { ImageUrlPipe } from '../../pipes/image-url.pipe';
 import { ImageCarouselComponent } from '../shared/image-carousel/image-carousel.component';
 
@@ -27,31 +25,20 @@ export class ProductViewComponent implements OnInit {
     private router: Router
   ) {}
 
-ngOnInit(): void {
-  this.isLoggedIn = this.authService.isLoggedIn();
-
-  const productId = this.route.snapshot.paramMap.get('id');
-  if (productId) {
-    this.productService.getProductById(productId).subscribe({
-      next: (data: Product) => {
-        this.product = data;
-
-        // fetching from the media-service the images associated with the product
-        this.productService.getProductImages(productId).subscribe({
-          next: (images: string[]) => {
-            if (images.length > 0) {
-              this.product!.images = images;
-            } else {
-              this.product!.images = ['assets/product_image_placeholder.png'];
-            }
+  ngOnInit(): void {
+    this.isLoggedIn = this.authService.isLoggedIn();
+    const productId = this.route.snapshot.paramMap.get('id');
+      if (productId) {
+        this.productService.getProductById(productId).subscribe({
+          next: (data: Product) => {
+            this.product = data;
           },
-          error: (err: unknown) => console.error('Error fetching images:', err)
+          error: (err: unknown) => console.error('Error fetching product:', err)
         });
-      },
-      error: (err: unknown) => console.error('Error fetching product:', err)
-    });
-  }
-}
+      } else {
+        this.router.navigate(['']);
+      }
+    }
 
   goToUpdateProduct(productId: string) {
     this.router.navigate(['/products/update', productId]);

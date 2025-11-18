@@ -16,5 +16,5 @@ export const routes: Routes = [
   { path: 'products/:id', component: ProductViewComponent },
   { path: 'seller-profile', component: SellerProfileComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'SELLER' }  },
   { path: 'client-profile', component: ClientProfileComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'CLIENT' }  },
-  { path: '**', redirectTo: '/auth' }
+  { path: '**', redirectTo: '' }
 ];

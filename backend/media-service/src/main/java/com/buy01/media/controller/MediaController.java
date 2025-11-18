@@ -9,8 +9,6 @@ import com.buy01.media.model.Media;
 import com.buy01.media.repository.MediaRepository;
 import com.buy01.media.service.MediaService;
 import jakarta.validation.Valid;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.CacheControl;
@@ -94,6 +92,21 @@ public class MediaController {
                 .toList();
     }
 
+    // Endpoint to update images for a product
+    @PutMapping("/internal/images/productId/{productId}")
+    public ResponseEntity<List<MediaResponseDTO>> updateProductImages(
+            @PathVariable String productId,
+            @Valid @ModelAttribute MediaUpdateRequest dto
+    ) throws IOException {
+        List<MediaResponseDTO> updatedMedia = mediaService.updateProductImages(
+                productId,
+                dto.getImagesToDelete(),
+                dto.getNewImages()
+        );
+
+        return ResponseEntity.ok(updatedMedia);
+    }
+
     // Delete image as per id
     @DeleteMapping("/internal/images/{id}")
     public ResponseEntity<?> deleteImage(
@@ -153,6 +166,7 @@ public class MediaController {
                 .body(resource);
     }
 
+    // Needs also PUT endpoint to update avatar
 
     // delete avatar from server
     @DeleteMapping("/internal/avatar/{path}")

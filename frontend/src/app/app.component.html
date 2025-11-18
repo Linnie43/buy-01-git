@@ -6,7 +6,7 @@
       Logout
     </button>
 
-    <a *ngIf="showProfile" [routerLink]="profileRoute" class="profile-link">
+    <a *ngIf="showProfile" [routerLink]="profileRoute" class="profile-link" [attr.title]="isSeller ? 'Manage my profile and product listings' : null">
       <img [src]="profileImageUrl" alt="Profile" class="profile-img" />
     </a>
 

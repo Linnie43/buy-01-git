@@ -21,6 +21,8 @@ export class AppComponent {
   profileImageUrl: string | null = null;
   isLoggedIn = false;
   showProfile = false;
+  isSeller = false;
+
 
   constructor(private auth: AuthService, private router: Router) {
     this.updateProfileState();
@@ -34,6 +36,7 @@ export class AppComponent {
   private updateProfileState() {
     this.isLoggedIn = this.auth.isLoggedIn();
     const role = this.auth.getUserRole();
+    this.isSeller = role === 'SELLER';
     this.profileRoute =
       role === 'CLIENT' ? '/client-profile' :
       role === 'SELLER' ? '/seller-profile' :
@@ -55,6 +58,7 @@ export class AppComponent {
 
   logout() {
     this.auth.logout();
+    this.isSeller = false;
     this.showProfile = false;
   }
 }

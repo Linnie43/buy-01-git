@@ -1,7 +1,6 @@
 package com.buy01.product.controller;
 
 import com.buy01.product.model.Product;
-import com.buy01.product.security.JwtUtil;
 import com.buy01.product.service.ProductService;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,12 +19,10 @@ import jakarta.validation.Valid;
 public class ProductController {
 
     private final ProductService productService;
-    private final JwtUtil jwtUtil;
     private final SecurityUtils securityUtils;
 
-    public ProductController(ProductService productService,  JwtUtil jwtUtil, SecurityUtils securityUtils) {
+    public ProductController(ProductService productService, SecurityUtils securityUtils) {
         this.productService = productService;
-        this.jwtUtil = jwtUtil;
         this.securityUtils = securityUtils;
     }
 
@@ -85,8 +82,8 @@ public class ProductController {
         }
         System.out.println("Current user id getting product: " + currentUserId);
         Product p = productService.getProductById(productId);
-//        List<String> images = productService.getProductImages(p.getProductId());
-        List<String> images = null;
+        List<String> images = productService.getProductImageIds(p.getProductId());
+        if (images == null) images = Collections.emptyList();
 
         return new ProductResponseDTO(
                 p.getProductId(),
@@ -100,29 +97,29 @@ public class ProductController {
         );
     }
 
-    // get all products of the current logged-in user
-    @GetMapping("/my-products")
-    public List<ProductResponseDTO> getMyProducts(
-            @RequestHeader("Authorization") String authHeader
-    ) {
-        String currentUserId = securityUtils.getCurrentUserId(authHeader);
-        return productService.getAllProducts().stream()
-                .filter(p -> p.getUserId().equals(currentUserId))
-                .map(p -> {
-                    List<String> images = productService.getProductImageIds(p.getProductId());
-                    return new ProductResponseDTO(
-                            p.getProductId(),
-                            p.getName(),
-                            p.getDescription(),
-                            p.getPrice(),
-                            p.getQuantity(),
-                            p.getUserId(),
-                            images,
-                            currentUserId.equals(p.getUserId())
-                    );
-                })
-                .toList();
-    }
+//    // get all products of the current logged-in user
+//    @GetMapping("/my-products")
+//    public List<ProductResponseDTO> getMyProducts(
+//            @RequestHeader("Authorization") String authHeader
+//    ) {
+//        String currentUserId = securityUtils.getCurrentUserId(authHeader);
+//        return productService.getAllProducts().stream()
+//                .filter(p -> p.getUserId().equals(currentUserId))
+//                .map(p -> {
+//                    List<String> images = productService.getProductImageIds(p.getProductId());
+//                    return new ProductResponseDTO(
+//                            p.getProductId(),
+//                            p.getName(),
+//                            p.getDescription(),
+//                            p.getPrice(),
+//                            p.getQuantity(),
+//                            p.getUserId(),
+//                            images,
+//                            currentUserId.equals(p.getUserId())
+//                    );
+//                })
+//                .toList();
+//    }
 
     // get all products of the current logged-in user
     @GetMapping("/internal/my-products/{userId}")

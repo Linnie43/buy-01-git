@@ -13,6 +13,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../shared/confirmation-dialog.component';
 import { ImageUrlPipe } from '../../pipes/image-url.pipe';
 
+const MAX_SIZE = 2 * 1024 * 1024; // 2 MB
+
 interface ImagePreview {
   url: string;
   isNew: boolean; // To distinguish between existing (id) and new (file)
@@ -34,6 +36,7 @@ export class ManageProductsComponent implements OnInit {
     loading = false;
     error: string | null = null;
     selectedFiles: File[] = [];
+    rejectedFiles: string[] = [];
     imagePreviews: ImagePreview[] = [];
     deletedImageIds: string[] = []; // track images user removed during edit
 
@@ -81,40 +84,78 @@ export class ManageProductsComponent implements OnInit {
           };
         }
 
-       onFileSelected(event: Event): void {
-               const input = event.target as HTMLInputElement;
-               if (!input.files || input.files.length === 0) {
-                   return;
-               }
+      onFileSelected(event: Event): void {
+        const input = event.target as HTMLInputElement;
+        if (!input.files || input.files.length === 0) return;
 
-               this.error = null;
-               const totalCurrentImageCount = this.imagePreviews.length;
-               const allowedNewFiles = 5 - totalCurrentImageCount;
+        // Reset per-selection state
+        this.error = null;
+        this.rejectedFiles = [];
 
-               if (allowedNewFiles <= 0) {
-                   this.error = 'You have already reached the maximum of 5 images.';
-                   return;
-               }
+        const totalCurrentImageCount = this.imagePreviews.length;
+        const allowedNewFiles = 5 - totalCurrentImageCount;
 
-               const filesToProcess = Array.from(input.files).slice(0, allowedNewFiles);
+        if (allowedNewFiles <= 0) {
+          this.error = 'You have already reached the maximum of 5 images.';
+          return;
+        }
 
-               if (input.files.length > allowedNewFiles) {
-                   this.error = `You can only add ${allowedNewFiles} more image(s). ${filesToProcess.length} were added.`;
-               }
+        // Enforce count first
+        const candidateFiles = Array.from(input.files).slice(0, allowedNewFiles);
+        let countError: string | null = null;
+        if (input.files.length > allowedNewFiles) {
+          countError = `You can only add ${allowedNewFiles} more image(s). Extra files were ignored.`;
+        }
 
-                filesToProcess.forEach(file => {
-                                           this.selectedFiles.push(file);
-                                       });
-                                this.updateImagePreviews();
-                                input.value = '';
-                   }
+      // Get names of already selected files for uniqueness check
+        const existingFileNames = new Set(this.selectedFiles.map(f => f.name));
+        const duplicateFiles: string[] = [];
+
+        // Size and uniqueness validation
+        const validFiles: File[] = [];
+        candidateFiles.forEach(file => {
+          if (existingFileNames.has(file.name)) {
+            duplicateFiles.push(file.name);
+          } else if (file.size > MAX_SIZE) {
+            this.rejectedFiles.push(
+              `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`
+            );
+          } else {
+            validFiles.push(file);
+            existingFileNames.add(file.name); // Add to set to check for duplicates within the same selection
+          }
+        });
+
+        let sizeError: string | null = null;
+        if (this.rejectedFiles.length) {
+          sizeError = `Files can only be up to 2 MB, you have: ${this.rejectedFiles.join(', ')}`;
+        }
+
+       let duplicateError: string | null = null;
+              if (duplicateFiles.length > 0) {
+                duplicateError = `Duplicate file names are not allowed: ${duplicateFiles.join(', ')}`;
+              }
+
+        // Combine errors if both occurred
+        this.error = [countError, sizeError, duplicateError].filter(Boolean).join(' | ');
+
+
+        // Accept valid files
+        validFiles.forEach(f => this.selectedFiles.push(f));
+
+        // Refresh previews
+        this.updateImagePreviews();
+
+        // Clear input so same files can be re-selected if needed
+        input.value = '';
+      }
 
       loadMyProducts() {
           this.loading = true;
           this.error = null;
           this.userService.getMe().subscribe({
             next: (user: User) => {
-              this.sellerProducts = user.products || [];
+              this.sellerProducts = (user.products || []).reverse();
               console.log('getMyProducts: success', this.sellerProducts);
               this.loading = false;
             },
@@ -136,8 +177,8 @@ export class ManageProductsComponent implements OnInit {
               const formData = new FormData();
               formData.append('name', this.product.name);
               formData.append('description', this.product.description);
-              formData.append('price', this.product.price.toString());
-              formData.append('quantity', this.product.quantity.toString());
+              formData.append('price', (this.product.price ?? 0).toString());
+              formData.append('quantity', (this.product.quantity ?? 0).toString());
 
               if (this.mode === 'create') {
                   // create endpoint expects key 'imagesList'
@@ -150,7 +191,6 @@ export class ManageProductsComponent implements OnInit {
                     error: (err) => console.error('Create failed', err)
                   });
               } else {
-                  // update: include deletedImageIds and new files under key 'images'
                   this.deletedImageIds.forEach(id => formData.append('deletedImageIds', id));
                   this.selectedFiles.forEach(file => {
                      formData.append('images', file);

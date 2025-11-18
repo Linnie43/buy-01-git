@@ -5,8 +5,8 @@ spring:
   cloud:
     discovery:
       enabled: true
-
     gateway:
+      max-in-memory-size: 15MB   # must cover total multipart + form overhead
       discovery:
         locator:
           enabled: true
@@ -52,10 +52,6 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
     register-with-eureka: true
     fetch-registry: true
-
-  cloud:
-    gateway:
-      max-in-memory-size: 15MB   # must cover total multipart + form overhead
 
 logging:
   level:

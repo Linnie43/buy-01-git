@@ -107,15 +107,22 @@ export class ManageProductsComponent implements OnInit {
           countError = `You can only add ${allowedNewFiles} more image(s). Extra files were ignored.`;
         }
 
-        // Size validation
+      // Get names of already selected files for uniqueness check
+        const existingFileNames = new Set(this.selectedFiles.map(f => f.name));
+        const duplicateFiles: string[] = [];
+
+        // Size and uniqueness validation
         const validFiles: File[] = [];
         candidateFiles.forEach(file => {
-          if (file.size > MAX_SIZE) {
+          if (existingFileNames.has(file.name)) {
+            duplicateFiles.push(file.name);
+          } else if (file.size > MAX_SIZE) {
             this.rejectedFiles.push(
               `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`
             );
           } else {
             validFiles.push(file);
+            existingFileNames.add(file.name); // Add to set to check for duplicates within the same selection
           }
         });
 
@@ -124,10 +131,14 @@ export class ManageProductsComponent implements OnInit {
           sizeError = `Files can only be up to 2 MB, you have: ${this.rejectedFiles.join(', ')}`;
         }
 
+       let duplicateError: string | null = null;
+              if (duplicateFiles.length > 0) {
+                duplicateError = `Duplicate file names are not allowed: ${duplicateFiles.join(', ')}`;
+              }
+
         // Combine errors if both occurred
-        if (countError || sizeError) {
-          this.error = [countError, sizeError].filter(Boolean).join(' | ');
-        }
+        this.error = [countError, sizeError, duplicateError].filter(Boolean).join(' | ');
+
 
         // Accept valid files
         validFiles.forEach(f => this.selectedFiles.push(f));
@@ -144,7 +155,7 @@ export class ManageProductsComponent implements OnInit {
           this.error = null;
           this.userService.getMe().subscribe({
             next: (user: User) => {
-              this.sellerProducts = user.products || [];
+              this.sellerProducts = (user.products || []).reverse();
               console.log('getMyProducts: success', this.sellerProducts);
               this.loading = false;
             },
@@ -166,8 +177,8 @@ export class ManageProductsComponent implements OnInit {
               const formData = new FormData();
               formData.append('name', this.product.name);
               formData.append('description', this.product.description);
-              formData.append('price', this.product.price.toString());
-              formData.append('quantity', this.product.quantity.toString());
+              formData.append('price', (this.product.price ?? 0).toString());
+              formData.append('quantity', (this.product.quantity ?? 0).toString());
 
               if (this.mode === 'create') {
                   // create endpoint expects key 'imagesList'
@@ -180,7 +191,6 @@ export class ManageProductsComponent implements OnInit {
                     error: (err) => console.error('Create failed', err)
                   });
               } else {
-                  // update: include deletedImageIds and new files under key 'images'
                   this.deletedImageIds.forEach(id => formData.append('deletedImageIds', id));
                   this.selectedFiles.forEach(file => {
                      formData.append('images', file);

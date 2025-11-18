@@ -1,5 +1,5 @@
 <div class="image-carousel position-relative">
-  <img [src]="currentImageSrc | imageUrl" class="img-fluid" alt="Product Image">
+  <img [src]="currentImageSrc | imageUrl" class="img-fluid" alt="Product Image" [style.object-fit]="objectFit">
 
   <!-- Carousel Controls -->
   <ng-container *ngIf="images && images.length > 1">

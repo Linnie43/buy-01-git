@@ -53,3 +53,6 @@
   border-color: #004d00;
 }
 
+.form-control.is-invalid ~ .invalid-feedback {
+  display: block;
+}

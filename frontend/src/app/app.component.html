@@ -10,7 +10,7 @@
       <img src="assets/default.jpg" alt="Profile" class="profile-img" />
     </a>
 
-    <button *ngIf="!showProfile" routerLink="/auth" class="login-btn">
+    <button *ngIf="!showProfile && !isOnAuthPage" routerLink="/auth" class="login-btn">
       Login
     </button>
   </div>

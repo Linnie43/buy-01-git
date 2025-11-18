@@ -21,6 +21,7 @@ export class AppComponent {
   isLoggedIn = false;
   showProfile = false;
   isSeller = false;
+  isOnAuthPage = false;
 
 
   constructor(private auth: AuthService, private router: Router) {
@@ -43,6 +44,7 @@ export class AppComponent {
 
     const url = this.router.url ?? '';
     this.showProfile = this.isLoggedIn && !url.includes('auth');
+    this.isOnAuthPage = url.includes('auth');
   }
 
   logout() {

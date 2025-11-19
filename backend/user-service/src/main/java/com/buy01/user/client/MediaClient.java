@@ -2,6 +2,7 @@ package com.buy01.user.client;
 
 import com.buy01.user.dto.AvatarCreateDTO;
 import com.buy01.user.dto.AvatarResponseDTO;
+import com.buy01.user.dto.AvatarUpdateRequest;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.io.ByteArrayResource;
@@ -33,7 +34,6 @@ public class MediaClient {
         MultipartFile avatar = avatarCreateDTO.getAvatar();
 
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("userId", avatarCreateDTO.getUserId());
         body.add("avatar", new ByteArrayResource(avatar.getBytes()) {
             @Override
             public String getFilename() {
@@ -55,6 +55,40 @@ public class MediaClient {
 
         if (!response.getStatusCode().is2xxSuccessful()) {
             throw new FileUploadException("Failed to upload avatar: " + response.getStatusCode());
+        }
+
+        return response.getBody();
+    }
+
+    public AvatarResponseDTO updateAvatar(AvatarUpdateRequest avatarUpdateRequest) throws IOException, FileUploadException {
+        String url = mediaServiceBaseUrl + "/avatar";
+        System.out.println("Request url: " + url);
+        MultipartFile avatar = avatarUpdateRequest.getNewAvatar();
+
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("oldAvatarUrl", avatarUpdateRequest.getOldAvatar());
+        body.add("avatar", new ByteArrayResource(avatar.getBytes()) {
+            @Override
+            public String getFilename() {
+                return avatar.getOriginalFilename();
+            }
+        });
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+        ResponseEntity<AvatarResponseDTO> response = restTemplate.exchange(
+                url,
+                HttpMethod.PUT,
+                requestEntity,
+                AvatarResponseDTO.class
+        );
+
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            throw new FileUploadException("Failed to update avatar: " + response.getStatusCode());
         }
 
         return response.getBody();

@@ -1,8 +1,11 @@
 package com.buy01.user.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.web.multipart.MultipartFile;
 
 public class SellerUpdateRequest extends com.buy01.user.dto.UserUpdateRequest {
+    @NotNull
     private MultipartFile avatar;
 
     public SellerUpdateRequest() {}

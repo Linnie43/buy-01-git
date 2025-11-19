@@ -9,19 +9,14 @@ import java.util.List;
 public class AvatarCreateDTO {
 
     private MultipartFile avatar;
-    @NotBlank
-    private String userId;
 
     public AvatarCreateDTO() {}
-    public AvatarCreateDTO(MultipartFile avatar, String userId) {
+    public AvatarCreateDTO(MultipartFile avatar) {
         this.avatar = avatar;
-        this.userId = userId;
     }
 
     public MultipartFile getAvatar() { return avatar; }
     public void setAvatar(MultipartFile avatar) { this.avatar = avatar; }
 
-    public String getUserId() { return userId; }
-    public void setUserId(String userId) { this.userId = userId; }
 
 }

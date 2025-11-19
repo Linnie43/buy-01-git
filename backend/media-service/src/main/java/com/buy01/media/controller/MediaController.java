@@ -165,6 +165,15 @@ public class MediaController {
     }
 
     // Needs also PUT endpoint to update avatar
+    @PutMapping("/internal/avatar")
+    public ResponseEntity<AvatarResponseDTO> updateAvatar(
+            @Valid @ModelAttribute AvatarUpdateRequest dto
+    ) throws IOException {
+
+        AvatarResponseDTO response = mediaService.updateAvatar(dto.getNewAvatar(), dto.getOldAvatar());
+
+        return ResponseEntity.ok(response);
+    }
 
     // delete avatar from server
     @DeleteMapping("/internal/avatar/{path}")

@@ -1,6 +1,7 @@
 package com.buy01.media.service;
 
 import com.buy01.media.client.ProductClient;
+import com.buy01.media.dto.AvatarResponseDTO;
 import com.buy01.media.dto.MediaResponseDTO;
 import com.buy01.media.exception.ForbiddenException;
 import com.buy01.media.exception.NotFoundException;
@@ -169,6 +170,19 @@ public class MediaService {
 
         // return relative URL usable by frontend
         return fileName;
+    }
+
+    public AvatarResponseDTO updateAvatar(MultipartFile file, String oldAvatarUrl) {
+        validateFile(file);
+
+        // delete old avatar if exists
+        if (oldAvatarUrl != null && !oldAvatarUrl.isEmpty()) {
+            deleteAvatar(oldAvatarUrl);
+        }
+
+        // save new avatar
+        String newAvatarFilename = saveUserAvatar(file);
+        return new AvatarResponseDTO(newAvatarFilename);
     }
 
     // delete user avatar from server

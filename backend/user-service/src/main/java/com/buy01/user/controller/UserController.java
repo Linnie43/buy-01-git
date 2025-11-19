@@ -8,11 +8,13 @@ import com.buy01.user.model.User;
 import com.buy01.user.repository.UserRepository;
 import com.buy01.user.security.SecurityUtils;
 import com.buy01.user.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import com.buy01.user.security.JwtUtil;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -93,22 +95,20 @@ public class UserController {
     @PutMapping("/me")
     public UserResponseDTO updateCurrentUser(
             @RequestHeader("Authorization") String authHeader,
-            @RequestBody SellerUpdateRequest request
-    ) {
+            @ModelAttribute @Valid SellerUpdateRequest request
+    ) throws IOException {
         String currentUserId = securityUtils.getCurrentUserId(authHeader);
 
         User user = userRepository.findUserById(currentUserId)
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
-        if (user.getRole() != Role.SELLER) {
+        if (user.getRole() != Role.SELLER && user.getRole() != Role.ADMIN) {
             throw new ForbiddenException("Your role is not able to update the profile");
         }
 
-        String token = jwtUtil.getToken(authHeader);
-
         if (request.getAvatar() != null) {
             String oldAvatar = user.getAvatarUrl();
-            String avatarUrl = userService.updateUserAvatar(request.getAvatar(), oldAvatar, token);
+            String avatarUrl = userService.updateUserAvatar(request.getAvatar(), oldAvatar);
             user.setAvatarUrl(avatarUrl);
         }
         userRepository.save(user);

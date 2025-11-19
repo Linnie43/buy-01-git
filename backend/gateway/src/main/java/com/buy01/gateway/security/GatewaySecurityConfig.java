@@ -36,26 +36,18 @@ public class GatewaySecurityConfig {
                 .formLogin(form -> form.disable())
                 .authorizeExchange(auth -> auth
                         // public endpoints
-                        .pathMatchers("/user-service/api/auth/**").permitAll()
-                        .pathMatchers(HttpMethod.GET, "/product-service/api/products/**").permitAll()
-                        .pathMatchers(HttpMethod.GET, "/media-service/api/media/images/**").permitAll()
+                        .pathMatchers("/api/auth/**").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/media/images/**").permitAll()
 
                         // User endpoints
-                        .pathMatchers("/user-service/api/users/me").hasAnyRole("CLIENT", "SELLER")
-                        .pathMatchers("/user-service/api/users/**").hasRole("ADMIN") // includes /users and /users/{id}
+                        .pathMatchers("/api/users/me").hasAnyRole("CLIENT", "SELLER")
+                        .pathMatchers("/api/users/**").hasRole("ADMIN") // includes /users and /users/{id}
 
                         // Product endpoints
-                        .pathMatchers("/product-service/api/products/my-products").hasRole("SELLER")
-                        .pathMatchers(HttpMethod.POST, "/product-service/api/products/**").hasAnyRole("SELLER", "ADMIN")
-                        .pathMatchers(HttpMethod.PUT, "/product-service/api/products/**").hasAnyRole("SELLER", "ADMIN")
-                        .pathMatchers(HttpMethod.DELETE, "/product-service/api/products/**").hasAnyRole("SELLER", "ADMIN")
-
-                        // Media endpoints
-                        .pathMatchers(HttpMethod.GET, "/media-service/api/media/avatar/**").permitAll()
-                        .pathMatchers(HttpMethod.POST, "/media-service/api/media/internal/avatar").hasAnyRole("SELLER","ADMIN")
-                        .pathMatchers(HttpMethod.DELETE, "/media-service/api/media/internal/avatar").hasAnyRole("SELLER","ADMIN")
-
-                        .pathMatchers("/media-service/api/media/images/**").hasAnyRole("SELLER", "ADMIN")
+                        .pathMatchers(HttpMethod.POST, "/api/products/**").hasAnyRole("SELLER", "ADMIN")
+                        .pathMatchers(HttpMethod.PUT, "/api/products/**").hasAnyRole("SELLER", "ADMIN")
+                        .pathMatchers(HttpMethod.DELETE, "/api/products/**").hasAnyRole("SELLER", "ADMIN")
 
                         .anyExchange().authenticated()
                 )

@@ -3,14 +3,33 @@ spring:
     name: GATEWAY
 
   cloud:
-    discovery:
-      enabled: true
     gateway:
       max-in-memory-size: 15MB   # must cover total multipart + form overhead
-      discovery:
-        locator:
-          enabled: true
-          lower-case-service-id: true
+      routes:
+        - id: auth-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/api/auth/**
+
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/api/users/**
+
+        - id: all-products
+          uri: lb://PRODUCT-SERVICE
+          predicates:
+            - Path=/api/products
+
+        - id: product-service
+          uri: lb://PRODUCT-SERVICE
+          predicates:
+            - Path=/api/products/**
+
+        - id: media-service
+          uri: lb://MEDIA-SERVICE
+          predicates:
+            - Path=/api/media/**
 
 server:
   port: 8443
@@ -19,27 +38,6 @@ server:
     key-store: classpath:ssl/keystore.p12
     key-store-password: password
     key-store-type: PKCS12
-
-gateway:
-  routes:
-    - id: user-service
-      uri: lb://USER-SERVICE
-      predicates:
-        - Path=/user-service/**
-      filters:
-    - RewritePath=/user-service/(?<remaining>.*), /${remaining}
-    - id: product-service
-      uri: lb://PRODUCT-SERVICE
-      predicates:
-        - Path=/product-service/**
-      filters:
-        - RewritePath=/product-service/(?<remaining>.*), /${remaining}
-    - id: media-service
-      uri: lb://MEDIA-SERVICE
-      predicates:
-        - Path=/media-service/**
-      filters:
-        - RewritePath=/media-service/(?<remaining>.*), /${remaining}
 
 jwt:
   secret: very-long-secret-key-string-with-at-least-32-chars

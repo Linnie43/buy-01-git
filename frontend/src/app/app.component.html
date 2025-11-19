@@ -1,5 +1,7 @@
 <header>
-  <a routerLink="/" class="logo">FKML</a>
+  <a routerLink="/" class="logo">
+    <img src="assets/logo.png" alt="FKML Logo" style="height: 80px;">
+  </a>
 
   <div class="header-right">
     <button *ngIf="showProfile" (click)="logout()" class="login-btn">

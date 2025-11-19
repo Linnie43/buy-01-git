@@ -23,7 +23,7 @@
           </div>
         </div>
         <small class="text-muted mt-1">Click main image to add new images (max 5).</small>
-        <small class="text-muted mt-1" style="font-size: 0.75rem;">Accepted formats: JPG, PNG, GIF.</small>
+        <small class="text-muted mt-1" style="font-size: 0.75rem;">Accepted formats: JPG, PNG, GIF, WEBP.</small>
       </div>
       <div class="col-md-7">
         <h3>{{ mode === 'create' ? 'Create Product' : 'Update Product' }}</h3>
@@ -53,7 +53,7 @@
             <input id="price" type="number" class="form-control" formControlName="price" step="0.01" [class.is-invalid]="(productForm.get('price')?.invalid && (productForm.get('price')?.dirty || productForm.get('price')?.touched)) || formErrors['price']">
             <div *ngIf="(productForm.get('price')?.invalid && (productForm.get('price')?.dirty || productForm.get('price')?.touched)) || formErrors['price']" class="invalid-feedback">
               <div *ngIf="productForm.get('price')?.errors?.['required']">Price is required.</div>
-              <div *ngIf="productForm.get('price')?.errors?.['min']">Price must be at least 1.</div>
+              <div *ngIf="productForm.get('price')?.errors?.['min']">Price must be over 0.</div>
               <div *ngIf="formErrors['price']">{{ formErrors['price'] }}</div>
             </div>
           </div>
@@ -104,6 +104,9 @@
     <div class="card product-card-uniform h-100" (click)="edit(p)" style="cursor: pointer;">
       <div class="card-img-container">
         <app-image-carousel [images]="p.images || []"></app-image-carousel>
+        <div class="edit-overlay">
+          <span>Edit</span>
+        </div>
       </div>
       <div class="card-body">
         <h5 class="card-title text-truncate">{{p.name}}</h5>

@@ -10,10 +10,17 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   opacity: 0;
   transition: opacity 0.3s ease;
-  z-index: 5;
+  pointer-events: none; /* Allows clicks to pass through to the card */
+  font-size: 1.2rem;
+  font-weight: bold;
+  font-family: Times New Roman, serif;
 }
 
 .product-card-uniform:hover .edit-overlay {

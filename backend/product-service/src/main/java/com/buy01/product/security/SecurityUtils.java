@@ -1,5 +1,6 @@
 package com.buy01.product.security;
 
+import com.buy01.product.exception.ForbiddenException;
 import io.jsonwebtoken.Claims;
 import org.springframework.stereotype.Component;
 import com.buy01.product.security.JwtUtil;
@@ -23,12 +24,12 @@ public class SecurityUtils {
                 userId = claims.getSubject();
             } catch (Exception e) {
                 System.out.println("FAILS IN GET USERID");
-                throw new RuntimeException("Invalid JWT token", e);
+                throw new ForbiddenException("Invalid JWT token", e);
             }
         }
 
         if (userId == null) {
-            throw new RuntimeException("User not authenticated");
+            throw new ForbiddenException("User not authenticated");
         }
 
         return userId;

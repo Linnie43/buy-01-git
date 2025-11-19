@@ -68,6 +68,11 @@ public class ProductService {
             validateUserId(request.getUserId());
             productOwnerId = request.getUserId();
         }
+
+        if (request.getImagesList() != null && request.getImagesList().size() > 5) {
+            throw new BadRequestException("You can upload up to 5 images.");
+        }
+
         product.setUserId(productOwnerId);
 
         Product savedProduct = productRepository.save(product);
@@ -77,9 +82,6 @@ public class ProductService {
 
         if (request.getImagesList() != null) {
             System.out.println("Number of images uploaded: " + request.getImagesList().size());
-            if (request.getImagesList().size() > 5) {
-                throw new BadRequestException("You can upload up to 5 images.");
-            }
             try {
                 mediaIds = mediaClient.postProductImages(savedProduct.getProductId(), request.getImagesList());
                 System.out.println("Uploaded product images: " + mediaIds);
@@ -131,39 +133,37 @@ public class ProductService {
 
         authProductOwner(product, userId, role);
 
-        if (request.getName() != null && !request.getName().trim().isEmpty()) { // if name exists, validate and update
-            validateProductName(request.getName());
-            product.setName(request.getName().trim());
+        // VALIDATE EVERYTHING FIRST BEFORE UPDATING ??? OR UPDATING WHAT WE CAN, ONE BY ONE
+        // REQUIRES THAT THE IMAGES ARE ALL HANDLED IN ONE REQUEST (UPDATE) AND NOT DELETE AND ADD IN SEPARATE REQUESTS
+
+        //VALIDATE FIRST THEN SET
+        validateProductName(request.getName());
+        validateProductDescription(request.getDescription());
+        validateProductPrice(request.getPrice());
+        validateProductQuantity(request.getQuantity());
+
+        // VALIDATE AND HANDLE IMAGES
+
+        if (request.getDeletedImageIds() == null) {
+            request.setDeletedImageIds(List.of());
+        }
+        if (request.getImages() == null) {
+            request.setImages(List.of());
         }
 
-        if (request.getDescription() != null && !request.getDescription().trim().isEmpty()) {
-            validateProductDescription(request.getDescription());
-            product.setDescription(request.getDescription().trim());
-        }
+        List<String> newMediaIds = mediaClient.updateProductImages(
+                productId,
+                request.getDeletedImageIds(),
+                request.getImages()
+        );
 
-        if (request.getPrice() != null) {
-            validateProductPrice(request.getPrice());
-            product.setPrice(request.getPrice());
-        }
+        // SET IF VALIDATED AND IMAGES HANDLED
 
-        if (request.getQuantity() != null) {
-            validateProductQuantity(request.getQuantity());
-            product.setQuantity(request.getQuantity());
-        }
+        product.setName(request.getName().trim());
+        product.setDescription(request.getDescription().trim());
+        product.setPrice(request.getPrice());
+        product.setQuantity(request.getQuantity());
 
-        if (request.getDeletedImageIds() != null) {
-            System.out.println("Deleted image ids: " + request.getDeletedImageIds());
-            for (String imageId : request.getDeletedImageIds()) {
-                mediaClient.deleteImage( imageId);
-            }
-        }
-
-        List<String> newMediaIds = List.of();
-
-        if (request.getImages() != null) {
-            System.out.println("New images to upload: " + request.getImages().size());
-            newMediaIds = mediaClient.postProductImages(productId, request.getImages());
-        }
 
         Product updatedProduct = productRepository.save(product);
 

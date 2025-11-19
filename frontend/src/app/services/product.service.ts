@@ -66,10 +66,6 @@ export class ProductService {
    deleteProduct(id: string): Observable<void> {
        return this.http.delete<void>(`${this.apiUrl}/${id}`);
      }
-
-   getProductImages(productId: string): Observable<string[]> {
-     return this.http.get<string[]>(`${MEDIA_BASE_URL}/${productId}`);
-   }
   }
 
 

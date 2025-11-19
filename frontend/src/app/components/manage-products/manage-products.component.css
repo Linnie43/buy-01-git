@@ -1,14 +1,21 @@
-.product-card {
-  cursor: pointer;
+/* "Edit" overlay functionality */
+.product-card-uniform {
   position: relative;
+  cursor: pointer;
 }
 
-.product-card .edit-overlay {
+.edit-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
   opacity: 0;
   transition: opacity 0.3s ease;
+  z-index: 5;
 }
 
-.product-card:hover .edit-overlay {
+.product-card-uniform:hover .edit-overlay {
   opacity: 1;
 }

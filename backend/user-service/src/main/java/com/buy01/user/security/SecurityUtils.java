@@ -1,5 +1,6 @@
 package com.buy01.user.security;
 
+import com.buy01.user.exception.ForbiddenException;
 import com.buy01.user.security.JwtUtil;
 import io.jsonwebtoken.Claims;
 import org.springframework.stereotype.Component;
@@ -22,12 +23,12 @@ public class SecurityUtils {
                 Claims claims = jwtUtil.extractClaims(token); // you can use same JwtUtil as in Gateway
                 userId = claims.getSubject();
             } catch (Exception e) {
-                throw new RuntimeException("Invalid JWT token", e);
+                throw new ForbiddenException("Invalid JWT token", e);
             }
         }
 
         if (userId == null) {
-            throw new RuntimeException("User not authenticated");
+            throw new ForbiddenException("User not authenticated");
         }
 
         return userId;

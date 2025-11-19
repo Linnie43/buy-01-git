@@ -27,29 +27,18 @@ export class ProductViewComponent implements OnInit {
 
   ngOnInit(): void {
     this.isLoggedIn = this.authService.isLoggedIn();
-
-const productId = this.route.snapshot.paramMap.get('id');
-  if (productId) {
-    this.productService.getProductById(productId).subscribe({
-      next: (data: Product) => {
-        this.product = data;
-
-        // fetching from the media-service the images associated with the product
-        this.productService.getProductImages(productId).subscribe({
-          next: (images: string[]) => {
-            if (images.length > 0) {
-              this.product!.images = images;
-            } else {
-              this.product!.images = ['assets/product_image_placeholder.png'];
-            }
+    const productId = this.route.snapshot.paramMap.get('id');
+      if (productId) {
+        this.productService.getProductById(productId).subscribe({
+          next: (data: Product) => {
+            this.product = data;
           },
-          error: (err: unknown) => console.error('Error fetching images:', err)
+          error: (err: unknown) => console.error('Error fetching product:', err)
         });
-      },
-      error: (err: unknown) => console.error('Error fetching product:', err)
-    });
-  }
-}
+      } else {
+        this.router.navigate(['']);
+      }
+    }
 
   goToUpdateProduct(productId: string) {
     this.router.navigate(['/products/update', productId]);

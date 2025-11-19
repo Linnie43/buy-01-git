@@ -6,11 +6,11 @@
       Logout
     </button>
 
-    <a *ngIf="showProfile" [routerLink]="profileRoute" class="profile-link">
-      <img src="assets/default.jpg" alt="Profile" class="profile-img" />
+    <a *ngIf="showProfile" [routerLink]="profileRoute" class="profile-link" [attr.title]="isSeller ? 'Manage my profile and product listings' : null">
+      <img [src]="profileImageUrl" alt="Profile" class="profile-img" />
     </a>
 
-    <button *ngIf="!showProfile" routerLink="/auth" class="login-btn">
+    <button *ngIf="!showProfile && !isOnAuthPage" routerLink="/auth" class="login-btn">
       Login
     </button>
   </div>

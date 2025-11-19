@@ -6,6 +6,7 @@ import com.buy01.media.exception.ForbiddenException;
 import com.buy01.media.exception.NotFoundException;
 import com.buy01.media.repository.MediaRepository;
 import com.buy01.media.exception.FileUploadException;
+import jakarta.ws.rs.InternalServerErrorException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,6 +46,11 @@ public class MediaService {
     // saves all images and returns result, trust validation from product service
     public List<MediaResponseDTO> saveProductImages(String productId, List<MultipartFile> files) throws IOException {
 
+        // validate all images first before saving
+        for (MultipartFile file : files) {
+            validateFile(file);
+        }
+
         System.out.println("Saving images for productId: " + productId + ", number of files: " + files.size());
         // Stream files, save them and create a list of MediaResponseDTO for return
         List<MediaResponseDTO> result = files.stream()
@@ -59,7 +65,6 @@ public class MediaService {
 
     // creates path and saves the image to uploads
     public Media saveImage(MultipartFile file, String productId) {
-        validateFile(file);
 
         String extension = Objects.requireNonNull(file.getOriginalFilename())
                 .substring(file.getOriginalFilename().lastIndexOf("."));
@@ -71,6 +76,59 @@ public class MediaService {
         media.setProductId(productId);
 
         return mediaRepository.save(media);
+    }
+
+    // validating updated content and updating media
+    public List<MediaResponseDTO> updateProductImages(String productId, List<String> deletedIds, List<MultipartFile> newImages) {
+         // validate deletedIds exist and belong to productId
+        if (!deletedIds.isEmpty()) {
+            for (String id : deletedIds) {
+                Media media = mediaRepository.findById(id)
+                        .orElseThrow(() -> new NotFoundException("Media not found with id: " + id));
+                if (!media.getProductId().equals(productId)) {
+                    throw new ForbiddenException("Media id: " + id + " does not belong to productId: " + productId);
+                }
+            }
+            System.out.println("Deleting images for productId: " + productId + ", number of files: " + deletedIds.size());
+        }
+
+        // validate newImages
+        if (!newImages.isEmpty()) {
+            for (MultipartFile file : newImages) {
+                validateFile(file);
+            }
+            System.out.println("Updating images for productId: " + productId + ", number of files: " + newImages.size());
+        }
+
+        // validate total amount of pictures for the product is 5
+        List<Media> existingMedia = mediaRepository.getMediaByProductId(productId);
+        int totalImages = existingMedia.size() - deletedIds.size() + newImages.size();
+        if (totalImages > 5) {
+            throw new ForbiddenException("Total number of images for productId: " + productId + " exceeds limit of 5");
+        }
+
+        // delete images
+        for (String id : deletedIds) {
+            Media media = mediaRepository.findById(id).get();
+            deleteFile(media.getPath());
+            mediaRepository.deleteById(id);
+        }
+
+        // save new images
+        List<MediaResponseDTO> updatedMedia = new ArrayList<>();
+        existingMedia.forEach(media -> {
+            if (!deletedIds.contains(media.getId())) {
+                updatedMedia.add(new MediaResponseDTO(media.getId(), media.getProductId()));
+            }
+        });
+        for (MultipartFile file : newImages) {
+            Media media = saveImage(file, productId);
+            updatedMedia.add(new MediaResponseDTO(media.getId(), media.getProductId()));
+        }
+
+        //return updated list
+        System.out.println("Updated images for productId: " + productId + ", number of files: " + updatedMedia.size());
+        return updatedMedia;
     }
 
     // delete media from database
@@ -92,18 +150,31 @@ public class MediaService {
         }
     }
 
+    public Path getAvatarPath(String filename) {
+        return avatarPath.resolve(filename).toAbsolutePath();
+    }
+
+
     // saves user avatar to server and returns path to file
     public String saveUserAvatar(MultipartFile file) {
         validateFile(file);
-        String extension = Objects.requireNonNull(file.getOriginalFilename())
-                .substring(file.getOriginalFilename().lastIndexOf("."));
+
+        // get extension without dot
+        String originalFileName = Objects.requireNonNull(file.getOriginalFilename());
+        String extension = originalFileName.substring(originalFileName.lastIndexOf(".") + 1);
         String fileName = UUID.randomUUID() + "." + extension;
-        return storeFile(file, avatarPath.toString(), fileName);
+
+        // save file
+        storeFile(file, avatarPath.toString(), fileName);
+
+        // return relative URL usable by frontend
+        return fileName;
     }
 
     // delete user avatar from server
-    public void deleteAvatar(String path) {
-        deleteFile(path);
+    public void deleteAvatar(String filename) {
+        Path filePath = avatarPath.resolve(filename).toAbsolutePath();
+        deleteFile(filePath.toString());
     }
 
     // validating the file before storing file to server
@@ -128,6 +199,7 @@ public class MediaService {
         }
         String contentType = file.getContentType();
         if (contentType == null || !contentType.startsWith("image/")) {
+            System.out.println("Invalid content type: " + contentType);
             throw new FileUploadException("Invalid file type");
         }
     }
@@ -141,7 +213,7 @@ public class MediaService {
                 System.out.println("File not found: " + filePath);
             }
         } catch (IOException e) {
-            throw new RuntimeException("Failed to delete file: " + filePath, e);
+            throw new InternalServerErrorException("Failed to delete file: " + filePath, e);
         }
     }
 

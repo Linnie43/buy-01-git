@@ -1,5 +1,6 @@
 package com.buy01.user.security;
 
+import com.buy01.user.exception.ForbiddenException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.security.Keys;
 import javax.crypto.SecretKey;
@@ -42,7 +43,7 @@ public class JwtUtil {
                     .parseClaimsJws(token)
                     .getBody();
         } catch (Exception e) {
-            throw new RuntimeException("Invalid JWT token", e);
+            throw new ForbiddenException("Invalid JWT token", e);
         }
     }
 

@@ -51,7 +51,10 @@ public class GatewaySecurityConfig {
                         .pathMatchers(HttpMethod.DELETE, "/product-service/api/products/**").hasAnyRole("SELLER", "ADMIN")
 
                         // Media endpoints
-                        .pathMatchers("/media-service/api/media/avatar/**").hasAnyRole("SELLER", "ADMIN")
+                        .pathMatchers(HttpMethod.GET, "/media-service/api/media/avatar/**").permitAll()
+                        .pathMatchers(HttpMethod.POST, "/media-service/api/media/internal/avatar").hasAnyRole("SELLER","ADMIN")
+                        .pathMatchers(HttpMethod.DELETE, "/media-service/api/media/internal/avatar").hasAnyRole("SELLER","ADMIN")
+
                         .pathMatchers("/media-service/api/media/images/**").hasAnyRole("SELLER", "ADMIN")
 
                         .anyExchange().authenticated()

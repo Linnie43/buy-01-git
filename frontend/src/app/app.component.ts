@@ -7,6 +7,7 @@ import { Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
+import { AVATAR_BASE_URL } from './constants/constants';
 
 @Component({
   selector: 'app-root',
@@ -20,6 +21,9 @@ export class AppComponent {
   profileImageUrl: string | null = null;
   isLoggedIn = false;
   showProfile = false;
+  isSeller = false;
+  isOnAuthPage = false;
+
 
   constructor(private auth: AuthService, private router: Router) {
     this.updateProfileState();
@@ -33,6 +37,7 @@ export class AppComponent {
   private updateProfileState() {
     this.isLoggedIn = this.auth.isLoggedIn();
     const role = this.auth.getUserRole();
+    this.isSeller = role === 'SELLER';
     this.profileRoute =
       role === 'CLIENT' ? '/client-profile' :
       role === 'SELLER' ? '/seller-profile' :
@@ -40,10 +45,22 @@ export class AppComponent {
 
     const url = this.router.url ?? '';
     this.showProfile = this.isLoggedIn && !url.includes('auth');
+    this.isOnAuthPage = url.includes('auth');
+
+    if (this.isLoggedIn) {
+        this.auth.getCurrentUser().subscribe(user => {
+          this.profileImageUrl = user.avatar
+            ? `${AVATAR_BASE_URL}/${user.avatar}`
+            : 'assets/default.jpg';
+        });
+      } else {
+        this.profileImageUrl = 'assets/default.jpg';
+      }
   }
 
   logout() {
     this.auth.logout();
+    this.isSeller = false;
     this.showProfile = false;
   }
 }

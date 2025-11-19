@@ -7,7 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public class AvatarCreateDTO {
-    @NotEmpty(message = "At least one file is required")
+
     private MultipartFile avatar;
     @NotBlank
     private String userId;

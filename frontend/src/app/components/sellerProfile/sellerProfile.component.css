@@ -1,30 +1,6 @@
-.seller-profile {
-    display: flex;
-    align-items: center;
-    margin-top: 6.25rem;
-    margin-left: 12.5rem;
-}
-.seller-profile img {
-    border-radius: 50%;
-    width:  9.375rem;
-    height: 9.375rem;
-    margin-right: 1.25rem;
-}
-
-.seller-profile p {
-    font-size: 1.5em;
-    margin: 0;
-}
-
-@media (max-width: 768px) {
-    .seller-profile {
-        flex-direction: column;
-        align-items: center;
-        margin-top: 3.125rem;
-        margin-left: 0;
-    }
-    .seller-profile img {
-        margin-right: 0;
-        margin-bottom: 1rem;
-    }
+.profile-img {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  object-fit: cover;
 }

@@ -12,6 +12,7 @@ import { ImageUrlPipe } from '../../../pipes/image-url.pipe';
 export class ImageCarouselComponent {
   @Input() images: string[] = [];
   @Input() placeholder: string = 'assets/product_image_placeholder.png';
+  @Input() objectFit: 'cover' | 'contain' = 'cover';
 
   currentImageIndex = 0;
 

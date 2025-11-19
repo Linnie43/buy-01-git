@@ -1,5 +1,34 @@
-.image-container {
-  max-width: 500px;
+.product-view-card {
+  width: 100%;
+  max-width: 900px;
+}
+
+.main-image-container {
   height: 400px;
   width: 100%;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: .25rem;
+  overflow: hidden;
+}
+
+.main-image-container app-image-carousel {
+  height: 100%;
+  width: 100%;
+  display: block;
+}
+
+.main-image-container ::ng-deep .carousel-item img {
+  object-fit: contain;
+}
+
+.product-details h1 {
+  font-size: 2rem;
+  font-weight: 300;
+}
+
+.product-details .description {
+  font-size: 1rem;
+  white-space: pre-wrap; /* Respects newlines in the description */
+  margin: 1.5rem 0;
 }

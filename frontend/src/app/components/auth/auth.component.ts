@@ -24,9 +24,11 @@ export function passwordsMatchValidator(control: AbstractControl): ValidationErr
 export class AuthComponent {
   isLogin = true; // toggle: true = login, false = signup
 
+  avatarFile: File | null = null;
+
   loginForm = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
-    password: ['', Validators.required]
+    password: ['', [Validators.required, Validators.minLength(3)]]
   });
 
   signupForm = this.fb.group({
@@ -34,7 +36,7 @@ export class AuthComponent {
       lastname: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(3)]],
-      confirmPassword: ['', Validators.required],
+      confirmPassword: ['', [Validators.required, Validators.minLength(3)]],
       role: ['CLIENT', Validators.required]
     }, { validators: passwordsMatchValidator });
 
@@ -44,14 +46,13 @@ export class AuthComponent {
     this.isLogin = !this.isLogin;
   }
 
+  // some bug here? Not reliable when trying to log in with wrong credentials
   onLoginSubmit() {
     if (!this.loginForm.valid) return;
 
     this.authService.login(this.loginForm.value).subscribe({
       next: (res) => {
         console.log('Login success:', res);
-        this.router.navigate(['/']); // redirect after login
-        //does it need to be reload?       window.location.reload();
       },
       error: (err) => {
         console.error('Login error:', err);
@@ -66,22 +67,32 @@ export class AuthComponent {
     const formValue = this.signupForm.value;
 
     const formData = new FormData();
-    formData.append("firstname", formValue.firstname!);
-    formData.append("lastname", formValue.lastname!);
-    formData.append("email", formValue.email!);
-    formData.append("password", formValue.password!); 
-    formData.append("role", formValue.role!);
+    formData.append('firstname', formValue.firstname!);
+    formData.append('lastname', formValue.lastname!);
+    formData.append('email', formValue.email!);
+    formData.append('password', formValue.password!);
+    formData.append('role', formValue.role!);
 
-    // add avatar file here
+    // use the correct property name
+    if (this.avatarFile) {
+      formData.append('avatar', this.avatarFile);
+    }
 
     this.authService.signup(formData).subscribe({
       next: (res) => {
         console.log('Signup success:', res);
-        this.toggleForm(); // switch to login after signup
+        this.toggleForm(); // switch to login
       },
       error: (err) => {
         console.error('Signup error:', err);
       }
     });
+  }
+
+  onAvatarSelected(event: any) {
+    const file: File = event.target.files[0];
+    if (file) {
+      this.avatarFile = file;
+    }
   }
 }

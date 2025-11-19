@@ -40,7 +40,7 @@ public class UserController {
         String currentUserId = securityUtils.getCurrentUserId(authHeader);
 
         User user = userService.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
         return new UserResponseDTO(
                 user.getName(),
                 user.getEmail(),
@@ -158,7 +158,7 @@ public class UserController {
         // Check if user has ADMIN role
         if (auth == null || auth.getAuthorities().stream()
                 .noneMatch(a -> a.getAuthority().equals("ADMIN"))) {
-            throw new RuntimeException("Forbidden - only admin can delete users");
+            throw new ForbiddenException("Forbidden - only admin can delete users");
         }
 
         // Forward JWT token for internal calls if needed

@@ -1,9 +1,7 @@
 package com.buy01.media.controller;
 
 import com.buy01.media.dto.AvatarCreateDTO;
-import com.buy01.media.dto.AvatarResponseDTO;
-import com.buy01.media.dto.MediaCreateDTO;
-import com.buy01.media.dto.MediaResponseDTO;
+import com.buy01.media.dto.*;
 import com.buy01.media.exception.NotFoundException;
 import com.buy01.media.model.Media;
 import com.buy01.media.repository.MediaRepository;
@@ -25,11 +23,11 @@ import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/api/media")
-@CrossOrigin(origins = "*")
 public class MediaController {
 
     private final MediaRepository mediaRepository;
     private final MediaService mediaService;
+    private final String avatarDir = "uploads/avatar";
 
     public MediaController(MediaRepository mediaRepository,MediaService mediaService) {
         this.mediaRepository = mediaRepository;
@@ -92,6 +90,21 @@ public class MediaController {
                 .toList();
     }
 
+    // Endpoint to update images for a product
+    @PutMapping("/internal/images/productId/{productId}")
+    public ResponseEntity<List<MediaResponseDTO>> updateProductImages(
+            @PathVariable String productId,
+            @Valid @ModelAttribute MediaUpdateRequest dto
+    ) throws IOException {
+        List<MediaResponseDTO> updatedMedia = mediaService.updateProductImages(
+                productId,
+                dto.getImagesToDelete(),
+                dto.getNewImages()
+        );
+
+        return ResponseEntity.ok(updatedMedia);
+    }
+
     // Delete image as per id
     @DeleteMapping("/internal/images/{id}")
     public ResponseEntity<?> deleteImage(
@@ -116,13 +129,23 @@ public class MediaController {
     }
 
     // serve the avatar url from the server
-    @GetMapping("/avatar/{path}")
+    @GetMapping("/avatar/{filename}")
     public ResponseEntity<Resource> getAvatar(
-            @PathVariable String path
+            @PathVariable String filename
     ) throws IOException {
-        System.out.println("Avatar requested with path: "+ path);
+        System.out.println("Avatar requested with path: "+ filename);
 
-        Path filePath = Paths.get(path).toAbsolutePath();
+
+        Path baseDir = Paths.get(avatarDir).toAbsolutePath().normalize();
+        Path filePath = baseDir.resolve(filename).normalize();
+
+        System.out.println("Filepath: " + filePath);
+
+        // prevent path traversal
+        if (!filePath.startsWith(baseDir)) {
+            throw new NotFoundException("Invalid path");
+        }
+
         Resource resource = new UrlResource(filePath.toUri());
 
         if (!resource.exists() || !resource.isReadable()) {
@@ -140,6 +163,8 @@ public class MediaController {
                 .cacheControl(CacheControl.maxAge(30, TimeUnit.DAYS).cachePublic())
                 .body(resource);
     }
+
+    // Needs also PUT endpoint to update avatar
 
     // delete avatar from server
     @DeleteMapping("/internal/avatar/{path}")

@@ -1,111 +1,99 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Observable, tap } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
 import { Router } from '@angular/router';
 import { BASE_URL } from '../constants/constants';
-import { AppComponent } from '../app.component';
+import { User } from './user.service';
 
+interface AuthResponse { token?: string; message?: string; avatar?: string; }
+interface DecodedToken { sub?: string; userId?: string; id?: string; role: string; exp: number; }
 
-interface AuthResponse {
-  token?: string;
-  message?: string;
-}
-
-interface DecodedToken {
-  sub: string; // The user's unique ID
-  userId?: string;
-  id?: string;
-  role: string;
-  iat: number;
-  exp: number;
-}
-
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class AuthService {
   private apiUrl = `${BASE_URL}/user-service/api/auth`;
   private decodedToken: DecodedToken | null = null;
-  private token: string | null = null;
-  public appComponent!: AppComponent;
+  private avatarUrl: string | null = null;
 
-  constructor(
-    private http: HttpClient,
-    private router: Router
-    ) {
+  constructor(private http: HttpClient, private router: Router) {
+    const token = localStorage.getItem('token');
+    if (token) this.safeDecode(token);
+  }
 
-     const token = localStorage.getItem('token');
-         if (token) {
-           try {
-             this.decodedToken = jwtDecode<DecodedToken>(token);
-           } catch (error) {
-             console.error('Error decoding token on startup:', error);
-             this.logout();
-           }
-         }
-     }
-
-  isLoggedIn(): boolean {
-      return !!this.decodedToken && this.decodedToken.exp * 1000 > Date.now();
-    }
-
-  getUserRole(): string | null {
-      return this.decodedToken ? this.decodedToken.role : null;
-    }
+  private safeDecode(token: string) {
+    try { this.decodedToken = jwtDecode<DecodedToken>(token); }
+    catch { this.decodedToken = null; }
+  }
 
   getToken(): string | null {
-      return this.token ?? localStorage.getItem('token');
-    }
+    return localStorage.getItem('token');
+  }
 
-  getExpiration(): number | null {
-      const token = this.getToken();
-      if (!token) return null;
+ getCurrentUser(): Observable<User> {
+    return this.http.get<User>(`${BASE_URL}/user-service/api/users/me`);
+  }
 
-      try {
-        const decodedToken: { exp: number } = jwtDecode(token);
-        return decodedToken.exp;
-      } catch (e) {
-        return null;
-      }
-    }
+  getUserId(): string | null {
+    return this.decodedToken?.userId || this.decodedToken?.id || this.decodedToken?.sub || null;
+  }
 
+  setAvatar(url: string) {
+    this.avatarUrl = url;
+  }
 
-  signup(userData: any): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/signup`, userData);
-    }
+  getAvatar(): string | null {
+    return this.avatarUrl;
+  }
+
+  isLoggedIn(): boolean {
+    return !!this.decodedToken && this.decodedToken.exp * 1000 > Date.now();
+  }
+
+  getUserRole(): string | null {
+    return this.decodedToken ? this.decodedToken.role : null;
+  }
+
+  signup(data: any): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/signup`, data);
+  }
 
   login(credentials: any): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(
       tap(res => {
         if (res.token) {
           localStorage.setItem('token', res.token);
-          try {
-            this.decodedToken = jwtDecode<DecodedToken>(res.token);
-            this.router.navigate(['/']).then(() => {
-              window.location.reload();
-            });
-          } catch (error) {
-            console.error('Error decoding token on login:', error);
-            this.decodedToken = null;
-          }
+          this.safeDecode(res.token);
+
+        }
+        if (res.avatar) {
+          this.setAvatar(res.avatar);  // store avatar in the service
+        }
+      this.router.navigate(['/']).then(() => window.location.reload());
+      })
+    );
+  }
+
+  loginNoReload(credentials: any): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(
+      tap(res => {
+        if (res.token) {
+          localStorage.setItem('token', res.token);
+          this.safeDecode(res.token);
         }
       })
     );
   }
 
   logout() {
-    const currentUrl = this.router.url;
-    localStorage.removeItem('token');
-    this.decodedToken = null;
-     if (currentUrl.includes('/seller-profile') || currentUrl.includes('/client-profile')) {
-          this.router.navigate(['/']).then(() => {
+      const currentUrl = this.router.url;
+      localStorage.removeItem('token');
+      this.decodedToken = null;
+       if (!currentUrl.includes('/products/*')) {
+            this.router.navigate(['/']).then(() => {
+              window.location.reload();
+            });
+          } else {
             window.location.reload();
-          });
-        } else {
-          window.location.reload();
-        }
-  }
-
+          }
+    }
 }

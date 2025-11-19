@@ -22,8 +22,11 @@ export class AuthInterceptor implements HttpInterceptor {
     const token = this.authService.getToken();
     let authReq = req;
 
-    // Only attach the token if it exists and is not expired.
-    if (token && this.authService.isLoggedIn()) {
+    // Exclude signup and any public endpoints
+    const excludedUrls = ['/api/auth/signup', '/api/auth/login'];
+    const isExcluded = excludedUrls.some(url => req.url.includes(url));
+
+    if (!isExcluded && token && this.authService.isLoggedIn()) {
       authReq = req.clone({
         setHeaders: {
           Authorization: `Bearer ${token}`
@@ -31,18 +34,18 @@ export class AuthInterceptor implements HttpInterceptor {
       });
       console.log('AuthInterceptor - Modified request with Authorization header');
     } else {
-      console.log('AuthInterceptor - No token or token expired, sending request without Authorization header');
+      console.log('AuthInterceptor - No token attached (excluded URL or no token)');
     }
 
     return next.handle(authReq).pipe(
       catchError((error: HttpErrorResponse) => {
         let errorMsg = 'Something went wrong';
+        const errorBody = error.error;
 
-        if (error.status === 401) {
-          errorMsg = 'Your session has expired. Please log in again.';
+        if (error.status === 401 && !req.url.includes('/api/auth/login')) {
+          errorMsg = 'Please log in to continue.';
           this.authService.logout();
         } else if (error.status === 403) {
-          const errorBody = error.error;
           if (errorBody && typeof errorBody.error === 'string' && errorBody.error.includes('Invalid JWT token')) {
              errorMsg = 'Your session is invalid. Please log in again.';
              this.authService.logout();
@@ -52,8 +55,11 @@ export class AuthInterceptor implements HttpInterceptor {
         } else if (error.status === 0) {
           errorMsg = 'Cannot reach server';
         } else if (error.status >= 400 && error.status < 500) {
-          console.log('AuthInterceptor - Client error response', error);
-          errorMsg = error.error?.message || 'Client error';
+          if (typeof errorBody === 'string' && errorBody === 'Invalid credentials') {
+            errorMsg = 'Invalid email or password';
+          } else {
+            errorMsg = errorBody?.message || errorBody?.error || 'Client error';
+          }
         } else if (error.status >= 500) {
           errorMsg = 'Server error occurred';
         }

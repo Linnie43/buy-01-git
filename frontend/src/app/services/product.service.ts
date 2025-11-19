@@ -11,7 +11,7 @@ import { MEDIA_BASE_URL } from '../constants/constants';
 })
 export class ProductService {
 
-  private apiUrl = `${BASE_URL}/product-service/api/products`;  // endpoint
+  private apiUrl = `${BASE_URL}/api/products`;  // endpoint
 
   constructor(private http: HttpClient) {}
 

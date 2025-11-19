@@ -11,7 +11,7 @@ interface DecodedToken { sub?: string; userId?: string; id?: string; role: strin
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private apiUrl = `${BASE_URL}/user-service/api/auth`;
+  private apiUrl = `${BASE_URL}/api/auth`;
   private decodedToken: DecodedToken | null = null;
   private avatarUrl: string | null = null;
 
@@ -30,7 +30,7 @@ export class AuthService {
   }
 
  getCurrentUser(): Observable<User> {
-    return this.http.get<User>(`${BASE_URL}/user-service/api/users/me`);
+    return this.http.get<User>(`${BASE_URL}/api/users/me`);
   }
 
   getUserId(): string | null {

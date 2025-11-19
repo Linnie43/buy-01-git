@@ -38,7 +38,7 @@ public class GatewaySecurityConfig {
                         // public endpoints
                         .pathMatchers("/api/auth/**").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/products/**").permitAll()
-                        .pathMatchers(HttpMethod.GET, "/api/media/images/**").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/media/**").permitAll()
 
                         // User endpoints
                         .pathMatchers("/api/users/me").hasAnyRole("CLIENT", "SELLER")

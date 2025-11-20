@@ -3,16 +3,16 @@
     <!-- user profile section with avatar and name -->
     <div class="d-flex flex-column flex-md-row align-items-center mb-4">
       <div class="text-center mb-3 mb-md-0 me-md-3">
-        <img
-          [src]="profileImageUrl"
-          alt="Profile of {{ user?.name }}"
-          class="profile-img mb-1"
-          style="cursor: pointer;"
-          (click)="avatarInput.click()"
-          title="Click to change avatar"
-        />
+        <div class="avatar-wrapper" (click)="avatarInput.click()">
+          <img
+            [src]="profileImageUrl"
+            alt="Profile of {{ user?.name }}"
+            class="profile-img"
+            aria-label="Edit avatar"
+          />
+          <div class="avatar-overlay">Edit</div>
+        </div>
         <input #avatarInput type="file" accept="image/*" hidden (change)="onAvatarSelected($event)" />
-        <small class="text-muted d-block" *ngIf="user">Click avatar to change</small>
       </div>
       <h1 class="h3 mb-0">{{ user.name }}</h1>
     </div>

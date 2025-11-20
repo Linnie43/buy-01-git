@@ -1,17 +1,20 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  Validators,
+  AbstractControl,
+  ValidationErrors,
+  FormGroup
+} from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 
-export function passwordsMatchValidator(control: AbstractControl): ValidationErrors | null {
-  const password = control.get('password');
-  const confirmPassword = control.get('confirmPassword');
-
-  if (password && confirmPassword && password.value !== confirmPassword.value) {
-    return { passwordsMismatch: true };
-  }
-  return null;
+export function passwordsMatchValidator(group: AbstractControl): ValidationErrors | null {
+  const password = group.get('password')?.value;
+  const confirm = group.get('confirmPassword')?.value;
+  return password && confirm && password !== confirm ? { passwordsMismatch: true } : null;
 }
 
 @Component({
@@ -21,78 +24,81 @@ export function passwordsMatchValidator(control: AbstractControl): ValidationErr
   templateUrl: './auth.component.html',
   styleUrls: ['./auth.component.css']
 })
-export class AuthComponent {
-  isLogin = true; // toggle: true = login, false = signup
-
+export class AuthComponent implements OnInit {
+  isLogin = true;
   avatarFile: File | null = null;
 
-  loginForm = this.fb.group({
+  @ViewChild('avatarInput') avatarInputRef!: ElementRef<HTMLInputElement>;
+
+  loginForm: FormGroup = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(3)]]
   });
 
-  signupForm = this.fb.group({
+  signupForm: FormGroup = this.fb.group(
+    {
       firstname: ['', [Validators.required, Validators.minLength(2)]],
       lastname: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(3)]],
-      confirmPassword: ['', [Validators.required, Validators.minLength(3)]],
-      role: ['CLIENT', Validators.required]
-    }, { validators: passwordsMatchValidator });
+      confirmPassword: ['', [Validators.required]],
+      role: ['CLIENT', [Validators.required]]
+    },
+    { validators: passwordsMatchValidator }
+  );
 
   constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {}
 
-  toggleForm() {
-    this.isLogin = !this.isLogin;
-  }
-
-  // some bug here? Not reliable when trying to log in with wrong credentials
-  onLoginSubmit() {
-    if (!this.loginForm.valid) return;
-
-    this.authService.login(this.loginForm.value).subscribe({
-      next: (res) => {
-        console.log('Login success:', res);
-      },
-      error: (err) => {
-        console.error('Login error:', err);
+  ngOnInit(): void {
+    // Reset avatar when switching role to CLIENT
+    this.signupForm.get('role')?.valueChanges.subscribe(role => {
+      if (role !== 'SELLER') {
+        this.avatarFile = null;
+        if (this.avatarInputRef) {
+          this.avatarInputRef.nativeElement.value = '';
+        }
       }
     });
   }
 
-  onSignupSubmit() {
-    if (!this.signupForm.valid) return;
+  toggleForm(): void {
+    this.isLogin = !this.isLogin;
+  }
 
-    console.log('Sending payload: ', this.signupForm.value);
-    const formValue = this.signupForm.value;
+  onLoginSubmit(): void {
+    if (this.loginForm.invalid) return;
+    this.authService.login(this.loginForm.value).subscribe();
+  }
+
+  onSignupSubmit(): void {
+    if (this.signupForm.invalid) return;
 
     const formData = new FormData();
-    formData.append('firstname', formValue.firstname!);
-    formData.append('lastname', formValue.lastname!);
-    formData.append('email', formValue.email!);
-    formData.append('password', formValue.password!);
-    formData.append('role', formValue.role!);
+    formData.append('firstname', this.signupForm.get('firstname')?.value);
+    formData.append('lastname', this.signupForm.get('lastname')?.value);
+    formData.append('email', this.signupForm.get('email')?.value);
+    formData.append('password', this.signupForm.get('password')?.value);
+    formData.append('role', this.signupForm.get('role')?.value);
 
-    // use the correct property name
-    if (this.avatarFile) {
+    if (this.signupForm.get('role')?.value === 'SELLER' && this.avatarFile) {
       formData.append('avatar', this.avatarFile);
     }
 
     this.authService.signup(formData).subscribe({
-      next: (res) => {
-        console.log('Signup success:', res);
-        this.toggleForm(); // switch to login
+      next: () => {
+        // After signup, switch to login view
+        this.isLogin = true;
+        this.loginForm.patchValue({ email: this.signupForm.get('email')?.value });
       },
-      error: (err) => {
-        console.error('Signup error:', err);
-      }
+      error: () => {}
     });
   }
 
-  onAvatarSelected(event: any) {
-    const file: File = event.target.files[0];
-    if (file) {
-      this.avatarFile = file;
-    }
+  onAvatarSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    if (this.signupForm.get('role')?.value !== 'SELLER') return;
+    this.avatarFile = file;
   }
 }

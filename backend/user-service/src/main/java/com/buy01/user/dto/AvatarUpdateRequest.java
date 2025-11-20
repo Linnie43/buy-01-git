@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.web.multipart.MultipartFile;
 
 public class AvatarUpdateRequest {
-    @NotBlank
+    @NotNull
     private String oldAvatar;
     @NotNull
     private MultipartFile newAvatar;

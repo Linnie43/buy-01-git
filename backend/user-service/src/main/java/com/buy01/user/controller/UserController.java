@@ -108,7 +108,7 @@ public class UserController {
         }
 
         if (request.getAvatar() != null) {
-            String oldAvatar = user.getAvatarUrl();
+            String oldAvatar = user.getAvatarUrl() != null ? user.getAvatarUrl() : "";
             String avatarUrl = userService.updateUserAvatar(request.getAvatar(), oldAvatar);
             user.setAvatarUrl(avatarUrl);
         }

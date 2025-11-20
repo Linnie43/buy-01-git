@@ -62,6 +62,7 @@ export class SellerProfileComponent implements OnInit {
         const filename = updated.avatar;
         this.profileImageUrl = this.avatarService.buildAvatarUrl(filename);
         if (this.user) this.user.avatar = filename;
+        window.location.reload();
         console.debug('[SellerProfile] Avatar updated:', filename);
       },
       error: err => {

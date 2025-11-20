@@ -76,19 +76,37 @@
           <div *ngIf="signupForm.errors?.['passwordsMismatch']">Passwords do not match.</div>
         </div>
       </div>
-      <div class="mb-3">
-        <input type="file" class="form-control" (change)="onAvatarSelected($event)" accept="image/*">
-      </div>
+
+      <!-- Role selection (ensure these set formControlName 'role') -->
       <div class="mb-3 d-flex">
         <div class="form-check me-3">
-          <input type="radio" formControlName="role" class="form-check-input" value="CLIENT" id="roleClient">
+          <input class="form-check-input"
+                 type="radio"
+                 id="roleClient"
+                 value="CLIENT"
+                 formControlName="role">
           <label class="form-check-label" for="roleClient">Client</label>
         </div>
         <div class="form-check">
-          <input type="radio" formControlName="role" class="form-check-input" value="SELLER" id="roleSeller">
+          <input class="form-check-input"
+                 type="radio"
+                 id="roleSeller"
+                 value="SELLER"
+                 formControlName="role">
           <label class="form-check-label" for="roleSeller">Seller</label>
         </div>
       </div>
+
+      <!-- Avatar input only when SELLER -->
+      <div class="mb-3" *ngIf="signupForm.get('role')?.value === 'SELLER'">
+        <input #avatarInput
+               type="file"
+               class="form-control"
+               (change)="onAvatarSelected($event)"
+               accept="image/*">
+        <small class="text-muted">Add an optional avatar</small>
+      </div>
+
       <button class="btn btn-dark-green w-100" type="submit" [disabled]="signupForm.invalid">Signup</button>
     </form>
   </div>

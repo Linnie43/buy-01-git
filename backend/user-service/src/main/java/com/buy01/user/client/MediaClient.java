@@ -54,6 +54,7 @@ public class MediaClient {
         );
 
         if (!response.getStatusCode().is2xxSuccessful()) {
+            System.out.println("Avatar download failed, response code: " + response.getStatusCode());
             throw new FileUploadException("Failed to upload avatar: " + response.getStatusCode());
         }
 

@@ -120,8 +120,9 @@ public class MediaController {
     // uploading media to the server, validating and saving metadata to database
     @PostMapping("/internal/avatar")
     public ResponseEntity<AvatarResponseDTO> uploadAvatar(
-            @Valid @ModelAttribute AvatarCreateDTO dto
+            @ModelAttribute AvatarCreateDTO dto
     ) throws IOException {
+        System.out.println("Upload avatar requested");
 
         String url = mediaService.saveUserAvatar(dto.getAvatar());
 

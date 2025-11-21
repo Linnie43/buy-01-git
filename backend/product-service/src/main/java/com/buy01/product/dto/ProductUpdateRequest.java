@@ -15,7 +15,7 @@ public class ProductUpdateRequest {
     @Size(max = 500, message = "Description can be at most 500 characters")
     private String description;
 
-    @Min(value = 1, message = "Price must be at least 1")
+    @Positive(message = "Price must be over 0")
     @Max(value = 100000, message = "Price cannot exceed 100000")
     private Double price;
 

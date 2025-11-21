@@ -133,9 +133,6 @@ public class ProductService {
 
         authProductOwner(product, userId, role);
 
-        // VALIDATE EVERYTHING FIRST BEFORE UPDATING ??? OR UPDATING WHAT WE CAN, ONE BY ONE
-        // REQUIRES THAT THE IMAGES ARE ALL HANDLED IN ONE REQUEST (UPDATE) AND NOT DELETE AND ADD IN SEPARATE REQUESTS
-
         //VALIDATE FIRST THEN SET
         validateProductName(request.getName());
         validateProductDescription(request.getDescription());
@@ -232,8 +229,10 @@ public class ProductService {
     }
 
     private void validateProductDescription(String productDescription) {
-        if (productDescription.length() > 500) {
-            throw new IllegalArgumentException("Product description must be under 500 characters");
+        productDescription = productDescription.trim();
+
+        if (productDescription == null || productDescription.length() < 1 || productDescription.length() > 500) {
+            throw new IllegalArgumentException("Product description must be between 1 - 500 characters");
         }
     }
 

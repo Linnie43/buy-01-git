@@ -46,23 +46,22 @@ public class UserService {
             throw new IllegalArgumentException("Please select a role");
         }
 
-        User savedUser = userRepository.save(user);
+        AvatarResponseDTO avatarResponseDTO = null;
 
-        // 2. Only upload avatar if provided
-        if (avatar != null && !avatar.isEmpty() && savedUser.getRole().equals(Role.SELLER)) {
+        if (avatar != null && !avatar.isEmpty() && user.getRole().equals(Role.SELLER)) {
             System.out.println("Avatar received in user service: " + avatar.getOriginalFilename());
 
             // Call media-service through MediaClient
-            AvatarResponseDTO avatarResponseDTO =
-                    mediaClient.saveAvatar(new AvatarCreateDTO(avatar));
+             avatarResponseDTO = mediaClient.saveAvatar(new AvatarCreateDTO(avatar));
 
-            if (avatarResponseDTO != null) {
-                savedUser.setAvatarUrl(avatarResponseDTO.getAvatarUrl());
-                savedUser = userRepository.save(savedUser); // update with avatarUrl
-            }
         }
 
-        return savedUser;
+        if (avatarResponseDTO != null) {
+            user.setAvatarUrl(avatarResponseDTO.getAvatarUrl());
+        }
+
+        // Save the user only if the avatar upload is successful or no avatar is provided
+        return userRepository.save(user);
     }
 
 

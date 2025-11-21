@@ -37,7 +37,7 @@ public class AuthController {
         String email = loginData.get("email");
         String password = loginData.get("password");
 
-        User user = userService.findByEmail(email)
+        User user = userService.findByEmail(email.toLowerCase())
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
         // in case password does not match
@@ -71,7 +71,7 @@ public class AuthController {
         // Create the user entity
         User user = new User();
         user.setName(request.getFirstname() + " " + request.getLastname());
-        user.setEmail(request.getEmail());
+        user.setEmail(request.getEmail().toLowerCase());
         user.setPassword(request.getPassword());
         user.setRole(request.getRole());
 

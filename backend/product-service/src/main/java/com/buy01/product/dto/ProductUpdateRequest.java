@@ -9,16 +9,20 @@ import java.util.List;
 // DTO for updating an existing product - what the client sends in the request body
 public class ProductUpdateRequest {
 
+    @NotBlank(message = "Product name cannot be blank")
     @Pattern(regexp = "^[A-Za-z0-9 ]+$", message = "Product name can only contain letters, numbers, and spaces")
     private String name;
 
+    @NotBlank(message = "Description cannot be empty")
     @Size(max = 500, message = "Description can be at most 500 characters")
     private String description;
 
+    @NotNull(message = "Price is required")
     @Positive(message = "Price must be over 0")
     @Max(value = 100000, message = "Price cannot exceed 100000")
     private Double price;
 
+    @NotNull(message = "Quantity is required")
     @PositiveOrZero(message = "Quantity cannot be negative")
     private Integer quantity;
 

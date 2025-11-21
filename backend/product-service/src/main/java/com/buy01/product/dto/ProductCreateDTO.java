@@ -12,6 +12,7 @@ public class ProductCreateDTO {
     @Pattern(regexp = "^[A-Za-z0-9 ]+$", message = "Product name can only contain letters, numbers, and spaces")
     private String name;
 
+    @NotBlank(message = "Description cannot be empty")
     @Size(max = 500, message = "Description can be at most 500 characters")
     private String description;
 

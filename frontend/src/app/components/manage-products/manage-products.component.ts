@@ -268,21 +268,17 @@ export class ManageProductsComponent implements OnInit {
         }
 
       private updateImagePreviews(existingImageIds: string[]) {
-        if (existingImageIds.length > 0 && this.imagePreviews.length === 0) {
-          // load existing images as main if no current preview
-          this.imagePreviews = existingImageIds.map(id => ({
+         const existing = existingImageIds.map(id => ({
             url: id,
             isNew: false,
             identifier: id
           }));
-        } else if (this.selectedFiles.length > 0) {
-          // Replace main preview with the first selected file
-          const newPreview = {
-            url: URL.createObjectURL(this.selectedFiles[0]),
+         const newFiles = this.selectedFiles.map(file => ({
+            url: URL.createObjectURL(file),
             isNew: true,
-            identifier: this.selectedFiles[0]
-          };
-          this.imagePreviews = [newPreview, ...this.imagePreviews.slice(1)];
+            identifier: file
+          }));
+          this.imagePreviews = [...existing, ...newFiles];
         }
       }
 }

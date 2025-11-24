@@ -68,7 +68,7 @@ export class ManageProductsComponent implements OnInit {
             this.productService.getProductById(this.productId).subscribe({
               next: (data: Product) => {
                 this.productForm.patchValue(data);
-                const images = (data.images || []).filter(img => img);
+                const images = data.images || [];
                 this.resetStagedChanges(images);
                 },
               error: (err: any) => {
@@ -267,17 +267,22 @@ export class ManageProductsComponent implements OnInit {
           this.formErrors = {};
         }
 
-       private updateImagePreviews(existingImageIds: string[]) {
-          const existing = existingImageIds.map(id => ({
+      private updateImagePreviews(existingImageIds: string[]) {
+        if (existingImageIds.length > 0 && this.imagePreviews.length === 0) {
+          // load existing images as main if no current preview
+          this.imagePreviews = existingImageIds.map(id => ({
             url: id,
             isNew: false,
             identifier: id
           }));
-          const newFiles = this.selectedFiles.map(file => ({
-            url: URL.createObjectURL(file),
+        } else if (this.selectedFiles.length > 0) {
+          // Replace main preview with the first selected file
+          const newPreview = {
+            url: URL.createObjectURL(this.selectedFiles[0]),
             isNew: true,
-            identifier: file
-          }));
-          this.imagePreviews = [...existing, ...newFiles];
+            identifier: this.selectedFiles[0]
+          };
+          this.imagePreviews = [newPreview, ...this.imagePreviews.slice(1)];
         }
       }
+

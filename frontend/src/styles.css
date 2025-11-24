@@ -48,7 +48,7 @@ button, .btn {
   transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
 
-button:hover, .btn:hover, btn:active, button:active {
+button:hover, .btn:hover, .btn:active, button:active, .btn:focus-visible, button:focus-visible {
   background-color: var(--primary-hover-color);
   border-color: var(--primary-hover-color);
   color: #fff;

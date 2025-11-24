@@ -40,7 +40,7 @@ export class AuthInterceptor implements HttpInterceptor {
     return next.handle(authReq).pipe(
       catchError((error: HttpErrorResponse) => {
         let errorMsg = 'Something went wrong';
-        const errorBody = error.error;
+        const errorBody = error.error.error;
 
         if (error.status === 401 && !req.url.includes('/api/auth/login')) {
           errorMsg = 'Please log in to continue.';
@@ -48,7 +48,7 @@ export class AuthInterceptor implements HttpInterceptor {
           } else if (error.status === 404 && !req.url.includes('/api/auth/login')) {
           errorMsg = 'Resource not found';
         } else if (error.status === 403) {
-          if (errorBody && typeof errorBody.error === 'string' && errorBody.error.includes('Invalid JWT token')) {
+          if (errorBody && typeof errorBody === 'string' && errorBody.includes('Invalid JWT token')) {
              errorMsg = 'Your session is invalid. Please log in again.';
              this.authService.logout();
           } else {
@@ -60,10 +60,10 @@ export class AuthInterceptor implements HttpInterceptor {
           if (typeof errorBody === 'string' && (errorBody === 'Invalid credentials' || errorBody === 'User not found')) {
             errorMsg = 'Invalid email or password';
           } else {
-            errorMsg = errorBody?.message || errorBody?.error || 'Client error';
+            errorMsg = errorBody? || 'Client error';
           }
         } else if (error.status >= 500) {
-          errorMsg = 'Server error occurred';
+          errorMsg = 'Oops, try again later';
         }
 
         this.snackBar.open(errorMsg, 'Close', { duration: 5000 });

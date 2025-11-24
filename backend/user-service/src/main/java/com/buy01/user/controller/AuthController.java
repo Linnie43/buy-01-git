@@ -42,7 +42,7 @@ public class AuthController {
 
         // in case password does not match
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+            throw new IllegalArgumentException("Invalid credentials");
         }
 
         String token = jwtUtil.generateToken(user);

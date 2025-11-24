@@ -27,6 +27,7 @@ export function passwordsMatchValidator(group: AbstractControl): ValidationError
 export class AuthComponent implements OnInit {
   isLogin = true;
   avatarFile: File | null = null;
+  avatarError: string | null = null;
 
   @ViewChild('avatarInput') avatarInputRef!: ElementRef<HTMLInputElement>;
 
@@ -54,6 +55,7 @@ export class AuthComponent implements OnInit {
     this.signupForm.get('role')?.valueChanges.subscribe(role => {
       if (role !== 'SELLER') {
         this.avatarFile = null;
+        this.avatarError = null;
         if (this.avatarInputRef) {
           this.avatarInputRef.nativeElement.value = '';
         }
@@ -71,7 +73,7 @@ export class AuthComponent implements OnInit {
   }
 
   onSignupSubmit(): void {
-    if (this.signupForm.invalid) return;
+    if (this.signupForm.invalid || this.avatarError) return;
 
     const formData = new FormData();
     formData.append('firstname', this.signupForm.get('firstname')?.value);
@@ -97,8 +99,26 @@ export class AuthComponent implements OnInit {
   onAvatarSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
+    this.avatarError = null;
+    this.avatarFile = null;
+
     if (!file) return;
     if (this.signupForm.get('role')?.value !== 'SELLER') return;
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      this.avatarError = 'Invalid file type. Please select an image (jpeg, png, gif, webp).';
+      this.avatarInputRef.nativeElement.value = '';
+      return;
+    }
+
+    const maxSizeInBytes = 2 * 1024 * 1024; // 2MB
+    if (file.size > maxSizeInBytes) {
+      this.avatarError = 'File size exceeds 2MB.';
+      this.avatarInputRef.nativeElement.value = '';
+      return;
+    }
+
     this.avatarFile = file;
   }
 }

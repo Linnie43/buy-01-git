@@ -11,6 +11,7 @@
   <!-- Toggle -->
   <div class="d-flex justify-content-center mb-4">
     <div class="toggle-container">
+      <div class="toggle-slider" [class.right]="!isLogin"></div>
       <div class="toggle-btn" [class.active]="isLogin" (click)="isLogin = true">Login</div>
       <div class="toggle-btn" [class.active]="!isLogin" (click)="isLogin = false">Signup</div>
     </div>

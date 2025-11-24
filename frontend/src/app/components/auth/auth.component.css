@@ -1,13 +1,29 @@
 .toggle-container {
+  position: relative;
   display: flex;
   border: 1px solid var(--border-color);
   border-radius: 50px;
-  overflow: hidden;
   background-color: var(--background-color);
   width: 400px;
   height: 40px;
   padding: 4px;
   margin-bottom: 20px;
+}
+
+.toggle-slider {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
+  height: calc(100% - 8px);
+  background-color: var(--primary-color);
+  border-radius: 50px;
+  transition: transform 0.3s ease-in-out;
+  z-index: 1;
+}
+
+.toggle-slider.right {
+  transform: translateX(100%);
 }
 
 .toggle-btn {
@@ -16,16 +32,16 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: color 0.3s ease;
   color: var(--primary-color);
   border-radius: 50px;
   font-size: 14px;
   font-weight: 500;
   user-select: none;
+  z-index: 2;
 }
 
 .toggle-btn.active {
-  background-color: var(--primary-color);
   color: #fff;
 }
 

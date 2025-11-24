@@ -102,7 +102,7 @@
       </button>
     </div>
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 mt-2">
-      <div class="col" *ngFor="let p of sellerProducts">
+      <div class="col mb-4" *ngFor="let p of sellerProducts">
         <div class="card product-card-uniform h-100" (click)="edit(p)" style="cursor: pointer;">
           <div class="card-img-container">
             <app-image-carousel [images]="p.images || []"></app-image-carousel>

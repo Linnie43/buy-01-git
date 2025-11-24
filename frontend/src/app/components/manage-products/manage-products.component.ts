@@ -285,4 +285,5 @@ export class ManageProductsComponent implements OnInit {
           this.imagePreviews = [newPreview, ...this.imagePreviews.slice(1)];
         }
       }
+}
 

@@ -60,7 +60,7 @@ export class AuthInterceptor implements HttpInterceptor {
           if (typeof errorBody === 'string' && (errorBody === 'Invalid credentials' || errorBody === 'User not found')) {
             errorMsg = 'Invalid email or password';
           } else {
-            errorMsg = errorBody?.message || errorBody?.error || 'Client error';
+            errorMsg = errorBody ? errorBody : 'Client error';
           }
         } else if (error.status >= 500) {
           errorMsg = 'Server error occurred';

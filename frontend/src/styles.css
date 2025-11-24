@@ -70,7 +70,6 @@ button:hover, .btn:hover, .btn:active, button:active, .btn:focus-visible, button
 .btn-danger {
   background-color: var(--danger-color);
   border-color: var(--danger-color);
-  border-radius: .4rem;
 }
 .btn-danger:hover, .btn-danger:active {
   background-color: var(--danger-hover-color);

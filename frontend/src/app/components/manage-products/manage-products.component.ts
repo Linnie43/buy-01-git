@@ -281,5 +281,5 @@ export class ManageProductsComponent implements OnInit {
           this.imagePreviews = [...existing, ...newFiles];
         }
       }
-}
+
 

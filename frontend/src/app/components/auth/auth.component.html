@@ -104,8 +104,12 @@
                    type="file"
                    class="form-control"
                    (change)="onAvatarSelected($event)"
-                   accept="image/*">
-            <small class="text-muted">Add an optional avatar</small>
+                   accept="image/*"
+                   [class.is-invalid]="avatarError">
+            <small class="text-muted">Add an optional avatar (max 2MB)</small>
+            <div *ngIf="avatarError" class="invalid-feedback d-block">
+              {{ avatarError }}
+            </div>
           </div>
 
           <button class="btn w-100" type="submit" [disabled]="signupForm.invalid">Signup</button>

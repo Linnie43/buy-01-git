@@ -7,14 +7,14 @@
           <!-- Main image preview -->
           <div class="position-relative mb-2">
             <img [src]="imagePreviews.length > 0 ? (imagePreviews[0].isNew ? imagePreviews[0].url : (imagePreviews[0].url | imageUrl)) : 'assets/product_image_placeholder.png'" class="img-fluid" alt="Product Image Preview" style="cursor: pointer; object-fit: cover; width: 250px; height: 250px; border: 1px solid var(--border-color); border-radius: 8px;" (click)="fileInput.click()">
-            <button *ngIf="imagePreviews.length > 0 && imagePreviews[0].url !== 'assets/product_image_placeholder.png'" type="button" class="btn btn-danger btn-sm position-absolute" style="top: 0.5rem; right: 0.5rem; width: 1.5rem; height: 1.5rem; display: flex; align-items: center; justify-content: center; z-index: 10;" (click)="removeImagePreview(imagePreviews[0]); $event.stopPropagation()">
+            <button *ngIf="imagePreviews.length > 0" type="button" class="btn btn-danger btn-sm position-absolute" style="top: 0.5rem; right: 0.5rem; width: 1.5rem; height: 1.5rem; display: flex; align-items: center; justify-content: center; z-index: 10;" (click)="removeImagePreview(imagePreviews[0]); $event.stopPropagation()">
               &times;
             </button>
             <div *ngIf="imagePreviews.length === 0" class="position-absolute top-0 start-0" style="pointer-events: none;">
               <i class="bi bi-images fs-2" style="color: var(--dark-color); padding-left:10px"></i>
             </div>
           </div>
-          <!-- existing images with delete buttons -->
+          <!-- thumbnails for additional images -->
           <div *ngIf="imagePreviews.length > 1" class="d-flex flex-wrap justify-content-center">
             <div *ngFor="let preview of imagePreviews.slice(1); let i = index" class="position-relative m-1">
               <img [src]="preview.isNew ? preview.url : (preview.url | imageUrl)" class="img-thumbnail" alt="Product image {{i + 2}}" style="width: 60px; height: 60px; object-fit: cover;">

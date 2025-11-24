@@ -78,8 +78,9 @@ button:hover, .btn:hover, .btn:active, button:active, .btn:focus-visible, button
 
 .btn:disabled, .button:disabled, .btn-success:disabled {
   background-color: transparent;
-  border-color: --dark-color;
-  color: --dark-color;
+  border-color: var(--border-color);
+  color: var(--border-color);
+  cursor: not-allowed;
 }
 
 .product-card-uniform {

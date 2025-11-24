@@ -45,7 +45,7 @@ export class AuthInterceptor implements HttpInterceptor {
         if (error.status === 401 && !req.url.includes('/api/auth/login')) {
           errorMsg = 'Please log in to continue.';
           this.authService.logout();
-          } else if (error.status === 404) {
+          } else if (error.status === 404 && !req.url.includes('/api/auth/login')) {
           errorMsg = 'Resource not found';
         } else if (error.status === 403) {
           if (errorBody && typeof errorBody.error === 'string' && errorBody.error.includes('Invalid JWT token')) {
@@ -57,7 +57,7 @@ export class AuthInterceptor implements HttpInterceptor {
         } else if (error.status === 0) {
           errorMsg = 'Cannot reach server';
         } else if (error.status >= 400 && error.status < 500) {
-          if (typeof errorBody === 'string' && errorBody === 'Invalid credentials') {
+          if (typeof errorBody === 'string' && (errorBody === 'Invalid credentials' || errorBody === 'User not found')) {
             errorMsg = 'Invalid email or password';
           } else {
             errorMsg = errorBody?.message || errorBody?.error || 'Client error';

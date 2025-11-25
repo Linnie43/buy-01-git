@@ -83,6 +83,7 @@ export class ManageProductsComponent implements OnInit {
         this.loadMyProducts();
       }
 
+      // Handle file selection
       onFileSelected(event: Event): void {
         const input = event.target as HTMLInputElement;
         if (!input.files || input.files.length === 0) return;
@@ -149,6 +150,7 @@ export class ManageProductsComponent implements OnInit {
         input.value = '';
       }
 
+      // Load products of the logged-in seller
       loadMyProducts() {
           this.loading = true;
           this.error = null;
@@ -165,6 +167,7 @@ export class ManageProductsComponent implements OnInit {
           });
         }
 
+      // Handle form submission for create/update
       submit() {
               this.error = null;
               this.formErrors = {};
@@ -207,6 +210,7 @@ export class ManageProductsComponent implements OnInit {
                       }
                     }
 
+      // Centralized error handling for create/update operations
       private handleError(err: HttpErrorResponse, action: 'Create' | 'Update') {
           console.error(`${action} failed`, err);
           if (err.status === 400 && err.error && typeof err.error === 'object') {
@@ -224,6 +228,7 @@ export class ManageProductsComponent implements OnInit {
           }
         }
 
+      // Handle product deletion with confirmation
       onDelete(): void {
         const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
           width: '350px',
@@ -243,6 +248,7 @@ export class ManageProductsComponent implements OnInit {
             });
           }
 
+      // Remove an image preview and update staged changes
       removeImagePreview(previewToRemove: ImagePreview) {
           const currentImages = this.imagePreviews.filter(p => !p.isNew).map(p => p.identifier as string);
           if (previewToRemove.isNew) {
@@ -253,16 +259,18 @@ export class ManageProductsComponent implements OnInit {
           this.updateImagePreviews(currentImages.filter(id => id !== previewToRemove.identifier));
         }
 
-
+      // Common success handler for create/update/delete
       private onSuccess() {
         this.loadMyProducts();
         this.switchToCreateMode(); // Reset form after success
       }
 
-      edit(p: Product) {
+     // Navigate to edit mode for a specific product
+     edit(p: Product) {
        this.router.navigate(['/products/update', p.productId]);
       }
 
+     // Switch to create mode and reset form
      switchToCreateMode() {
          this.mode = 'create';
          this.productForm.reset({ price: 0, quantity: 1 });
@@ -272,7 +280,8 @@ export class ManageProductsComponent implements OnInit {
          }
        }
 
-      private resetStagedChanges(images: string[] = []) {
+     // Reset staged changes: selected files, deleted images, previews, errors
+     private resetStagedChanges(images: string[] = []) {
           this.deletedImageIds = [];
           this.selectedFiles = [];
           this.updateImagePreviews(images);
@@ -280,6 +289,7 @@ export class ManageProductsComponent implements OnInit {
           this.formErrors = {};
         }
 
+      // Update image previews based on existing image IDs and newly selected files
       private updateImagePreviews(existingImageIds: string[]) {
          const filteredIds = existingImageIds.filter(id =>
              id && id !== 'default_product.png' && id !== 'assets/product_image_placeholder.png'

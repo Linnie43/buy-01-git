@@ -281,17 +281,23 @@ export class ManageProductsComponent implements OnInit {
         }
 
       private updateImagePreviews(existingImageIds: string[]) {
-         const existing = existingImageIds.map(id => ({
-            url: id,
-            isNew: false,
-            identifier: id
-          }));
-         const newFiles = this.selectedFiles.map(file => ({
-            url: URL.createObjectURL(file),
-            isNew: true,
-            identifier: file
-          }));
-          this.imagePreviews = [...existing, ...newFiles];
+         const filteredIds = existingImageIds.filter(id =>
+             id && id !== 'default_product.png' && id !== 'assets/product_image_placeholder.png'
+           );
+
+           const existing = filteredIds.map(id => ({
+             url: id,
+             isNew: false,
+             identifier: id
+           }));
+
+           const newFiles = this.selectedFiles.map(file => ({
+             url: URL.createObjectURL(file),
+             isNew: true,
+             identifier: file
+           }));
+
+           this.imagePreviews = [...existing, ...newFiles];
         }
       }
 

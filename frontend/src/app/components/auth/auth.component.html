@@ -25,15 +25,17 @@
         <form [formGroup]="loginForm" (ngSubmit)="onLoginSubmit()">
           <div class="mb-3">
             <input type="email" class="form-control" formControlName="email" placeholder="Enter your email:"
-                   [class.is-invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.value">
-            <div *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.value" class="invalid-feedback">
+                   [class.is-invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.dirty">
+            <div *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.dirty" class="invalid-feedback">
+              <div *ngIf="loginForm.get('email')?.errors?.['required']">Email is required.</div>
               <div *ngIf="loginForm.get('email')?.errors?.['email']">Please enter a valid email address.</div>
             </div>
           </div>
           <div class="mb-3">
             <input type="password" class="form-control" formControlName="password" placeholder="Enter your password:"
-                   [class.is-invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.value">
-            <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.value" class="invalid-feedback">
+                   [class.is-invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.dirty">
+            <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.dirty" class="invalid-feedback">
+              <div *ngIf="loginForm.get('password')?.errors?.['required']">Password is required.</div>
               <div *ngIf="loginForm.get('password')?.errors?.['minlength']">Password must be at least 3 characters long.</div>
             </div>
           </div>
@@ -46,36 +48,45 @@
         <form [formGroup]="signupForm" (ngSubmit)="onSignupSubmit()">
           <div class="mb-3">
             <input type="text" class="form-control" formControlName="firstname" placeholder="Enter your first name:"
-                   [class.is-invalid]="signupForm.get('firstname')?.invalid && signupForm.get('firstname')?.value">
-            <div *ngIf="signupForm.get('firstname')?.invalid && signupForm.get('firstname')?.value" class="invalid-feedback">
+                   [class.is-invalid]="signupForm.get('firstname')?.invalid && signupForm.get('firstname')?.dirty">
+            <div *ngIf="signupForm.get('firstname')?.invalid && signupForm.get('firstname')?.dirty" class="invalid-feedback">
+              <div *ngIf="signupForm.get('firstname')?.errors?.['required']">First name is required.</div>
               <div *ngIf="signupForm.get('firstname')?.errors?.['minlength']">First name must be at least 2 characters long.</div>
+              <div *ngIf="signupForm.get('firstname')?.errors?.['maxlength']">First name cannot be more than 50 characters long.</div>
+              <div *ngIf="signupForm.get('firstname')?.errors?.['whitespace']">First name cannot be only whitespace.</div>
             </div>
           </div>
           <div class="mb-3">
             <input type="text" class="form-control" formControlName="lastname" placeholder="Enter your last name:"
-                   [class.is-invalid]="signupForm.get('lastname')?.invalid && signupForm.get('lastname')?.value">
-            <div *ngIf="signupForm.get('lastname')?.invalid && signupForm.get('lastname')?.value" class="invalid-feedback">
+                   [class.is-invalid]="signupForm.get('lastname')?.invalid && signupForm.get('lastname')?.dirty">
+            <div *ngIf="signupForm.get('lastname')?.invalid && signupForm.get('lastname')?.dirty" class="invalid-feedback">
+              <div *ngIf="signupForm.get('lastname')?.errors?.['required']">Last name is required.</div>
               <div *ngIf="signupForm.get('lastname')?.errors?.['minlength']">Last name must be at least 2 characters long.</div>
+              <div *ngIf="signupForm.get('lastname')?.errors?.['maxlength']">Last name cannot be more than 50 characters long.</div>
+              <div *ngIf="signupForm.get('lastname')?.errors?.['whitespace']">Last name cannot be only whitespace.</div>
             </div>
           </div>
           <div class="mb-3">
             <input type="email" class="form-control" formControlName="email" placeholder="Enter your email:"
-                   [class.is-invalid]="signupForm.get('email')?.invalid && signupForm.get('email')?.value">
-            <div *ngIf="signupForm.get('email')?.invalid && signupForm.get('email')?.value" class="invalid-feedback">
-              <div *ngIf="signupForm.get('email')?.errors?.['email']">Please enter a valid email address.</div>
+                   [class.is-invalid]="signupForm.get('email')?.invalid && signupForm.get('email')?.dirty">
+            <div *ngIf="signupForm.get('email')?.invalid && signupForm.get('email')?.dirty" class="invalid-feedback">
+              <div *ngIf="signupForm.get('email')?.errors?.['required']">Email is required.</div>
+              <div *ngIf="signupForm.get('email')?.errors?.['pattern']">Please enter a valid email address.</div>
             </div>
           </div>
           <div class="mb-3">
             <input type="password" class="form-control" formControlName="password" placeholder="Enter your password:"
-                   [class.is-invalid]="signupForm.get('password')?.invalid && signupForm.get('password')?.value">
-            <div *ngIf="signupForm.get('password')?.invalid && signupForm.get('password')?.value" class="invalid-feedback">
+                   [class.is-invalid]="signupForm.get('password')?.invalid && signupForm.get('password')?.dirty">
+            <div *ngIf="signupForm.get('password')?.invalid && signupForm.get('password')?.dirty" class="invalid-feedback">
+              <div *ngIf="signupForm.get('password')?.errors?.['required']">Password is required.</div>
               <div *ngIf="signupForm.get('password')?.errors?.['minlength']">Password must be at least 3 characters long.</div>
             </div>
           </div>
           <div class="mb-3">
             <input type="password" class="form-control" formControlName="confirmPassword" placeholder="Confirm your password:"
-                   [class.is-invalid]="(signupForm.get('confirmPassword')?.invalid && signupForm.get('confirmPassword')?.value) || (signupForm.errors?.['passwordsMismatch'] && signupForm.get('confirmPassword')?.dirty)">
-            <div *ngIf="(signupForm.get('confirmPassword')?.invalid && signupForm.get('confirmPassword')?.value) || (signupForm.errors?.['passwordsMismatch'] && signupForm.get('confirmPassword')?.dirty)" class="invalid-feedback">
+                   [class.is-invalid]="(signupForm.get('confirmPassword')?.invalid && signupForm.get('confirmPassword')?.dirty) || (signupForm.errors?.['passwordsMismatch'] && signupForm.get('confirmPassword')?.dirty)">
+            <div *ngIf="(signupForm.get('confirmPassword')?.invalid && signupForm.get('confirmPassword')?.dirty) || (signupForm.errors?.['passwordsMismatch'] && signupForm.get('confirmPassword')?.dirty)" class="invalid-feedback">
+              <div *ngIf="signupForm.get('confirmPassword')?.errors?.['required']">Password confirmation is required.</div>
               <div *ngIf="signupForm.errors?.['passwordsMismatch']">Passwords do not match.</div>
             </div>
           </div>

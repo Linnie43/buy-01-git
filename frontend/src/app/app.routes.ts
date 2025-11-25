@@ -9,10 +9,11 @@ import { ProductViewComponent } from './components/product-view/product-view.com
 import { ManageProductsComponent } from './components/manage-products/manage-products.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { productOwnerGuard } from './guards/product-owner.guard';
+import { SessionGuard } from './guards/session.guard';
 
 export const routes: Routes = [
   { path: '', component: DashboardComponent },
-  { path: 'auth', component: AuthComponent },
+  { path: 'auth', component: AuthComponent, canActivate: [SessionGuard] },
   { path: 'products/manage', component: ManageProductsComponent, canActivate: [AuthGuard]  },
   { path: 'products/update/:id', component: ManageProductsComponent, canActivate: [productOwnerGuard] },
   { path: 'products/:id', component: ProductViewComponent },

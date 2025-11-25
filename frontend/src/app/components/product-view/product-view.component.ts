@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 import { ImageUrlPipe } from '../../pipes/image-url.pipe';
 import { ImageCarouselComponent } from '../shared/image-carousel/image-carousel.component';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-product-view',
@@ -26,19 +27,25 @@ export class ProductViewComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.isLoggedIn = this.authService.isLoggedIn();
-    const productId = this.route.snapshot.paramMap.get('id');
-      if (productId) {
-        this.productService.getProductById(productId).subscribe({
-          next: (data: Product) => {
-            this.product = data;
-          },
-          error: (err: unknown) => console.error('Error fetching product:', err)
-        });
-      } else {
-        this.router.navigate(['']);
+      this.isLoggedIn = this.authService.isLoggedIn();
+      const productId = this.route.snapshot.paramMap.get('id');
+        if (productId) {
+          this.productService.getProductById(productId).subscribe({
+            next: (data: Product) => {
+              this.product = data;
+            },
+            error: (err: unknown) => {
+              if (err instanceof HttpErrorResponse && err.status === 404) {
+                this.router.navigate(['/404']);
+              } else {
+                console.error('Error fetching product:', err);
+              }
+            }
+          });
+        } else {
+          this.router.navigate(['']);
+        }
       }
-    }
 
   goToUpdateProduct(productId: string) {
     this.router.navigate(['/products/update', productId]);

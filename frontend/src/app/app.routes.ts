@@ -7,6 +7,7 @@ import { AuthGuard } from './guards/auth.guard';
 import { RoleGuard } from './guards/role.guard';
 import { ProductViewComponent } from './components/product-view/product-view.component';
 import { ManageProductsComponent } from './components/manage-products/manage-products.component';
+import { NotFoundComponent } from './components/not-found/not-found.component';
 
 export const routes: Routes = [
   { path: '', component: DashboardComponent },
@@ -16,5 +17,6 @@ export const routes: Routes = [
   { path: 'products/:id', component: ProductViewComponent },
   { path: 'seller-profile', component: SellerProfileComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'SELLER' }  },
   { path: 'client-profile', component: ClientProfileComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'CLIENT' }  },
-  { path: '**', redirectTo: '' }
+  { path: '404', component: NotFoundComponent },
+  { path: '**', redirectTo: '/404' }
 ];

@@ -33,7 +33,7 @@ pipeline {
             steps {
                 echo "🔨 Building backend microservices..."
                 sh '''
-                    find backend -name "mvnw" -exec chmod +x {} \;
+                    find backend -name "mvnw" -exec chmod +x {} \\;
                     ./backend/user-service/mvnw -f backend/user-service/pom.xml clean package -DskipTests=false
                     ./backend/product-service/mvnw -f backend/product-service/pom.xml clean package -DskipTests=false
                     ./backend/media-service/mvnw -f backend/media-service/pom.xml clean package -DskipTests=false

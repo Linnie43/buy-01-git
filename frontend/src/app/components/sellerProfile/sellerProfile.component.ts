@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
@@ -25,7 +25,8 @@ export class SellerProfileComponent implements OnInit {
     private authService: AuthService,
     private userService: UserService,
     private avatarService: AvatarService,
-    private router: Router
+    private router: Router,
+    @Inject('WINDOW') private window: Window
   ) {}
 
   ngOnInit() {
@@ -62,7 +63,7 @@ export class SellerProfileComponent implements OnInit {
         const filename = updated.avatar;
         this.profileImageUrl = this.avatarService.buildAvatarUrl(filename);
         if (this.user) this.user.avatar = filename;
-        window.location.reload();
+        this.window.location.reload();
         console.debug('[SellerProfile] Avatar updated:', filename);
       },
       error: err => {

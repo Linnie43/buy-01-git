@@ -98,7 +98,6 @@ public class MediaService {
             for (MultipartFile file : newImages) {
                 validateFile(file);
             }
-            System.out.println("Updating images for productId: " + productId + ", number of files: " + newImages.size());
         }
 
         // validate total amount of pictures for the product is 5
@@ -221,7 +220,7 @@ public class MediaService {
     }
 
     // delete file from server by path
-    private void deleteFile(String filePathStr) {
+    public void deleteFile(String filePathStr) {
         System.out.println(filePathStr);
         Path filePath = Paths.get(filePathStr).toAbsolutePath();
         try {

@@ -18,6 +18,14 @@ public class Media {
         this.productId = productId;
     }
 
+    // Testing purpose constructor
+    protected Media(String id, String name, String path, String productId) {
+        this.id = id;
+        this.name = name;
+        this.path = path;
+        this.productId = productId;
+    }
+
     public String getId() { return id; } // MongoDB generates ID, no setter for it
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }

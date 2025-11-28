@@ -78,12 +78,6 @@ pipeline {
         }
 
         stage('Build Frontend') {
-             agent {
-                     docker {
-                         image 'node:20-bookworm'
-                         args '-u root'
-                     }
-                 }
              steps {
                   echo "Building Angular frontend"
                          // The working directory inside the container is the workspace
@@ -96,12 +90,6 @@ pipeline {
         }
 
         stage('Run Frontend Tests') {
-            agent {
-                    docker {
-                        image 'node:20-bookworm'
-                        args '-u root'
-                    }
-                }
             steps {
                 echo "Running frontend tests (Karma/Jasmine)"
                 sh '''

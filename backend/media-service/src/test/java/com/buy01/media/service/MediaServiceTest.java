@@ -4,17 +4,19 @@ import com.buy01.media.dto.MediaResponseDTO;
 import com.buy01.media.exception.FileUploadException;
 import com.buy01.media.model.Media;
 import com.buy01.media.repository.MediaRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,8 +32,19 @@ public class MediaServiceTest {
     @InjectMocks
     private MediaService mediaService;
 
-    public MediaServiceTest() {
-        MockitoAnnotations.openMocks(this);
+    @TempDir
+    Path tempDir;
+
+    static class TestMedia extends Media {
+
+        TestMedia(String id, String name, String path, String productId) {
+            super(id, name, path, productId);
+        }
+    }
+
+    @BeforeEach
+    void setUp() throws IOException {
+        mediaService = new MediaService(mediaRepository);
     }
 
     // -- PRODUCT IMAGE TESTS --
@@ -46,7 +59,14 @@ public class MediaServiceTest {
                 "file2", "image2.jpg", "image/jpeg", "dummy content 2".getBytes()
         );
 
-        var result = mediaService.saveProductImages("product123", java.util.List.of(file1, file2));
+        // Mock save() to return Media with IDs
+        when(mediaRepository.save(any(Media.class)))
+                .thenAnswer(invocation -> {
+                    Media m = invocation.getArgument(0);
+                    return new TestMedia("id-" + m.getName(), m.getName(), m.getPath(), m.getProductId());
+                });
+
+        List<MediaResponseDTO> result = mediaService.saveProductImages("product123", java.util.List.of(file1, file2));
 
         assertNotNull(result);
         assertEquals(2, result.size());
@@ -55,12 +75,9 @@ public class MediaServiceTest {
     // Testing saving invalid product images (one file empty) - expected to throw FileUploadException
     @Test
     void saveProductImages_oneEmptyFile_throwsException() {
-        MultipartFile file1 = new MockMultipartFile(
-                "file1", "image1.png", "image/png", "dummy content 1".getBytes()
-        );
-        MultipartFile file2 = new MockMultipartFile(
-                "file2", "empty.jpg", "image/jpeg", new byte[0]
-        );
+        MultipartFile file1 = new MockMultipartFile("file1", "image1.png", "image/png", "dummy content 1".getBytes());
+        MultipartFile file2 = new MockMultipartFile("file2", "empty.jpg", "image/jpeg", new byte[0]);
+
         assertThrows(FileUploadException.class, () ->
             mediaService.saveProductImages("product123", java.util.List.of(file1, file2))
         );
@@ -68,37 +85,46 @@ public class MediaServiceTest {
 
     // Testing updating product images with one deleted and one new file - expected to return list of MediaResponseDTO
     @Test
-    void updateProductImages_withOnlyAdditions_returnsUpdatedList() throws Exception {
-        String productId = "product123";
-        List<String> deletedIds = List.of();
+    void updateProductImages_shouldDeleteAndAddImages() throws IOException {
+        // given
+        String productId = "product-1";
+        String deleteId = "media-1";
 
-        // New files
-        MultipartFile newFile = new MockMultipartFile(
-                "newFile", "newImage.png", "image/png", "dummy content".getBytes()
+        // Create temporary files for delete simulation
+        Path file1Path = tempDir.resolve("img1.jpg");
+        Path file2Path = tempDir.resolve("img2.jpg");
+        Files.createFile(file1Path);
+        Files.createFile(file2Path);
+
+        Media existing1 = new TestMedia("media-1", "img1.jpg", file1Path.toString(), productId);
+        Media existing2 = new TestMedia("media-2", "img2.jpg", file2Path.toString(), productId);
+
+        // Mock repository behavior
+        when(mediaRepository.findById("media-1")).thenReturn(Optional.of(existing1));
+        lenient().when(mediaRepository.findById("media-2")).thenReturn(Optional.of(existing2));
+        when(mediaRepository.getMediaByProductId(productId)).thenReturn(List.of(existing1, existing2));
+        when(mediaRepository.save(any(Media.class))).thenAnswer(invocation -> {
+            Media saved = invocation.getArgument(0);
+            return new TestMedia("media-3", saved.getName(), saved.getPath(), saved.getProductId());
+        });
+
+        MockMultipartFile newImage = new MockMultipartFile("file", "new.jpg", "image/jpeg", "test".getBytes());
+
+        // Perform update
+        List<MediaResponseDTO> result = mediaService.updateProductImages(
+                productId,
+                List.of(deleteId),
+                List.of(newImage)
         );
-        MultipartFile newFile2 = new MockMultipartFile(
-                "newFile2", "newImage2.png", "image/png", "dummy content 2".getBytes()
-        );
-        List<MultipartFile> newImages = List.of(newFile, newFile2);
 
-        // Spy on the service to mock saveImage
-        MediaService spyService = spy(mediaService);
 
-        // Mock saveImage to return a Media for each file
-        doAnswer(invocation -> {
-                    MultipartFile file = invocation.getArgument(0);
-                    return new Media(file.getOriginalFilename(), "path/to/" + file.getOriginalFilename(), productId);
-        }).when(spyService).saveImage(any(MultipartFile.class), eq(productId));
+        // Assertions
+        assertEquals(2, result.size());
+        assertFalse(Files.exists(file1Path)); // deleted file
+        assertTrue(Files.exists(file2Path));  // untouched file
 
-        // No existing media in DB
-        when(mediaRepository.getMediaByProductId(productId)).thenReturn(List.of());
-
-        // Call the method
-        List<MediaResponseDTO> result = spyService.updateProductImages(productId, deletedIds, newImages);
-
-        // Verify
-        assertNotNull(result);
-        assertEquals(2, result.size()); // two new files
+        verify(mediaRepository).deleteById("media-1");
+        verify(mediaRepository).save(any(Media.class));
     }
 
 
@@ -136,4 +162,40 @@ public class MediaServiceTest {
 
         assertThrows(FileUploadException.class, () -> mediaService.saveUserAvatar(file));
     }
+
+    // -- KAFKA CONSUMER TESTS --
+
+    @Test
+    void deleteMediaByProductId_deletesFilesAndRepositoryEntries() throws IOException {
+        String productId = "product-123";
+
+        // Temporary files for testing delete
+        Path file1 = tempDir.resolve("img1.jpg");
+        Path file2 = tempDir.resolve("img2.jpg");
+        Files.createFile(file1);
+        Files.createFile(file2);
+
+        Media media1 = new TestMedia("media-1", "img1.jpg", file1.toString(), productId);
+        Media media2 = new TestMedia("media-2", "img2.jpg", file2.toString(), productId);
+
+        // Mock repository to return these media
+        when(mediaRepository.getMediaByProductId(productId))
+                .thenReturn(List.of(media1, media2));
+
+        // Spy on service to allow real deleteFile execution
+        MediaService spyService = spy(new MediaService(mediaRepository));
+
+        // Call the method (simulating Kafka consumer trigger)
+        spyService.deleteMediaByProductId(productId);
+
+        // Verify repository calls
+        verify(mediaRepository).getMediaByProductId(productId);
+        verify(mediaRepository).delete(media1);
+        verify(mediaRepository).delete(media2);
+
+        // Verify files are deleted
+        assertFalse(Files.exists(file1));
+        assertFalse(Files.exists(file2));
+    }
+
 }

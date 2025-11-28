@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+     tools {
+            maven 'maven'
+        }
+
     parameters {
         string(name: 'BRANCH', defaultValue: 'maris', description: 'Branch to build')
     }

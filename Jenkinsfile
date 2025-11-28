@@ -2,7 +2,7 @@ pipeline {
    agent {
            docker {
                image 'my-jenkins-agent:latest'
-               args '--privileged -v /var/run/docker.sock:/var/run/docker.sock'
+               args '--privileged -v /var/run/docker.sock:/var/run/docker.sock -v $WORKSPACE:$WORKSPACE'
            }
        }
 
@@ -37,6 +37,15 @@ pipeline {
     }
 
     stages {
+
+        stage('Check Tools') {
+                    steps {
+                        sh 'docker --version'
+                        sh 'docker ps'
+                        sh 'mvn -v'
+                        sh 'node -v'
+                    }
+                }
 
         stage('Check Docker') {
             steps {

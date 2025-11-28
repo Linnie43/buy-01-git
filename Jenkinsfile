@@ -1,11 +1,15 @@
 pipeline {
     agent {
-            label 'docker'
+            dockerfile {
+                filename 'Dockerfile'
+                // Mount the host's Docker socket to run docker commands from within the container
+                args '-v /var/run/docker.sock:/var/run/docker.sock'
+           }
     }
 
-     tools {
+    tools {
             maven 'maven'
-        }
+    }
 
     parameters {
         string(name: 'BRANCH', defaultValue: 'maris', description: 'Branch to build')
@@ -74,9 +78,6 @@ pipeline {
         }
 
         stage('Build Frontend') {
-             agent {
-                 docker { image 'node:18-alpine' }
-             }
              steps {
                   echo "Building Angular frontend"
                          // The working directory inside the container is the workspace
@@ -89,9 +90,6 @@ pipeline {
         }
 
         stage('Run Frontend Tests') {
-            agent {
-                docker { image 'node:18-alpine' }
-            }
             steps {
                 echo "Running frontend tests (Karma/Jasmine)"
                 sh '''

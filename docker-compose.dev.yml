@@ -49,10 +49,53 @@ services:
     networks:
       - dev-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      test: [ "CMD", "curl", "-f", "http://localhost:8081/actuator/health" ]
       interval: 10s
       timeout: 5s
       retries: 5
+
+  product-service:
+    build: ./backend/product-service
+    container_name: product-service-dev
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+    ports:
+      - "8082:8082"
+    depends_on:
+      discovery:
+        condition: service_healthy
+      gateway:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - dev-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8082/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  media-service:
+    build: ./backend/media-service
+    container_name: media-service-dev
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+    ports:
+      - "8083:8083"
+    depends_on:
+      discovery:
+        condition: service_healthy
+      gateway:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - dev-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8083/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 
   # ANGULAR FRONTEND
   frontend:

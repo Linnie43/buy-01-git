@@ -1,10 +1,11 @@
 pipeline {
-    agent {
-            docker {
-                image 'carlossg/jenkins-maven-node-docker'
-                args '-v /var/run/docker.sock:/var/run/docker.sock -v /tmp:/tmp' // Mount Docker socket to use docker-compose
-            }
-        }
+   agent {
+       docker {
+           image 'docker:24-dind'   // docker CLI + daemon
+           args '--privileged -v /var/run/docker.sock:/var/run/docker.sock'
+       }
+   }
+
 
     /*tools {
             maven 'maven'
@@ -36,6 +37,13 @@ pipeline {
     }
 
     stages {
+
+        stage('Check Docker') {
+            steps {
+                sh 'docker --version'
+                sh 'docker ps'
+            }
+        }
 
         stage('Checkout') {
             steps {

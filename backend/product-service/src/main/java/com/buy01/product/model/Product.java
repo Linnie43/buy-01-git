@@ -23,6 +23,16 @@ public class Product {
         this.userId = userId;
     }
 
+    // Testing purpose constructor
+    protected Product(String productId, String name, String description, double price, int quantity, String userId) {
+        this.productId = productId;
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.quantity = quantity;
+        this.userId = userId;
+    }
+
     // getters and setters
     public String getProductId() { return productId; }
     public String getName() { return name; }

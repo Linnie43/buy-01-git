@@ -30,7 +30,7 @@ pipeline {
         stage('Build Backend') {
             steps {
                 echo "Building backend microservices"
-                sh 'mvn -f backend/pom.xml clean package -DskipTests'
+                sh 'mvn -f backend/pom.xml clean package -DskipTests -Dspring-boot.repackage.skip=true'
             }
         }
 

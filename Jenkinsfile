@@ -2,7 +2,7 @@ pipeline {
    agent {
            docker {
                image 'my-jenkins-agent:latest'
-               args '--privileged -v /var/run/docker.sock:/var/run/docker.sock -v $WORKSPACE:$WORKSPACE'
+               args '--privileged -u 0:0 -v /var/run/docker.sock:/var/run/docker.sock -v $WORKSPACE:$WORKSPACE'
            }
        }
 

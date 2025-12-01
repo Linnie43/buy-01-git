@@ -1,10 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'infra-jenkins:latest'
-            args '-u root -v /var/run/docker.sock:/var/run/docker.sock'
-        }
-    }
+    agent none
 
     parameters {
         string(name: 'BRANCH', defaultValue: 'maris', description: 'Branch to build')
@@ -12,6 +7,7 @@ pipeline {
 
     stages {
         stage('Check Tools') {
+        agent { docker { image 'infra-jenkins:latest' args '-u root -v /var/run/docker.sock:/var/run/docker.sock' } }
             steps {
                 sh 'docker --version'
                 sh 'docker ps'
@@ -21,6 +17,7 @@ pipeline {
         }
 
         stage('Checkout') {
+            agent any
             steps {
                 echo "Checking out branch: ${params.BRANCH}"
                 git branch: "${params.BRANCH}",
@@ -29,6 +26,7 @@ pipeline {
         }
 
         stage('Build Backend') {
+            agent { docker { image 'infra-jenkins:latest' args '-u root -v /var/run/docker.sock:/var/run/docker.sock' } }
             steps {
                 echo "Building backend microservices"
                 sh 'mvn -f backend/pom.xml clean package -DskipTests'

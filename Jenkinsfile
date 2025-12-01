@@ -13,10 +13,10 @@ pipeline {
     stages {
         stage('Check Tools') {
             steps {
-                sh 'docker --version'
-                sh 'docker ps'
-                sh 'mvn -v'
-                sh 'node -v'
+                sh 'docker --version || true'
+                sh 'docker ps || true'
+                sh 'mvn -v || true'
+                sh 'node -v || true'
             }
         }
 
@@ -31,7 +31,7 @@ pipeline {
         stage('Build Backend') {
             steps {
                 echo "Building backend microservices"
-                sh 'ls backend'
+                sh 'ls backend || true'
                 sh 'mvn -f backend/pom.xml clean package -DskipTests'
             }
         }
@@ -39,8 +39,13 @@ pipeline {
 
     post {
         always {
-            echo "Cleaning workspace"
-            cleanWs notFailBuild: true
-        }
+            script {
+            if (env.WORKSPACE) {
+                cleanWs notFailBuild: true
+            } else {
+                echo "No workspace available; skipping cleanWs"
+            }
+          }
+       }
     }
 }

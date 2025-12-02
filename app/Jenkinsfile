@@ -50,7 +50,7 @@ pipeline {
            steps {
                echo "Running user service and controller tests"
                dir('app/backend') {
-                   sh 'mvn test -Dtest="com/buy01/user/**/*Test.java"'
+                   sh 'mvn test'
                }
            }
        }

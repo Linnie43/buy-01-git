@@ -46,8 +46,10 @@ pipeline {
 
        stage('Build Docker Images') {
             steps {
-                echo "Building Docker images"
-                sh 'docker compose -f docker-compose.dev.yml build'
+                //echo "Building Docker images"
+                // sh 'docker compose -f docker-compose.dev.yml build'
+                echo 'Skipping Docker image build because Dockerfiles are not present in this branch.'
+
               }
            }
 

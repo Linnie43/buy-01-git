@@ -44,6 +44,21 @@ pipeline {
           }
        }
 
+       stage('Test User Service and Controller') {
+           steps {
+               echo "Running user service and controller tests"
+               sh 'mvn -f backend/pom.xml test -Dtest=com.buy01.user.*Test'
+           }
+       }
+
+       stage('Test Product Service') {
+            steps {
+                echo "Running product service tests"
+                sh 'mvn -f backend/pom.xml test -Dtest=com.buy01.product.*Test'
+            }
+       }
+
+
        stage('Build Docker Images') {
             steps {
                 //echo "Building Docker images"

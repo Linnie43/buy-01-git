@@ -31,8 +31,7 @@ pipeline {
             steps {
                 echo "Building backend microservices"
                 dir('app/backend') {
-                    sh 'mvn clean package -DskipTests -Dspring-boot.repackage.skip=true'
-                }
+                   sh 'mvn clean install -DskipTests'                }
             }
         }
 
@@ -49,8 +48,8 @@ pipeline {
        stage('Test User Service and Controller') {
            steps {
                echo "Running user service and controller tests"
-               dir('app/backend/user-service') {
-                   sh 'mvn test'
+               dir('app/backend') {
+                   sh 'mvn -pl user-service test'
                }
            }
        }
@@ -59,8 +58,7 @@ pipeline {
             steps {
                 echo "Running product service tests"
                 dir('app/backend') {
-                    sh 'mvn test -Dtest="com/buy01/product/**/*Test.java"'
-                }
+                   sh 'mvn -pl product-service test'                }
             }
        }
 

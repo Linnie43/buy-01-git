@@ -49,7 +49,7 @@ pipeline {
        stage('Test User Service and Controller') {
            steps {
                echo "Running user service and controller tests"
-               dir('app/backend') {
+               dir('app/backend/user-service') {
                    sh 'mvn test'
                }
            }

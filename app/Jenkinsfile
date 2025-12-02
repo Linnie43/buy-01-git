@@ -49,8 +49,8 @@ pipeline {
        stage('Test User Service and Controller') {
            steps {
                echo "Running user service and controller tests"
-               dir('app/backend') {
-                   sh 'mvn -pl user-service test'
+               dir('app/backend/user-service') {
+                   sh 'mvn test'
                }
            }
        }
@@ -58,8 +58,8 @@ pipeline {
        stage('Test Product Service') {
             steps {
                 echo "Running product service tests"
-                dir('app/backend') {
-                   sh 'mvn -pl product-service test'
+                dir('app/backend/product-service') {
+                    sh 'mvn test'
                 }
             }
        }

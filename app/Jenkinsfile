@@ -31,7 +31,8 @@ pipeline {
             steps {
                 echo "Building backend microservices"
                 dir('app/backend') {
-                   sh 'mvn clean install -DskipTests'                }
+                    sh 'mvn clean package -DskipTests -Dspring-boot.repackage.skip=true'
+                }
             }
         }
 
@@ -58,7 +59,8 @@ pipeline {
             steps {
                 echo "Running product service tests"
                 dir('app/backend') {
-                   sh 'mvn -pl product-service test'                }
+                   sh 'mvn -pl product-service test'
+                }
             }
        }
 

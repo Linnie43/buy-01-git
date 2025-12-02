@@ -47,14 +47,14 @@ pipeline {
        stage('Test User Service and Controller') {
            steps {
                echo "Running user service and controller tests"
-               sh 'mvn -f backend/pom.xml test -Dtest=com.buy01.user..*Test'
+               sh 'mvn -f backend/pom.xml test -Dtest="com/buy01/user/**/*Test.java"'
            }
        }
 
        stage('Test Product Service') {
             steps {
                 echo "Running product service tests"
-                sh 'mvn -f backend/pom.xml test -Dtest=com.buy01.product..*Test'
+                sh 'mvn -f backend/pom.xml test -Dtest="com/buy01/product/**/*Test.java"'
             }
        }
 

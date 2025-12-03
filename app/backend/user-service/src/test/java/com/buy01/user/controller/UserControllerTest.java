@@ -129,7 +129,7 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.avatar").exists());
     }
 
-    // GET /api/users/internal/user/{id} TESTS
+    // GET /internal/user/{userId} TESTS
     @Test
     void getUserById_internal_returnsUserDTO() throws Exception {
         User user = new User("user123", "Test", "test@test.com", "pass", Role.CLIENT, null);
@@ -137,7 +137,7 @@ class UserControllerTest {
 
         when(userService.findById("user123")).thenReturn(Optional.of(user));
 
-        mockMvc.perform(get("/api/users/internal/user/user123"))
+        mockMvc.perform(get("/internal/user/user123"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("user123"))
                 .andExpect(jsonPath("$.role").value("CLIENT"));

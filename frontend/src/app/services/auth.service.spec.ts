@@ -76,4 +76,54 @@ describe('AuthService', () => {
     expect(req.request.method).toBe('POST');
     req.flush({});
   });
+
+  it('should call login endpoint, store token/avatar and reload', fakeAsync(() => {
+    const fakeToken = 'header.payload.signature';
+    service.login({ email: 'a', password: 'b' }).subscribe();
+    const req = httpMock.expectOne(`${service['apiUrl']}/login`);
+    expect(req.request.method).toBe('POST');
+
+    req.flush({ token: fakeToken, avatar: '/avatar.png' });
+    // advance microtasks to resolve router.navigate().then(...)
+    tick();
+
+    expect(localStorage.getItem('token')).toBe(fakeToken);
+    expect(service.getAvatar()).toBe('/avatar.png');
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
+    expect(mockWindow.location.reload).toHaveBeenCalled();
+  }));
+
+  it('loginNoReload should store token without navigating', () => {
+    const fakeToken = 'no.reload.token';
+    service.loginNoReload({ email: 'a', password: 'b' }).subscribe();
+    const req = httpMock.expectOne(`${service['apiUrl']}/login`);
+    expect(req.request.method).toBe('POST');
+
+    req.flush({ token: fakeToken });
+    expect(localStorage.getItem('token')).toBe(fakeToken);
+    expect(routerSpy.navigate).not.toHaveBeenCalled();
+  });
+
+  it('getCurrentUser should call users/me endpoint', () => {
+    service.getCurrentUser().subscribe();
+    const req = httpMock.expectOne((r) => r.url.endsWith('/api/users/me'));
+    expect(req.request.method).toBe('GET');
+    req.flush({ id: 'u1', email: 'a@b' });
+  });
+
+  it('getUserId should prefer userId, then id, then sub', () => {
+    service['decodedToken'] = { userId: 'u-user', role: 'CLIENT', exp: Date.now()/1000 + 1000 };
+    expect(service.getUserId()).toBe('u-user');
+
+    service['decodedToken'] = { id: 'u-id', role: 'CLIENT', exp: Date.now()/1000 + 1000 };
+    expect(service.getUserId()).toBe('u-id');
+
+    service['decodedToken'] = { sub: 'u-sub', role: 'CLIENT', exp: Date.now()/1000 + 1000 };
+    expect(service.getUserId()).toBe('u-sub');
+  });
+
+  it('safeDecode should not throw on invalid token and should clear decodedToken', () => {
+    (service as any).safeDecode('not.a.valid.jwt');
+    expect((service as any).decodedToken).toBeNull();
+  });
 });

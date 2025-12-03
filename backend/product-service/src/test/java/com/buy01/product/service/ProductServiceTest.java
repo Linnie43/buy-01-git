@@ -54,7 +54,7 @@ public class ProductServiceTest {
 
     @Test
     void createProduct_validRequest_returnsProductResponseDTO() throws IOException {
-        // Arrange
+
         ProductCreateDTO request = mock(ProductCreateDTO.class);
         when(request.getName()).thenReturn("Valid Name");
         when(request.getDescription()).thenReturn("A valid description");
@@ -63,20 +63,16 @@ public class ProductServiceTest {
         when(request.getUserId()).thenReturn(""); // use currentUserId
         when(request.getImagesList()).thenReturn(null);
 
-        // mock repository save to return product with id
         when(productRepository.save(any(Product.class))).thenAnswer(invocation -> {
             Product p = invocation.getArgument(0);
             return new TestProduct("prod-1", p.getName(), p.getDescription(), p.getPrice(), p.getQuantity(), p.getUserId());
         });
 
-        // Act
         ProductResponseDTO resp = productService.createProduct(request, "SELLER", "current-user-1");
 
-        // Assert
         assertNotNull(resp);
         assertEquals("prod-1", resp.getProductId());
         assertEquals("Valid Name", resp.getName());
-        // use existing backend DTO accessor
         assertEquals("current-user-1", resp.getOwnerId());
     }
 
@@ -96,7 +92,7 @@ public class ProductServiceTest {
 
     @Test
     void updateProduct_ownerUpdates_success() throws IOException {
-        // Arrange
+
         String productId = "prod-1";
         Product existing = new TestProduct(productId, "Old", "old desc", 5.0, 2, "owner-1");
         when(productRepository.findById(productId)).thenReturn(Optional.of(existing));
@@ -115,14 +111,11 @@ public class ProductServiceTest {
             return new TestProduct(productId, p.getName(), p.getDescription(), p.getPrice(), p.getQuantity(), p.getUserId());
         });
 
-        // Act
         ProductResponseDTO resp = productService.updateProduct(productId, request, "owner-1", "SELLER");
 
-        // Assert
         assertNotNull(resp);
         assertEquals("New Name", resp.getName());
         assertEquals(10.0, resp.getPrice());
-        // use existing backend boolean accessor
         assertTrue(Boolean.TRUE.equals(resp.getIsProductOwner()));
     }
 
@@ -138,7 +131,6 @@ public class ProductServiceTest {
         verify(productEventService).publishProductDeletedEvent(productId);
     }
 
-    // java
     @Test
     void createProduct_forbiddenRole_doesNotCallDownstreamClients() throws IOException {
         ProductCreateDTO request = mock(ProductCreateDTO.class);
@@ -157,9 +149,8 @@ public class ProductServiceTest {
         when(request.getDescription()).thenReturn("Desc here");
         when(request.getPrice()).thenReturn(9.0);
         when(request.getQuantity()).thenReturn(1);
-        when(request.getUserId()).thenReturn(""); // use currentUserId
+        when(request.getUserId()).thenReturn("");
 
-        // return a List<MultipartFile> instead of List<String>
         var mockFile = new org.springframework.mock.web.MockMultipartFile(
                 "file", "orig.jpg", "image/jpeg", new byte[] {1}
         );

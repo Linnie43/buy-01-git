@@ -111,7 +111,9 @@ class UserControllerTest {
         User sellerUser = new User("seller1", "Seller", "seller@test.com", "pass", Role.SELLER, null);
         //userRepository.save(sellerUser);
 
-        when(userService.findById("seller1")).thenReturn(Optional.of(sellerUser));
+        when(securityUtils.getCurrentUserId(anyString())).thenReturn("seller1");
+        when(securityUtils.getRole(anyString())).thenReturn("SELLER");
+
         when(userService.updateUserAvatar(any(), anyString())).thenReturn("http://new-avatar.com/img.jpg");
 
         MockMultipartFile avatarFile = new MockMultipartFile(

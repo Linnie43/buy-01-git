@@ -22,10 +22,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(properties = {
         "eureka.client.enabled=false",
         "spring.cloud.discovery.enabled=false",
-        "spring.data.mongodb.auto-index-creation=false",
-        "spring.data.mongodb.database=test",
-        "spring.data.mongodb.port=0",
-        "spring.data.mongodb.host=localhost"
+        "spring.data.mongodb.uri=mongodb://localhost/test",
+        "spring.kafka.consumer.bootstrap-servers=",
+        "spring.kafka.producer.bootstrap-servers="
 })
 public class MediaControllerTest {
 

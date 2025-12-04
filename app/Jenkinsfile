@@ -1,9 +1,9 @@
 pipeline {
     agent any
 
-    /*environment {
+    environment {
             SLACK_WEBHOOK = credentials('slack-webhook')
-        }*/
+        }
 
     parameters {
         string(name: 'BRANCH', defaultValue: 'maris', description: 'Branch to build')
@@ -112,28 +112,20 @@ pipeline {
                 echo "No workspace available; skipping cleanWs"
             }
           }
-          slackSend(
-              tokenCredentialId: 'slack-webhook',
-              color: '#439FE0',
-              message: "Job completed"
-            )
-       }
 
         success {
-             slackSend(
-                  tokenCredentialId: 'slack-webhook',
-                 channel: '#jenkins',
-                 color: 'good',
-                 message: "Job '${env.JOB_NAME}' succeeded!"
-               )
+                sh """
+                curl -X POST -H 'Content-type: application/json' \
+                --data '{"text": "Build SUCCESS ✅"}' \
+                $SLACK_WEBHOOK
+                """
         }
         failure {
-             slackSend(
-                  tokenCredentialId: 'slack-webhook',
-                 channel: '#jenkins',
-                 color: 'danger',
-                 message: "Job '${env.JOB_NAME}' failed!"
-               )
+                sh """
+                curl -X POST -H 'Content-type: application/json' \
+                --data '{"text": "Build FAILED ❌"}' \
+                $SLACK_WEBHOOK
+                """
         }
 
     }

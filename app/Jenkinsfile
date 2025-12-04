@@ -115,19 +115,10 @@ pipeline {
        }
 
         success {
-                   // webhook call for the slack notifications
-                   sh """
-                   curl -X POST -H 'Content-type: application/json' \
-                   --data '{"text": "Build OK"}' \
-                   $SLACK_WEBHOOK
-                   """
+                 slackSend(channel: '#jenkins', color: 'good', message: 'Build SUCCESS')
                }
-               failure {
-                   sh """
-                   curl -X POST -H 'Content-type: application/json' \
-                   --data '{"text": "Build ERROR"}' \
-                   $SLACK_WEBHOOK
-                   """
+        failure {
+                 slackSend(channel: '#jenkins', color: 'danger', message: 'Build FAILED')
                }
 
     }

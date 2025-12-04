@@ -20,8 +20,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest(properties = {
-        "spring.data.mongodb.uri=mongodb://localhost/test",
-        "eureka.client.enabled=false"
+        "eureka.client.enabled=false",
+        "spring.cloud.discovery.enabled=false",
+        "spring.data.mongodb.auto-index-creation=false",
+        "spring.data.mongodb.database=test",
+        "spring.data.mongodb.port=0",
+        "spring.data.mongodb.host=localhost"
 })
 public class MediaControllerTest {
 

@@ -46,9 +46,9 @@ pipeline {
           }
        }
 
-       stage('Test User Service and Controller') {
+       stage('Test User Service') {
            steps {
-               echo "Running user service and controller tests"
+               echo "Running user service"
                dir('app/backend/user-service') {
                    sh 'mvn test'
                }
@@ -59,6 +59,15 @@ pipeline {
             steps {
                 echo "Running product service tests"
                 dir('app/backend/product-service') {
+                    sh 'mvn test'
+                }
+            }
+       }
+
+       stage('Test Media Service') {
+            steps {
+                echo "Running media sevice tests"
+                dir('app/backend/media-service') {
                     sh 'mvn test'
                 }
             }

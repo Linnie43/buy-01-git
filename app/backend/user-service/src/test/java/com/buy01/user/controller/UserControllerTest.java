@@ -114,7 +114,7 @@ class UserControllerTest {
         when(securityUtils.getCurrentUserId(anyString())).thenReturn("seller1");
         when(securityUtils.getRole(anyString())).thenReturn("SELLER");
 
-        when(userService.findById("seller1")).thenReturn(Optional.of(sellerUser));
+        when(userRepository.findUserByUserId("seller1")).thenReturn(Optional.of(sellerUser));
         when(userService.updateUserAvatar(any(), anyString())).thenReturn("http://new-avatar.com/img.jpg");
 
         MockMultipartFile avatarFile = new MockMultipartFile(
@@ -126,7 +126,7 @@ class UserControllerTest {
                         .with(request -> { request.setMethod("PUT"); return request; })
                         .header("Authorization", "Bearer token"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.avatar").exists());
+                .andExpect(jsonPath("$.avatarUrl").value("http://new-avatar.com/img.jpg"));
     }
 
     // GET api/users/internal/user/{userId} TESTS
@@ -139,7 +139,7 @@ class UserControllerTest {
 
         mockMvc.perform(get("api/users/internal/user/user123"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value("user123"))
+                .andExpect(jsonPath("$.userId").value("user123"))
                 .andExpect(jsonPath("$.role").value("CLIENT"));
     }
 

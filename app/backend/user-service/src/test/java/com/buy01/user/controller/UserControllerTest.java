@@ -111,8 +111,13 @@ class UserControllerTest {
         User sellerUser = new User("seller1", "Seller", "seller@test.com", "pass", Role.SELLER, null);
         //userRepository.save(sellerUser);
 
-        when(userService.findById("seller1")).thenReturn(Optional.of(sellerUser));
+        when(securityUtils.getCurrentUserId(anyString())).thenReturn("seller1");
+        when(securityUtils.getRole(anyString())).thenReturn("SELLER");
+
+        when(userRepository.findUserByUserId("seller1")).thenReturn(Optional.of(sellerUser));
         when(userService.updateUserAvatar(any(), anyString())).thenReturn("http://new-avatar.com/img.jpg");
+
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         MockMultipartFile avatarFile = new MockMultipartFile(
                 "avatar", "avatar.jpg", MediaType.IMAGE_JPEG_VALUE, "test-image".getBytes()
@@ -123,16 +128,16 @@ class UserControllerTest {
                         .with(request -> { request.setMethod("PUT"); return request; })
                         .header("Authorization", "Bearer token"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.avatar").exists());
+                .andExpect(jsonPath("$.avatar").value("http://new-avatar.com/img.jpg"));
     }
 
-    // GET /api/users/internal/user/{id} TESTS
+    // GET api/users/internal/user/{userId} TESTS
     @Test
     void getUserById_internal_returnsUserDTO() throws Exception {
         User user = new User("user123", "Test", "test@test.com", "pass", Role.CLIENT, null);
         //userRepository.save(user); - cannot use this in the tests, as it tries to connect to MongoDB
 
-        when(userService.findById("user123")).thenReturn(Optional.of(user));
+        when(userRepository.findById("user123")).thenReturn(Optional.of(user));
 
         mockMvc.perform(get("/api/users/internal/user/user123"))
                 .andExpect(status().isOk())

@@ -141,7 +141,7 @@ class UserControllerTest {
 
         mockMvc.perform(get("/api/users/internal/user/user123"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.userId").value("user123"))
+                .andExpect(jsonPath("$.id").value("user123"))
                 .andExpect(jsonPath("$.role").value("CLIENT"));
     }
 

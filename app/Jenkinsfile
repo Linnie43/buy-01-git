@@ -1,9 +1,9 @@
 pipeline {
     agent any
 
-    environment {
+    /*environment {
             SLACK_WEBHOOK = credentials('slack-webhook')
-        }
+        }*/
 
     parameters {
         string(name: 'BRANCH', defaultValue: 'maris', description: 'Branch to build')

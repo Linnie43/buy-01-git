@@ -60,8 +60,10 @@ public class ProductServiceTest {
         when(request.getDescription()).thenReturn("A valid description");
         when(request.getPrice()).thenReturn(9.99);
         when(request.getQuantity()).thenReturn(5);
-        when(request.getUserId()).thenReturn(""); // use currentUserId
+        when(request.getUserId()).thenReturn("current-user-1"); // Use the actual user ID
         when(request.getImagesList()).thenReturn(null);
+
+        when(userClient.getRoleIfUserExists("current-user-1")).thenReturn("SELLER"); // Mock user role check
 
         when(productRepository.save(any(Product.class))).thenAnswer(invocation -> {
             Product p = invocation.getArgument(0);
@@ -149,12 +151,14 @@ public class ProductServiceTest {
         when(request.getDescription()).thenReturn("Desc here");
         when(request.getPrice()).thenReturn(9.0);
         when(request.getQuantity()).thenReturn(1);
-        when(request.getUserId()).thenReturn("");
+        when(request.getUserId()).thenReturn("current-user"); // Use the actual user ID
 
         var mockFile = new org.springframework.mock.web.MockMultipartFile(
                 "file", "orig.jpg", "image/jpeg", new byte[] {1}
         );
         when(request.getImagesList()).thenReturn(List.of(mockFile));
+
+        when(userClient.getRoleIfUserExists("current-user")).thenReturn("SELLER");
 
         when(productRepository.save(any(Product.class))).thenAnswer(invocation -> {
             Product p = invocation.getArgument(0);

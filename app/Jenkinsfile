@@ -116,7 +116,7 @@ pipeline {
               tokenCredentialId: 'slack-webhook',
               color: '#439FE0',
               message: "Job completed"
-            ))
+            )
        }
 
         success {

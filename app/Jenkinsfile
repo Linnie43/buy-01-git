@@ -1,5 +1,10 @@
 pipeline {
     agent any
+
+    environment {
+            SLACK_WEBHOOK = credentials('slack-webhook')
+        }
+
     parameters {
         string(name: 'BRANCH', defaultValue: 'maris', description: 'Branch to build')
     }
@@ -83,6 +88,19 @@ pipeline {
               }
            }
 
+        stage('Deploy') {
+                   steps {
+                       script {
+                           try {
+                               sh 'docker compose -f infra/docker-compose.yml down'
+                               sh 'docker compose -f infra/docker-compose.yml up -d --build'
+                           } catch (Exception e) {
+                               echo "Deployment failed — keeping previous version"
+                           }
+                       }
+                   }
+               }
+
     }
 
     post {
@@ -95,5 +113,24 @@ pipeline {
             }
           }
        }
+
+        success {
+                   // webhook call for the slack notifications
+                   sh """
+                   curl -X POST -H 'Content-type: application/json' \
+                   --data '{"text": "Build OK"}' \
+                   $SLACK_WEBHOOK
+                   """
+               }
+               failure {
+                   sh """
+                   curl -X POST -H 'Content-type: application/json' \
+                   --data '{"text": "Build ERROR"}' \
+                   $SLACK_WEBHOOK
+                   """
+               }
+
     }
+
+
 }

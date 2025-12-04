@@ -19,7 +19,10 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
+@SpringBootTest(properties = {
+        "spring.data.mongodb.uri=mongodb://localhost/test",
+        "eureka.client.enabled=false"
+})
 public class MediaControllerTest {
 
     @Autowired

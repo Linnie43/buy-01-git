@@ -3,7 +3,7 @@ version: '3.9'
 services:
 
   discovery:
-    build: ./backend/discovery
+    build: backend/discovery
     container_name: discovery-dev
     ports:
       - "8761:8761"
@@ -17,7 +17,7 @@ services:
       retries: 5
 
   gateway:
-    build: ./backend/gateway
+    build: backend/gateway
     container_name: gateway-dev
     ports:
       - "8080:8080"
@@ -34,7 +34,7 @@ services:
       retries: 5
 
   user-service:
-    build: ./backend/user-service
+    build: backend/user-service
     container_name: user-service-dev
     environment:
       SPRING_PROFILES_ACTIVE: dev
@@ -55,7 +55,7 @@ services:
       retries: 5
 
   product-service:
-    build: ./backend/product-service
+    build: backend/product-service
     container_name: product-service-dev
     environment:
       SPRING_PROFILES_ACTIVE: dev
@@ -76,7 +76,7 @@ services:
       retries: 5
 
   media-service:
-    build: ./backend/media-service
+    build: backend/media-service
     container_name: media-service-dev
     environment:
       SPRING_PROFILES_ACTIVE: dev
@@ -99,7 +99,7 @@ services:
 
   # ANGULAR FRONTEND
   frontend:
-    build: ./frontend
+    build: frontend
     container_name: frontend-dev
     ports:
       - "4200:4200"

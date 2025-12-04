@@ -118,14 +118,14 @@ pipeline {
                 sh """
                 curl -X POST -H 'Content-type: application/json' \
                 --data '{"text": "Build SUCCESS ✅"}' \
-                ${env.SLACK_WEBHOOK}
+                '\$SLACK_WEBHOOK'
                 """
         }
         failure {
                 sh """
                 curl -X POST -H 'Content-type: application/json' \
                 --data '{"text": "Build FAILED ❌"}' \
-                ${env.SLACK_WEBHOOK}
+                '\$SLACK_WEBHOOK'
                 """
         }
 

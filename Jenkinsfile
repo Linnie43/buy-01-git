@@ -1,9 +1,9 @@
 pipeline {
     agent any
 
-//     environment {
-//             SLACK_WEBHOOK = credentials('slack-webhook')
-//         }
+    environment {
+            SLACK_WEBHOOK = credentials('slack-webhook')
+        }
 
     parameters {
         string(name: 'BRANCH', defaultValue: 'maris', description: 'Branch to build')
@@ -31,10 +31,10 @@ pipeline {
             steps {
                 echo "Building frontend application"
                 dir('frontend') {
-                sh 'npm install'
-                sh 'npm run build'
-                withEnv(["CHROME_BIN=/usr/bin/chromium"]) {
-                sh 'npm test -- --watch=false --browsers=ChromeHeadless'
+                    sh 'npm install'
+                    sh 'npm run build'
+                    // Use ChromeHeadlessCI which is configured with --no-sandbox
+                    sh 'npm test -- --watch=false --browsers=ChromeHeadlessCI'
                 }
              }
           }

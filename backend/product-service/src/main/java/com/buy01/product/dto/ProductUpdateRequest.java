@@ -23,7 +23,8 @@ public class ProductUpdateRequest {
     private Double price;
 
     @NotNull(message = "Quantity is required")
-    @PositiveOrZero(message = "Quantity cannot be negative")
+    @Min(value = 0, message = "Quantity cannot be negative")
+    @Max(value = 1000, message = "Quantity cannot exceed 1000")
     private Integer quantity;
 
     private List<String> deletedImageIds = new ArrayList<>();

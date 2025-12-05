@@ -19,15 +19,30 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         String adminEmail = "admin@admin.com";
+        int retries = 10;
+        int wait = 5000; // 5 seconds
 
-        if (userRepository.findByEmail(adminEmail).isEmpty()) {
-            User admin = new User();
-            admin.setName("Admin");
-            admin.setEmail(adminEmail);
-            admin.setPassword(new BCryptPasswordEncoder().encode("123"));
-            admin.setRole(Role.ADMIN);
-            userRepository.save(admin);
-            System.out.println("Default admin created");
+        while (retries > 0) {
+            try {
+                if (userRepository.findByEmail(adminEmail).isEmpty()) {
+                    User admin = new User();
+                    admin.setName("Admin");
+                    admin.setEmail(adminEmail);
+                    admin.setPassword(new BCryptPasswordEncoder().encode("password"));
+                    admin.setRole(Role.ADMIN);
+                    userRepository.save(admin);
+                    System.out.println("Default admin created");
+                }
+                break; // success, exit loop
+            } catch (Exception e) {
+                retries--;
+                System.out.println("Mongo not ready, retrying in " + wait / 1000 + "s... (" + retries + " retries left)");
+                Thread.sleep(wait);
+            }
+        }
+
+        if (retries == 0) {
+            throw new RuntimeException("MongoDB not ready after multiple attempts");
         }
     }
 }

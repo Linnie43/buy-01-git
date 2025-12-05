@@ -70,9 +70,9 @@ public class AuthController {
 
         // Create the user entity
         User user = new User();
-        user.setName(request.getFirstname() + " " + request.getLastname());
-        user.setEmail(request.getEmail().toLowerCase());
-        user.setPassword(request.getPassword());
+        user.setName(request.getFirstname().trim() + " " + request.getLastname().trim());
+        user.setEmail(request.getEmail().toLowerCase().trim());
+        user.setPassword(request.getPassword().trim());
         user.setRole(request.getRole());
 
         // Save the user and avatar

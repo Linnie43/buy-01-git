@@ -38,7 +38,7 @@ pipeline {
                 dir('frontend') {
                 sh 'npm install'
                 sh 'npm run build'
-                withEnv(["CHROME_BIN=/usr/bin/google-chrome"]) {
+                withEnv(["CHROME_BIN=/usr/bin/google-chrome-stable"]) {
                 sh 'npm test -- --watch=false --browsers=ChromeHeadless'
                 }
              }

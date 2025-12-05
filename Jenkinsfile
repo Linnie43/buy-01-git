@@ -9,6 +9,11 @@ pipeline {
         string(name: 'BRANCH', defaultValue: 'maris', description: 'Branch to build')
     }
 
+    tools {
+        maven 'maven'
+        nodejs 'NodeJS-20'
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -31,13 +36,14 @@ pipeline {
             steps {
                 echo "Building frontend application"
                 dir('frontend') {
-                    sh 'npm install'
-                    sh 'npm run build'
-                    // Use ChromeHeadlessCI which is configured with --no-sandbox
-                    sh 'npm test -- --watch=false --browsers=ChromeHeadlessCI'
+                sh 'npm install'
+                sh 'npm run build'
+                withEnv(["CHROME_BIN=/usr/bin/google-chrome-stable"]) {
+                sh 'npm test -- --watch=false --browsers=ChromeHeadless'
                 }
              }
-        }
+          }
+       }
 
        stage('Test User Service') {
            steps {
@@ -67,43 +73,45 @@ pipeline {
        }
 
         stage('Deploy') {
-            steps {
-                dir("$WORKSPACE") {
-                    script {
-                           try {
-                               sh 'docker compose -f docker-compose.dev.yml down'
-                               sh 'docker compose -f docker-compose.dev.yml up -d --build'
-                           } catch (Exception e) {
-                               echo "Deployment failed — keeping previous version"
-                               sh 'docker compose -f docker-compose.dev.yml up -d'
-                           }
-                    }
-                }
-            }
+                   steps {
+                        dir("$WORKSPACE") {
+                            script {
+                                   try {
+                                       sh 'docker compose -f docker-compose.dev.yml down'
+                                       sh 'docker compose -f docker-compose.dev.yml up -d --build'
+                                   } catch (Exception e) {
+                                       echo "Deployment failed — keeping previous version"
+                                       sh 'docker compose -f docker-compose.dev.yml up -d'
+                                   }
+                            }
+                        }
+                   }
         }
+
     }
 
     post {
         always {
             script {
-                if (env.WORKSPACE) {
-                    cleanWs notFailBuild: true
-                } else {
-                    echo "No workspace available; skipping cleanWs"
-                }
+            if (env.WORKSPACE) {
+                cleanWs notFailBuild: true //clean the workspace after build
+            } else {
+                echo "No workspace available; skipping cleanWs"
             }
+          }
         }
 
         success {
-            node {
+            script {
                 sh """curl -X POST -H 'Content-type: application/json' --data '{"text": "Build SUCCESS ✅"}' ${env.SLACK_WEBHOOK}"""
             }
         }
-
         failure {
-            node {
+            script {
                 sh """curl -X POST -H 'Content-type: application/json' --data '{"text": "Build FAILED ❌"}' ${env.SLACK_WEBHOOK}"""
             }
         }
+
     }
+
 }

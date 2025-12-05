@@ -1,9 +1,21 @@
 FROM jenkins/jenkins:lts
 USER root
 
+# Install prerequisites
+RUN apt-get update && apt-get install -y chromium \
+    chromium-driver \
+    --no-install-recommends && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Google Chrome
+RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor > /usr/share/keyrings/google-linux-signing-key.gpg && \
+    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-linux-signing-key.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list && \
+    apt-get update && \
+    apt-get install -y google-chrome-stable && \
+    rm -rf /var/lib/apt/lists/*
+
 # Add Docker's official GPG key
-RUN apt-get update && apt-get install -y curl gnupg && \
-    install -m 0755 -d /etc/apt/keyrings && \
+RUN install -m 0755 -d /etc/apt/keyrings && \
     curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc && \
     chmod a+r /etc/apt/keyrings/docker.asc
 
@@ -13,7 +25,7 @@ RUN echo \
   $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
   tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-# Install all required tools and clean up
+# Install docker CLI, compose plugin, git, maven, node/npm
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
       docker-ce \
@@ -24,9 +36,9 @@ RUN apt-get update && \
       git \
       maven \
       nodejs \
-      npm \
-      chromium && \
+      npm && \
     usermod -aG docker jenkins && \
     rm -rf /var/lib/apt/lists/*
 
+# Ensure jenkins user owns home
 USER jenkins

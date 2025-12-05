@@ -16,13 +16,14 @@ pipeline {
 
     stages {
 
-        stage('Check Docker Compose') {
+        stage('Test Docker Compose') {
             steps {
                 dir("$WORKSPACE") {
-                    sh 'ls -l docker-compose.dev.yml'
+                    sh 'docker compose -f docker-compose.dev.yml config'
                 }
             }
         }
+
 
         stage('Check Tools') {
             steps {

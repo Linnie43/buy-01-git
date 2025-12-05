@@ -13,6 +13,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -129,16 +130,22 @@ public class ProductService {
         }
 
         return products.stream()
-                .map(product -> new ProductResponseDTO(
-                        product.getProductId(),
-                        product.getName(),
-                        product.getDescription(),
-                        product.getPrice(),
-                        product.getQuantity(),
-                        product.getUserId(),
-                        null, // images removed for now
-                        product.getUserId().equals(callerId)
-                ))
+                .map(product -> {
+                    // fetch images for each product
+                    List<String> images = getProductImageIds(product.getProductId());
+                    if (images == null) images = Collections.emptyList();
+
+                    return new ProductResponseDTO(
+                            product.getProductId(),
+                            product.getName(),
+                            product.getDescription(),
+                            product.getPrice(),
+                            product.getQuantity(),
+                            product.getUserId(),
+                            images, // now includes images
+                            product.getUserId().equals(callerId)
+                    );
+                })
                 .toList();
     }
 

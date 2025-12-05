@@ -5,6 +5,7 @@ import { UserService, User } from '../../services/user.service';
 import { AvatarService } from '../../services/avatar.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
+import { WINDOW } from '../../window.token';
 
 describe('SellerProfileComponent', () => {
   let component: SellerProfileComponent;
@@ -64,7 +65,7 @@ describe('SellerProfileComponent', () => {
         { provide: UserService, useValue: userServiceSpy },
         { provide: AvatarService, useValue: avatarServiceSpy },
         { provide: Router, useValue: routerSpy },
-        { provide: 'WINDOW', useValue: mockWindow },
+        { provide: WINDOW, useValue: mockWindow },
         { provide: ActivatedRoute, useValue: { snapshot: {}, paramMap: { get: () => null } } }
       ]
     }).compileComponents();
@@ -98,6 +99,6 @@ describe('SellerProfileComponent', () => {
     expect(avatarServiceSpy.updateMyAvatar).toHaveBeenCalledWith(fakeFile);
     expect(component.profileImageUrl).toBe('url/new-avatar.png');
     expect(component.user?.avatar).toBe('new-avatar.png');
-    expect(mockWindow.location.reload).toHaveBeenCalled(); // now works
+    expect(mockWindow.location.reload).toHaveBeenCalled();
   });
 });

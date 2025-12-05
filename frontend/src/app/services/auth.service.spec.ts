@@ -3,6 +3,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { AuthService } from './auth.service';
 import { Router } from '@angular/router';
 import { fakeAsync, tick } from '@angular/core/testing';
+import { WINDOW } from '../window.token';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -21,7 +22,7 @@ describe('AuthService', () => {
       providers: [
         AuthService,
         { provide: Router, useValue: routerSpy },
-        { provide: 'WINDOW', useValue: mockWindow }
+        { provide: WINDOW, useValue: mockWindow } // Correctly use the imported token
       ]
     });
 
@@ -33,6 +34,10 @@ describe('AuthService', () => {
   afterEach(() => {
     httpMock.verify();
     localStorage.clear();
+  });
+
+  it('should be created', () => {
+    expect(service).toBeTruthy();
   });
 
   it('should clear token on logout', fakeAsync(() => {

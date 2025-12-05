@@ -9,11 +9,6 @@ pipeline {
         string(name: 'BRANCH', defaultValue: 'maris', description: 'Branch to build')
     }
 
-    tools {
-        maven 'maven'
-        nodejs 'NodeJS-20'
-    }
-
     stages {
         stage('Checkout') {
             steps {

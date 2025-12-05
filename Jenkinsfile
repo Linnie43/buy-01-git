@@ -35,7 +35,7 @@ pipeline {
         stage('Build Backend') {
             steps {
                 echo "Building backend microservices"
-                dir('app/backend') {
+                dir('backend') {
                     sh 'mvn clean package -DskipTests -Dspring-boot.repackage.skip=true'
                 }
             }
@@ -44,7 +44,7 @@ pipeline {
         stage('Build Frontend') {
             steps {
                 echo "Building frontend application"
-                dir('app/frontend') {
+                dir('frontend') {
                 sh 'npm install'
                 sh 'npm run build'
              }
@@ -54,7 +54,7 @@ pipeline {
        stage('Test User Service') {
            steps {
                echo "Running user service"
-               dir('app/backend/user-service') {
+               dir('backend/user-service') {
                    sh 'mvn test'
                }
            }
@@ -63,7 +63,7 @@ pipeline {
        stage('Test Product Service') {
             steps {
                 echo "Running product service tests"
-                dir('app/backend/product-service') {
+                dir('backend/product-service') {
                     sh 'mvn test'
                 }
             }
@@ -72,7 +72,7 @@ pipeline {
        stage('Test Media Service') {
             steps {
                 echo "Running media sevice tests"
-                dir('app/backend/media-service') {
+                dir('backend/media-service') {
                     sh 'mvn test'
                 }
             }

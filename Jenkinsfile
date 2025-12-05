@@ -16,24 +16,8 @@ pipeline {
 
     stages {
 
-        stage('Test Docker Compose') {
-            steps {
-                dir("$WORKSPACE") {
-                    sh 'docker compose -f docker-compose.dev.yml config'
-                }
-            }
-        }
 
-
-        stage('Check Tools') {
-            steps {
-                sh 'docker --version || true'
-                sh 'docker ps || true'
-                sh 'mvn -v || true'
-                sh 'node -v || true'
-            }
-        }
-
+        // getting the project code from the repository
         stage('Checkout') {
             steps {
                 echo "Checking out branch: ${params.BRANCH}"
@@ -88,16 +72,6 @@ pipeline {
             }
        }
 
-
-       stage('Build Docker Images') {
-            steps {
-                //echo "Building Docker images"
-                // sh 'docker compose -f docker-compose.dev.yml build'
-                echo 'Skipping Docker image build because Dockerfiles are not present in this branch.'
-
-              }
-           }
-
         stage('Deploy') {
                    steps {
                         dir("$WORKSPACE") {
@@ -119,7 +93,7 @@ pipeline {
         always {
             script {
             if (env.WORKSPACE) {
-                cleanWs notFailBuild: true
+                cleanWs notFailBuild: true //clean the workspace after build
             } else {
                 echo "No workspace available; skipping cleanWs"
             }

@@ -7,13 +7,14 @@ RUN apt-get update && apt-get install -y chromium \
     --no-install-recommends && \
     rm -rf /var/lib/apt/lists/*
 
-# Install Chromium
+# Install Chromium (for Angular/Karma tests) and other utilities
 RUN apt-get update && \
-    apt-get install -y chromium chromium-driver --no-install-recommends && \
+    apt-get install -y chromium && \
     rm -rf /var/lib/apt/lists/*
 
-ENV CHROMIUM_BIN=/usr/bin/chromium-browser
-ENV CHROME_BIN=/usr/bin/chromium-browser
+# Set environment variables for Karma/ChromeHeadless
+ENV CHROMIUM_BIN=/usr/bin/chromium
+ENV CHROME_BIN=/usr/bin/chromium
 
 # Add Docker's official GPG key
 RUN install -m 0755 -d /etc/apt/keyrings && \

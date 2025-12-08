@@ -34,17 +34,16 @@ module.exports = function (config) {
     singleRun: true,
     autoWatch: false,
     restartOnFileChange: false,
-    /*customLaunchers: {
+    customLaunchers: {
       ChromiumHeadless: {
           base: 'ChromiumHeadless',
           flags: [
             '--no-sandbox',
-            '--disable-setuid-sandbox',
             '--disable-gpu',
             '--disable-dev-shm-usage',
             '--remote-debugging-port=9222'
           ]
       }
-    }*/
+    }
   });
 };

@@ -9,10 +9,11 @@ RUN apt-get update && apt-get install -y chromium \
 
 # Install Chromium
 RUN apt-get update && \
-    apt-get install -y chromium chromium-driver && \
+    apt-get install -y chromium chromium-driver --no-install-recommends && \
     rm -rf /var/lib/apt/lists/*
 
-ENV CHROMIUM_BIN=/usr/bin/chromium
+ENV CHROMIUM_BIN=/usr/bin/chromium-browser
+ENV CHROME_BIN=/usr/bin/chromium-browser
 
 # Add Docker's official GPG key
 RUN install -m 0755 -d /etc/apt/keyrings && \

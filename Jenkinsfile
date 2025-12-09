@@ -151,16 +151,20 @@ pipeline {
 
     post {
         always {
-            cleanWs notFailBuild: true //clean the workspace after build
-
+            node {
+                cleanWs notFailBuild: true //clean the workspace after build
+          }
         }
 
         success {
-            sh """curl -X POST -H 'Content-type: application/json' --data '{"text": "Build SUCCESS ✅"}' ${env.SLACK_WEBHOOK}"""
-
+            node {
+                sh """curl -X POST -H 'Content-type: application/json' --data '{"text": "Build SUCCESS ✅"}' ${env.SLACK_WEBHOOK}"""
+            }
         }
         failure {
-            sh """curl -X POST -H 'Content-type: application/json' --data '{"text": "Build FAILED ❌"}' ${env.SLACK_WEBHOOK}"""
+            node {
+                sh """curl -X POST -H 'Content-type: application/json' --data '{"text": "Build FAILED ❌"}' ${env.SLACK_WEBHOOK}"""
+            }
         }
 
     }

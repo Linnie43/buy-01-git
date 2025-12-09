@@ -87,7 +87,7 @@ This will:
 ### 3. Start the Entire Platform
 
 ```
-docker compose up
+docker compose up -d
 ```
 
 The following components start:

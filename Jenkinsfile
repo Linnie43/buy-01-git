@@ -36,10 +36,10 @@ pipeline {
             steps {
                 echo "Building frontend application"
                 dir('frontend') {
-                sh 'node -v'
                 sh 'npm install'
+                sh 'npm install --save-dev karma-chrome-launcher'
                 sh 'npm run build'
-                withEnv(["CHROMIUM_BIN=/usr/bin/chromium", "CHROME_BIN=/usr/bin/chromium"]) {
+                withEnv(["CHROMIUM_BIN=/usr/bin/chromium"]) {
                 sh 'npm test -- --watch=false --progress=false --browsers ChromiumHeadlessCI'
                 }
              }

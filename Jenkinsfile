@@ -11,7 +11,7 @@ pipeline {
 
     tools {
         maven 'maven'
-        nodejs 'NodeJS-20'
+        nodejs '20.19.6'
     }
 
     stages {
@@ -40,7 +40,7 @@ pipeline {
                 sh 'npm install'
                 sh 'npm run build'
                 withEnv(["CHROMIUM_BIN=/usr/bin/chromium", "CHROME_BIN=/usr/bin/chromium"]) {
-                sh 'npm test -- --watch=false --browsers=ChromiumHeadless'
+                sh 'npm test -- --watch=false --progress=false --browsers ChromiumHeadlessCI'
                 }
              }
           }

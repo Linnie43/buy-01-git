@@ -34,7 +34,7 @@ module.exports = function (config) {
     autoWatch: false,
     restartOnFileChange: false,
     customLaunchers: {
-      ChromiumHeadless: {
+      ChromiumHeadlessCI: {
           base: 'ChromiumHeadless',
           flags: [
             '--no-sandbox',

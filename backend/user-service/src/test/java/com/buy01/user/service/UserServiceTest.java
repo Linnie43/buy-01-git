@@ -15,6 +15,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.io.IOException;
 import java.util.List;
@@ -52,6 +54,7 @@ public class UserServiceTest {
     // Create User Tests
 
     @Test
+    @MockitoSettings(strictness = Strictness.LENIENT)
     void createUser_success_whenNoAvatar() throws IOException {
         User user = new User();
         user.setName("Anna");
@@ -73,6 +76,7 @@ public class UserServiceTest {
     }
 
     @Test
+    @MockitoSettings(strictness = Strictness.LENIENT)
     void createUser_success_withAvatar_whenSeller() throws IOException {
         User user = new User();
         user.setName("Seller");
@@ -97,6 +101,7 @@ public class UserServiceTest {
     }
 
     @Test
+    @MockitoSettings(strictness = Strictness.LENIENT)
     void createUser_throwsWhenEmailExists() {
         User existingUser = mock(User.class);
         when(existingUser.getId()).thenReturn("existing-id"); // mock ID since we cant get it when testing

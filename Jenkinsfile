@@ -2,7 +2,7 @@ pipeline {
     agent {
         // Use a Docker agent to provide the Docker daemon
         docker {
-            image: 'my-dind:latest'
+            image 'my-dind:latest'
             args '--privileged'
         }
     }

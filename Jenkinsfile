@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-            SLACK_WEBHOOK = credentials('slack-webhook')
+            //SLACK_WEBHOOK = credentials('slack-webhook')
             VERSION = "v${env.BUILD_NUMBER}"
             STABLE_TAG = "stable"
         }
@@ -85,7 +85,7 @@ pipeline {
                            }
                        }
                    }
-               }
+       }
 
         stage('Deploy & Verify') {
                     steps {
@@ -146,25 +146,27 @@ pipeline {
                             }
                         }
                     }
-                }
-            }
+        }
+    }
 
     post {
         always {
-            node('master') {
-                cleanWs notFailBuild: true //clean the workspace after build
+            script {
+                if (env.WORKSPACE) {
+                    cleanWs notFailBuild: true //clean the workspace after build
+                } else {
+                    echo "No workspace available; skipping cleanWs"
+                }
           }
         }
 
         success {
-            node('master') {
-                sh """curl -X POST -H 'Content-type: application/json' --data '{"text": "Build SUCCESS ✅"}' ${env.SLACK_WEBHOOK}"""
-            }
+            echo "Build succeeded!"
+            //sh """curl -X POST -H 'Content-type: application/json' --data '{"text": "Build SUCCESS ✅"}' ${env.SLACK_WEBHOOK}"""
         }
         failure {
-            node('master') {
-                sh """curl -X POST -H 'Content-type: application/json' --data '{"text": "Build FAILED ❌"}' ${env.SLACK_WEBHOOK}"""
-            }
+            echo "Build failed!"
+            //sh """curl -X POST -H 'Content-type: application/json' --data '{"text": "Build FAILED ❌"}' ${env.SLACK_WEBHOOK}"""
         }
 
     }

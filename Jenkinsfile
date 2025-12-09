@@ -36,6 +36,7 @@ pipeline {
             steps {
                 echo "Building frontend application"
                 dir('frontend') {
+                sh 'node -v'
                 sh 'npm install'
                 sh 'npm run build'
                 withEnv(["CHROMIUM_BIN=/usr/bin/chromium", "CHROME_BIN=/usr/bin/chromium"]) {

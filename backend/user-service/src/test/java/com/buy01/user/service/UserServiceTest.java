@@ -105,7 +105,7 @@ public class UserServiceTest {
     void createUser_throwsWhenEmailExists() {
         User existingUser = mock(User.class);
         when(existingUser.getId()).thenReturn("existing-id"); // mock ID since we cant get it when testing
-        when(userRepository.findByEmailAndRole("exists@test.com", Role.CLIENT))
+        when(userRepository.findByEmail("exists@test.com"))
                 .thenReturn(Optional.of(existingUser));
 
         User newUser = new User();

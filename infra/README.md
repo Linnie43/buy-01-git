@@ -50,7 +50,7 @@ cd jenkins
 Build the custom Jenkins image:
 
 ```sh
-docker build -t jenkins .
+docker build -t custom-jenkins .
 ```
 
 This image includes **Docker CLI**, **Compose plugin**, **Maven**, and **Node**.

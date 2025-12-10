@@ -138,6 +138,7 @@ pipeline {
                                         echo "Rolled back to previous stable version."
                                     } catch (Exception rollbackErr) {
                                         echo "FATAL: Rollback failed (maybe no stable version exists yet)."
+                                        sh """curl -X POST -H 'Content-type: application/json' --data '{"text": "Rollback FAILED! Manual intervention needed."}' ${env.SLACK_WEBHOOK}"""
                                     }
 
                                     // Fail the build so we get a notification
@@ -162,11 +163,11 @@ pipeline {
 
         success {
             echo "Build succeeded!"
-            sh """curl -X POST -H 'Content-type: application/json' --data '{"text": "Build SUCCESS ✅"}' ${env.SLACK_WEBHOOK}"""
+            sh """curl -X POST -H 'Content-type: application/json' --data '{"text": "Build and deployment SUCCESS"}' ${env.SLACK_WEBHOOK}"""
         }
         failure {
             echo "Build failed!"
-            sh """curl -X POST -H 'Content-type: application/json' --data '{"text": "Build FAILED ❌"}' ${env.SLACK_WEBHOOK}"""
+            sh """curl -X POST -H 'Content-type: application/json' --data '{"text": "Build FAILED, rolling back"}' ${env.SLACK_WEBHOOK}"""
         }
 
     }

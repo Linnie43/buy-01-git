@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-            SLACK_WEBHOOK = credentials('slack-webhook')
+            //SLACK_WEBHOOK = credentials('slack-webhook')
             VERSION = "v${env.BUILD_NUMBER}"
             STABLE_TAG = "stable"
         }
@@ -98,20 +98,20 @@ pipeline {
                                     // We do NOT run 'down' here to avoid downtime during the switch
                                     withEnv(["IMAGE_TAG=${VERSION}"]) {
                                         sh 'docker compose -f docker-compose.dev.yml up -d'
+
+                                        // 2. Health Check / Verification
+                                        echo "Waiting for services to stabilize..."
+                                        sleep 15 // Give Spring Boot time to start up
+
+                                        // Simple Check: Are the containers running?
+                                        // This looks for any container in the stack that has "Exit" (crashed)
+                                        sh """
+                                            if docker compose -f docker-compose.dev.yml ps | grep "Exit"; then
+                                                echo "Detected crashed containers!"
+                                                exit 1
+                                            fi
+                                        """
                                     }
-
-                                    // 2. Health Check / Verification
-                                    echo "Waiting for services to stabilize..."
-                                    sleep 15 // Give Spring Boot time to start up
-
-                                    // Simple Check: Are the containers running?
-                                    // This looks for any container in the stack that has "Exit" (crashed)
-                                    sh """
-                                        if docker compose -f docker-compose.dev.yml ps | grep "Exit"; then
-                                            echo "Detected crashed containers!"
-                                            exit 1
-                                        fi
-                                    """
 
                                     echo "Deployment Verification Passed!"
 
@@ -162,11 +162,11 @@ pipeline {
 
         success {
             echo "Build succeeded!"
-            sh """curl -X POST -H 'Content-type: application/json' --data '{"text": "Build SUCCESS ✅"}' ${env.SLACK_WEBHOOK}"""
+            //sh """curl -X POST -H 'Content-type: application/json' --data '{"text": "Build SUCCESS ✅"}' ${env.SLACK_WEBHOOK}"""
         }
         failure {
             echo "Build failed!"
-            sh """curl -X POST -H 'Content-type: application/json' --data '{"text": "Build FAILED ❌"}' ${env.SLACK_WEBHOOK}"""
+            //sh """curl -X POST -H 'Content-type: application/json' --data '{"text": "Build FAILED ❌"}' ${env.SLACK_WEBHOOK}"""
         }
 
     }

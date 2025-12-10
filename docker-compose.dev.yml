@@ -116,11 +116,6 @@ services:
     restart: unless-stopped
     networks:
       - FKML_secret_network
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://product-service:8081/actuator/health" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   media-service:
     build: backend/media-service

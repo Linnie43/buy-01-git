@@ -28,7 +28,8 @@ git --version
 ```
 buy-01-git/
 │
-├── app/                 # Backend + frontend source code
+├── frontend/
+├── backend/                 
 ├── infra/
 │   ├── Dockerfile       # Custom Jenkins image (Docker, Maven, Node included)
 │   │── docker-compose.yml
@@ -135,7 +136,7 @@ Create a job:
 
 ## 8. Jenkinsfile Required in Your Repo
 
-Place this in `app/` or the project root:
+Place this in to the project root:
 
 ```groovy
 pipeline {
@@ -198,10 +199,10 @@ docker compose down -v
 * **Maven** plugin for Maven integration. Already exists but have to add the version from the tool configuration.
 * **Slack Notification** plugin for Slack notifications.
 
-## 13. Adding Slack Notifications
+## 13. Adding Slack Notifications to Jenkins
 1. Install the **Slack Notification** plugin in Jenkins.
 2. Go to **Manage Jenkins → Credentials**.
 3. Press on **System** → **Global credentials (unrestricted)** → **Add Credentials**.
 4. Select **Secret text** as the kind.
-5. Write your slack webhook URL in the **Secret** field. You will get it from your Slack workspace by creating an Incoming Webhook app.
+5. Write your slack webhook URL in the **Secret** field. (`https://api.slack.com/apps`) **Features → Incoming Webhooks**
 6. Give it an ID `slack-webhook`(the same as you have in your Jenkinsfile), and save

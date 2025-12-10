@@ -29,8 +29,16 @@ kafka:
 
 server:
   port: 8081
+  address: 0.0.0.0
   ssl:
     enabled: false
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  server:
+    port: 8081
 
 eureka:
   instance:

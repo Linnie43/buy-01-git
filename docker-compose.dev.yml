@@ -92,11 +92,6 @@ services:
     restart: on-failure
     networks:
       - FKML_secret_network
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://user-service:8080/actuator/health" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   product-service:
     build: backend/product-service
@@ -135,12 +130,6 @@ services:
     restart: unless-stopped
     networks:
       - FKML_secret_network
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://media-service:8082/actuator/health" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
 
   # ANGULAR FRONTEND
   frontend:

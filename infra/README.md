@@ -62,7 +62,7 @@ This image includes **Docker CLI**, **Compose plugin**, **Maven**, and **Node**.
 Still inside the `infra/jenkins/` directory:
 
 ```sh
-docker compose up -d
+docker run -u root -v /var/run/docker.sock:/var/run/docker.sock -p 8085:8080 -it jenkins
 ```
 
 Jenkins will be available at:

@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-            SLACK_WEBHOOK = credentials('slack-webhook')
+            // SLACK_WEBHOOK = credentials('slack-webhook')
             VERSION = "v${env.BUILD_NUMBER}"
             STABLE_TAG = "stable"
         }

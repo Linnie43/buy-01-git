@@ -75,44 +75,55 @@ pipeline {
             }
        }
 
-       // ---------------------------------------
-       // NEW: SonarQube Analysis Stage
-       // ---------------------------------------
-       stage('SonarQube Analysis') {
-           environment {
-               scannerHome = tool 'sonar-scanner'
-           }
-           steps {
-               echo "Running SonarQube analysis"
+      // ---------------------------------------
+      // SonarQube Analysis Stage
+      // ---------------------------------------
+      stage('SonarQube Analysis') {
+          environment {
+              scannerHome = tool 'sonar-scanner' // must match Jenkins Global Tool Configuration
+          }
+          steps {
+              echo "Running SonarQube analysis"
 
-               withSonarQubeEnv('sonarqube-local') {
-                   sh """
-                       ${scannerHome}/bin/sonar-scanner \
-                       -Dsonar.projectKey=buy01 \
-                       -Dsonar.sources=backend,frontend \
-                       -Dsonar.host.url=http://host.docker.internal:9000 \
-                       -Dsonar.javascript.lcov.reportPaths=frontend/coverage/lcov.info \
-                       -Dsonar.java.binaries=backend/**/target/classes
-                   """
-               }
-           }
-       }
+              // withSonarQubeEnv injects SONAR_AUTH_TOKEN from your Jenkins credentials
+              withSonarQubeEnv('sonarqube-local') {
+                  // Make sure frontend coverage exists
+                  dir('frontend') {
+                      sh 'npm test -- --watch=false --browsers=ChromeHeadless --code-coverage'
+                  }
 
-       // ---------------------------------------
-       // NEW: Quality Gate Stage
-       // ---------------------------------------
-       stage('Quality Gate') {
-           steps {
-               timeout(time: 2, unit: 'MINUTES') {
-                   script {
-                       def result = waitForQualityGate()
-                       if (result.status != 'OK') {
-                           error "❌ SonarQube Quality Gate FAILED: ${result.status}"
-                       }
-                   }
-               }
-           }
-       }
+                  sh """
+                      ${scannerHome}/bin/sonar-scanner \
+                      -Dsonar.projectKey=safe-zone \
+                      -Dsonar.sources=backend,frontend \
+                      -Dsonar.host.url=http://host.docker.internal:9000 \
+                      -Dsonar.login=${SONAR_AUTH_TOKEN} \
+                      -Dsonar.javascript.lcov.reportPaths=frontend/coverage/lcov.info \
+                      -Dsonar.java.binaries=backend/**/target/classes \
+                      -Dsonar.branch.name=${params.BRANCH}
+                  """
+              }
+          }
+      }
+
+      // ---------------------------------------
+      // Quality Gate Stage
+      // ---------------------------------------
+      stage('Quality Gate') {
+          steps {
+              timeout(time: 2, unit: 'MINUTES') {
+                  script {
+                      def result = waitForQualityGate()
+                      if (result.status != 'OK') {
+                          error "❌ SonarQube Quality Gate FAILED: ${result.status}"
+                      } else {
+                          echo "✅ SonarQube Quality Gate PASSED"
+                      }
+                  }
+              }
+          }
+      }
+
 
 
        stage('Build Images') {

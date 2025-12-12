@@ -80,16 +80,14 @@ pipeline {
       // ---------------------------------------
       stage('SonarQube Analysis') {
           environment {
-              scannerHome = tool 'sonar-scanner' // must match Jenkins Global Tool Configuration
+              scannerHome = tool 'sonar-scanner'
           }
           steps {
               echo "Running SonarQube analysis"
 
-              // withSonarQubeEnv injects SONAR_AUTH_TOKEN from your Jenkins credentials
               withSonarQubeEnv('sonarqube-local') {
-                  // Make sure frontend coverage exists
                   dir('frontend') {
-                      sh 'npm test -- --watch=false --browsers=ChromeHeadless --code-coverage'
+                      sh 'npm test -- --watch=false --browsers=ChromeHeadless --code-coverage --no-sandbox'
                   }
 
                   sh """

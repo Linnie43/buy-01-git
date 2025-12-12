@@ -8,7 +8,7 @@ pipeline {
         }
 
     parameters {
-        string(name: 'BRANCH', defaultValue: 'deployment-test', description: 'Branch to build')
+        string(name: 'BRANCH', defaultValue: 'sonarqube', description: 'Branch to build')
     }
 
     tools {
@@ -74,6 +74,46 @@ pipeline {
                 }
             }
        }
+
+       // ---------------------------------------
+       // NEW: SonarQube Analysis Stage
+       // ---------------------------------------
+       stage('SonarQube Analysis') {
+           environment {
+               scannerHome = tool 'sonar-scanner'
+           }
+           steps {
+               echo "Running SonarQube analysis"
+
+               withSonarQubeEnv('sonarqube-local') {
+                   sh """
+                       ${scannerHome}/bin/sonar-scanner \
+                       -Dsonar.projectKey=buy01 \
+                       -Dsonar.sources=backend,frontend \
+                       -Dsonar.host.url=http://host.docker.internal:9000 \
+                       -Dsonar.javascript.lcov.reportPaths=frontend/coverage/lcov.info \
+                       -Dsonar.java.binaries=backend/**/target/classes
+                   """
+               }
+           }
+       }
+
+       // ---------------------------------------
+       // NEW: Quality Gate Stage
+       // ---------------------------------------
+       stage('Quality Gate') {
+           steps {
+               timeout(time: 2, unit: 'MINUTES') {
+                   script {
+                       def result = waitForQualityGate()
+                       if (result.status != 'OK') {
+                           error "❌ SonarQube Quality Gate FAILED: ${result.status}"
+                       }
+                   }
+               }
+           }
+       }
+
 
        stage('Build Images') {
                    steps {

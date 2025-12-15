@@ -1,10 +1,11 @@
-import { Injectable, Inject } from '@angular/core';
+import { Injectable, Inject, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
 import { Router } from '@angular/router';
 import { BASE_URL } from '../constants/constants';
 import { User } from './user.service';
+import { WINDOW } from '../window.token';
 
 interface AuthResponse { token?: string; message?: string; avatar?: string; }
 interface DecodedToken { sub?: string; userId?: string; id?: string; role: string; exp: number; }
@@ -14,11 +15,12 @@ export class AuthService {
   private apiUrl = `${BASE_URL}/api/auth`;
   private decodedToken: DecodedToken | null = null;
   private avatarUrl: string | null = null;
+  private window = inject(WINDOW);
 
   constructor(
     private http: HttpClient,
     private router: Router,
-    @Inject('WINDOW') private window: Window // inject window
+    
   ) {
     const token = localStorage.getItem('token');
     if (token) this.safeDecode(token);

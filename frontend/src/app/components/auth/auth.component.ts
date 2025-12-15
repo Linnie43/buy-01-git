@@ -17,6 +17,13 @@ export function passwordsMatchValidator(group: AbstractControl): ValidationError
   return password && confirm && password !== confirm ? { passwordsMismatch: true } : null;
 }
 
+export function noWhitespaceValidator(control: AbstractControl): ValidationErrors | null {
+  if (control.value && control.value.trim().length === 0) {
+    return { whitespace: true };
+  }
+  return null;
+}
+
 @Component({
   selector: 'app-auth',
   standalone: true,
@@ -38,9 +45,15 @@ export class AuthComponent implements OnInit {
 
   signupForm: FormGroup = this.fb.group(
     {
-      firstname: ['', [Validators.required, Validators.minLength(2)]],
-      lastname: ['', [Validators.required, Validators.minLength(2)]],
-      email: ['', [Validators.required, Validators.email]],
+      firstname: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50), noWhitespaceValidator]],
+      lastname: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50), noWhitespaceValidator]],
+      email: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
+        ]
+      ],
       password: ['', [Validators.required, Validators.minLength(3)]],
       confirmPassword: ['', [Validators.required]],
       role: ['CLIENT', [Validators.required]]
@@ -76,8 +89,8 @@ export class AuthComponent implements OnInit {
     if (this.signupForm.invalid || this.avatarError) return;
 
     const formData = new FormData();
-    formData.append('firstname', this.signupForm.get('firstname')?.value);
-    formData.append('lastname', this.signupForm.get('lastname')?.value);
+    formData.append('firstname', this.signupForm.get('firstname')?.value.trim());
+    formData.append('lastname', this.signupForm.get('lastname')?.value.trim());
     formData.append('email', this.signupForm.get('email')?.value);
     formData.append('password', this.signupForm.get('password')?.value);
     formData.append('role', this.signupForm.get('role')?.value);

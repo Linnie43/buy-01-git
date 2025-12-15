@@ -35,6 +35,7 @@ public class GatewaySecurityConfig {
                 .httpBasic(httpBasic -> httpBasic.disable())
                 .formLogin(form -> form.disable())
                 .authorizeExchange(auth -> auth
+                        .pathMatchers("/actuator/health").permitAll()
                         // public endpoints
                         .pathMatchers("/api/auth/**").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/products/**").permitAll()
@@ -60,7 +61,10 @@ public class GatewaySecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         System.out.println("CorsConfigurationSource activated");
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("https://localhost:4200"));
+        config.setAllowedOrigins(List.of(
+                "https://frontend:4200",  // Docker internal
+                "https://localhost:4200"  // Host browser
+        ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);

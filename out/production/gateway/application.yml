@@ -1,0 +1,62 @@
+spring:
+  application:
+    name: GATEWAY
+
+  cloud:
+    discovery:
+      enabled: true
+
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+
+server:
+  port: 8443
+  ssl:
+    enabled: true
+    key-store: classpath:ssl/keystore.p12
+    key-store-password: password
+    key-store-type: PKCS12
+
+gateway:
+  routes:
+    - id: user-service
+      uri: lb://USER-SERVICE
+      predicates:
+        - Path=/user-service/**
+      filters:
+    - RewritePath=/user-service/(?<remaining>.*), /${remaining}
+    - id: product-service
+      uri: lb://PRODUCT-SERVICE
+      predicates:
+        - Path=/product-service/**
+      filters:
+        - RewritePath=/product-service/(?<remaining>.*), /${remaining}
+    - id: media-service
+      uri: lb://MEDIA-SERVICE
+      predicates:
+        - Path=/media-service/**
+      filters:
+        - RewritePath=/media-service/(?<remaining>.*), /${remaining}
+
+jwt:
+  secret: very-long-secret-key-string-with-at-least-32-chars
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.web.reactive: DEBUG
+    reactor.netty.http.client: DEBUG
+    org.springframework.cloud.loadbalancer: DEBUG
+

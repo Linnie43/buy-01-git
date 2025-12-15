@@ -26,7 +26,7 @@ public class MediaClient {
     public MediaClient(RestTemplate restTemplate, RestTemplateBuilder builder) {
         this.restTemplate = builder.build();
         // Local dev URL; will switch to container name in Docker
-        this.mediaServiceBaseUrl = "http://localhost:8082/api/media";
+        this.mediaServiceBaseUrl = "http://media-service:8082/api/media";
     }
 
     // send avatar to media service and get back the URL path

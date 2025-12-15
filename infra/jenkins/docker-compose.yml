@@ -1,0 +1,15 @@
+services:
+  jenkins:
+    build: .
+    container_name: jenkins
+    user: root
+    ports:
+      - "8085:8080"   # Jenkins GUI //localhost:8085 to get into Jenkins
+      - "50000:50000" # Agent communication
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock  # Allow Jenkins to run Docker
+    restart: unless-stopped
+
+volumes:
+  jenkins_home:

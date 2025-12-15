@@ -6,22 +6,27 @@ import { of } from 'rxjs';
 import { AuthComponent, passwordsMatchValidator } from './auth.component';
 import { AuthService } from '../../services/auth.service';
 import { ElementRef } from '@angular/core';
+import { WINDOW } from '../../window.token'; // Import the token
+
 
 describe('AuthComponent', () => {
   let component: AuthComponent;
   let fixture: ComponentFixture<AuthComponent>;
   let authServiceSpy: jasmine.SpyObj<AuthService>;
   let routerSpy: jasmine.SpyObj<Router>;
+  let mockWindow: any;
 
   beforeEach(async () => {
     authServiceSpy = jasmine.createSpyObj('AuthService', ['login', 'signup']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    mockWindow = { location: { reload: jasmine.createSpy('reload') } };
 
     await TestBed.configureTestingModule({
       imports: [AuthComponent, ReactiveFormsModule, NoopAnimationsModule],
       providers: [
         { provide: AuthService, useValue: authServiceSpy },
-        { provide: Router, useValue: routerSpy }
+        { provide: Router, useValue: routerSpy },
+        { provide: WINDOW, useValue: mockWindow } // Provide the mock WINDOW token
       ]
     }).compileComponents();
 

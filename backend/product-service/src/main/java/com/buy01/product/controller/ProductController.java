@@ -27,7 +27,7 @@ public class ProductController {
         this.securityUtils = securityUtils;
     }
 
-    // add new product, only sellers
+    // add new product, role seller or admin
     @PostMapping
     public ResponseEntity<?> createProduct(
             @RequestHeader("Authorization") String authHeader,
@@ -38,7 +38,7 @@ public class ProductController {
         String role = securityUtils.getRole(authHeader);
         System.out.println("Creating product for user ID: " + currentUserId + " with role: " + role);
 
-        if (!role.equals("ADMIN") || request.getUserId().isEmpty()) {
+        if (role.equals("SELLER") || (role.equals("ADMIN") && request.getUserId() == null )) {
             request.setUserId(currentUserId);
         }
 
@@ -102,29 +102,16 @@ public class ProductController {
         return ResponseEntity.ok(product);
     }
 
-//    // get all products of the current logged-in user
-//    @GetMapping("/my-products")
-//    public List<ProductResponseDTO> getMyProducts(
-//            @RequestHeader("Authorization") String authHeader
-//    ) {
-//        String currentUserId = securityUtils.getCurrentUserId(authHeader);
-//        return productService.getAllProducts().stream()
-//                .filter(p -> p.getUserId().equals(currentUserId))
-//                .map(p -> {
-//                    List<String> images = productService.getProductImageIds(p.getProductId());
-//                    return new ProductResponseDTO(
-//                            p.getProductId(),
-//                            p.getName(),
-//                            p.getDescription(),
-//                            p.getPrice(),
-//                            p.getQuantity(),
-//                            p.getUserId(),
-//                            images,
-//                            currentUserId.equals(p.getUserId())
-//                    );
-//                })
-//                .toList();
-//    }
+    // get all products of the current logged-in user
+    @GetMapping("/my-products")
+    public List<ProductResponseDTO> getMyProducts(
+            @RequestHeader("Authorization") String authHeader
+    ) {
+        System.out.println("product-service my-products called");
+        String currentUserId = securityUtils.getCurrentUserId(authHeader);
+        String role = securityUtils.getRole(authHeader);
+        return productService.getAllProductsByUserId(currentUserId, role, currentUserId);
+    }
 
     // get all products of the current logged-in user
     @GetMapping("/internal/my-products/{userId}")
@@ -133,30 +120,13 @@ public class ProductController {
     ) {
         System.out.println("Fetching products for user ID: " + userId);
 
-        List<Product> products = productService.getAllProductsByUserId(userId, "SELLER");
+        List<ProductResponseDTO> products = productService.getAllProductsByUserId(userId, "SELLER", userId);
         if  (products.isEmpty()) {
             System.out.println("No products for user ID: " + userId);
             return new ArrayList<>();
         }
 
-        return products.stream()
-                .map(p -> {
-                    // Call the method, but return empty list for now
-                    List<String> images = productService.getProductImageIds(p.getProductId());
-                    if (images == null) images = Collections.emptyList();
-
-                    return new ProductResponseDTO(
-                            p.getProductId(),
-                            p.getName(),
-                            p.getDescription(),
-                            p.getPrice(),
-                            p.getQuantity(),
-                            p.getUserId(),
-                            images, // will be empty for now
-                            userId.equals(p.getUserId())
-                    );
-                })
-                .toList();
+        return products;
     }
 
     // update a specific product by ID

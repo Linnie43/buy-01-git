@@ -18,7 +18,7 @@ public class ProductClient {
     public ProductClient(RestTemplate restTemplate, RestTemplateBuilder builder) {
         this.restTemplate = builder.build();
         // Local dev URL; will switch to container name in Docker
-        this.productServiceBaseUrl = "http://localhost:8081/api/products";
+        this.productServiceBaseUrl = "http://product-service:8081/api/products";
     }
 
     public List<ProductDTO> getUsersProducts(String userId) {

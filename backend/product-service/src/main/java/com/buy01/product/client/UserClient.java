@@ -15,7 +15,7 @@ public class UserClient {
     public UserClient() {
         this.restTemplate = new RestTemplate();
         // Local dev URL; will switch to container name in Docker
-        this.userServiceBaseUrl = "http://localhost:8080/api/users";
+        this.userServiceBaseUrl = "http://user-service:8080/api/users";
     }
 
     public String getRoleIfUserExists(String userId){

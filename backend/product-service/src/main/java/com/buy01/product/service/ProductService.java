@@ -13,6 +13,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,23 +58,19 @@ public class ProductService {
         validateProductPrice(request.getPrice());
         // validate quantity
         validateProductQuantity(request.getQuantity());
+        // validate userId
+        validateUserId(request.getUserId());
 
         Product product = new Product();
         product.setName(request.getName().trim());
         product.setDescription(request.getDescription().trim());
         product.setPrice(request.getPrice());
         product.setQuantity(request.getQuantity());
-
-        if (!request.getUserId().isEmpty()){
-            validateUserId(request.getUserId());
-            productOwnerId = request.getUserId();
-        }
+        product.setUserId(request.getUserId());
 
         if (request.getImagesList() != null && request.getImagesList().size() > 5) {
             throw new BadRequestException("You can upload up to 5 images.");
         }
-
-        product.setUserId(productOwnerId);
 
         Product savedProduct = productRepository.save(product);
         System.out.println("Saved product : " + savedProduct);
@@ -116,14 +113,40 @@ public class ProductService {
                 .orElseThrow(() -> new NotFoundException(productId));
     }
 
-    // Get all products by userId, currently limited to ADMIN
-    public List<Product> getAllProductsByUserId(String userId, String role) {
-
-        if (!role.equals("ADMIN") && !role.equals("SELLER")) {
+    // Get all products by userId
+    public List<ProductResponseDTO> getAllProductsByUserId(String userId, String role, String callerId) {
+        List<Product> products;
+        if (role.equals("ADMIN")) {
+            // Admin can see any user's products
+            products = productRepository.findAllProductsByUserId(userId);
+        } else if (role.equals("SELLER")) {
+            // Seller can only see their own products
+            if (!userId.equals(callerId)) {
+                throw new ForbiddenException("SELLER can only access their own products");
+            }
+            products = productRepository.findAllProductsByUserId(userId);
+        } else {
             throw new ForbiddenException(role);
         }
 
-        return productRepository.findAllProductsByUserId(userId);
+        return products.stream()
+                .map(product -> {
+                    // fetch images for each product
+                    List<String> images = getProductImageIds(product.getProductId());
+                    if (images == null) images = Collections.emptyList();
+
+                    return new ProductResponseDTO(
+                            product.getProductId(),
+                            product.getName(),
+                            product.getDescription(),
+                            product.getPrice(),
+                            product.getQuantity(),
+                            product.getUserId(),
+                            images, // now includes images
+                            product.getUserId().equals(callerId)
+                    );
+                })
+                .toList();
     }
 
     // Update product, only ADMIN or the owner of the product can update
@@ -254,7 +277,7 @@ public class ProductService {
     private void validateUserId(String userId) {
         // call UserClient to verify that the id exists.
         String role = userClient.getRoleIfUserExists(userId);
-        if (!role.equals("ADMIN") && !role.equals("SELLER")) {
+        if (role == null || !role.equals("ADMIN") && !role.equals("SELLER")) {
             throw new BadRequestException();
         }
     }

@@ -26,7 +26,7 @@ public class MediaClient {
     public MediaClient() {
         this.restTemplate = new RestTemplate();
         // Local dev URL; will switch to container name in Docker
-        this.mediaServiceBaseUrl = "http://localhost:8082/api/media";
+        this.mediaServiceBaseUrl = "http://media-service:8082/api/media";
     }
 
     public List<String> getProductImageIds(String productId) {

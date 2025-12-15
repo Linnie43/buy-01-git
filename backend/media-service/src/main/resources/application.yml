@@ -3,10 +3,13 @@ spring:
     name: MEDIA-SERVICE
   data:
     mongodb:
-      uri: mongodb://localhost:27017/buy01
       database: buy01
+  cloud:
+    inetutils:
+      preferredNetworks:
+        -"172."
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: kafka:9092
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
@@ -25,15 +28,30 @@ kafka:
 
 server:
   port: 8082
+  address: 0.0.0.0
   ssl:
     enabled: false
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  server:
+    port: 8082
 
 eureka:
+  instance:
+    hostname: ${SERVICE_NAME}
+    instance-id: ${SERVICE_NAME}:${server.port}
+    prefer-ip-address: false
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://discovery:8761/eureka/
     register-with-eureka: true
     fetch-registry: true
+
+file:
+  upload-dir: /app/uploads
 
 jwt:
   secret: very-long-secret-key-string-with-at-least-32-chars

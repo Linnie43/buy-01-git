@@ -8,6 +8,7 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { AuthInterceptor } from './app/interceptors/auth.interceptor';
+import { WINDOW } from './app/window.token';
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -19,6 +20,7 @@ bootstrapApplication(AppComponent, {
     provide: HTTP_INTERCEPTORS,
     useClass: AuthInterceptor,
     multi: true
-    }
+    },
+    { provide: WINDOW, useValue: window } // provide window object
   ]
 }).catch(err => console.error(err));

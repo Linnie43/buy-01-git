@@ -124,11 +124,10 @@ public class UserService {
 
     // Check if email is unique for that role, ignoring the user themselves
     private void checkEmailUniqueness(User user) {
-            Optional<User> existing = userRepository.findByEmailAndRole(user.getEmail(), user.getRole());
+            Optional<User> existing = userRepository.findByEmail(user.getEmail());
 
             if (existing.isPresent() && !existing.get().getId().equals(user.getId())) {
-                String role = user.getRole().toString().toLowerCase();
-                String message = String.format("%s with this email already exists", role);
+                String message = String.format("User with this email already exists");
                 throw new IllegalArgumentException(message);
             }
 
@@ -136,6 +135,7 @@ public class UserService {
 
     // Validate name length (add validation for only alphabets)
     private void validateName(String name) {
+        name = name.trim();
             if (name == null || name.isEmpty()) {
                 throw new IllegalArgumentException("Name cannot be null or empty");
             }

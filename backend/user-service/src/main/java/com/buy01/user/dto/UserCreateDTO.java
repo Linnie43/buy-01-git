@@ -24,15 +24,27 @@ public class UserCreateDTO {
     private String email;
 
     @NotBlank(message = "Password is required")
-    @Size(min = 3, message = "Password must be at least 3 characters")
+    @Pattern(
+            regexp = "^[A-Za-z\\d!@#$%^&*()]{3,64}$",
+            message = "Password must be 3–64 characters long, contain letters, digits, or !@#$%^&*(), and have no spaces"
+    )
     private String password;
 
+
     @NotBlank(message = "First ame is required")
-    @Size(min = 2, max = 50, message = "First name must be between 2 and 20 characters")
+    @Size(min = 2, max = 50, message = "Firstname must be between 2 and 50 characters")
+    @Pattern(
+            regexp = "^[A-Za-z- ]+$",
+            message = "Name can contain only letters, hyphens, and spaces"
+    )
     private String firstname;
 
     @NotBlank(message = "Last name is required")
-    @Size(min = 2, max = 50, message = "Last name must be between 2 and 20 characters")
+    @Size(min = 2, max = 50, message = "Lastname must be between 2 and 50 characters")
+    @Pattern(
+            regexp = "^[A-Za-z- ]+$",
+            message = "Name can contain only letters, hyphens, and spaces"
+    )
     private String lastname;
 
     @Field(targetType = FieldType.STRING)

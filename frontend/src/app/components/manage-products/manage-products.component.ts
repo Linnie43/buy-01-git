@@ -53,9 +53,9 @@ export class ManageProductsComponent implements OnInit {
     ) {
       this.productForm = this.fb.group({
             name: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(255)]],
-            description: ['', [Validators.required]],
+            description: ['', [Validators.required, Validators.maxLength(2000)]],
             price: [null, [Validators.required, Validators.min(0.01)]],
-            quantity: [0, [Validators.required, Validators.min(0)]]
+            quantity: [0, [Validators.required, Validators.min(0), Validators.max(1000), Validators.pattern("^[0-9]*$")]]
           });
       }
 
@@ -83,6 +83,7 @@ export class ManageProductsComponent implements OnInit {
         this.loadMyProducts();
       }
 
+      // Handle file selection
       onFileSelected(event: Event): void {
         const input = event.target as HTMLInputElement;
         if (!input.files || input.files.length === 0) return;
@@ -149,6 +150,7 @@ export class ManageProductsComponent implements OnInit {
         input.value = '';
       }
 
+      // Load products of the logged-in seller
       loadMyProducts() {
           this.loading = true;
           this.error = null;
@@ -165,9 +167,23 @@ export class ManageProductsComponent implements OnInit {
           });
         }
 
+      // Handle form submission for create/update
       submit() {
               this.error = null;
               this.formErrors = {};
+
+               // Trim string values before validation and submission
+               const nameControl = this.productForm.get('name');
+               if (nameControl && typeof nameControl.value === 'string') {
+                 nameControl.setValue(nameControl.value.trim());
+               }
+               const descriptionControl = this.productForm.get('description');
+                 if (descriptionControl && typeof descriptionControl.value === 'string') {
+                   // Replace multiple newlines with a single one, then trim.
+                   const cleanedDescription = descriptionControl.value.replace(/(\r\n|\r|\n){3,}/g, '\n\n').trim();
+                   descriptionControl.setValue(cleanedDescription);
+                  }
+
               if (this.productForm.invalid) {
                 return;
               }
@@ -194,6 +210,7 @@ export class ManageProductsComponent implements OnInit {
                       }
                     }
 
+      // Centralized error handling for create/update operations
       private handleError(err: HttpErrorResponse, action: 'Create' | 'Update') {
           console.error(`${action} failed`, err);
           if (err.status === 400 && err.error && typeof err.error === 'object') {
@@ -211,6 +228,7 @@ export class ManageProductsComponent implements OnInit {
           }
         }
 
+      // Handle product deletion with confirmation
       onDelete(): void {
         const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
           width: '350px',
@@ -230,6 +248,7 @@ export class ManageProductsComponent implements OnInit {
             });
           }
 
+      // Remove an image preview and update staged changes
       removeImagePreview(previewToRemove: ImagePreview) {
           const currentImages = this.imagePreviews.filter(p => !p.isNew).map(p => p.identifier as string);
           if (previewToRemove.isNew) {
@@ -240,16 +259,18 @@ export class ManageProductsComponent implements OnInit {
           this.updateImagePreviews(currentImages.filter(id => id !== previewToRemove.identifier));
         }
 
-
+      // Common success handler for create/update/delete
       private onSuccess() {
         this.loadMyProducts();
         this.switchToCreateMode(); // Reset form after success
       }
 
-      edit(p: Product) {
+     // Navigate to edit mode for a specific product
+     edit(p: Product) {
        this.router.navigate(['/products/update', p.productId]);
       }
 
+     // Switch to create mode and reset form
      switchToCreateMode() {
          this.mode = 'create';
          this.productForm.reset({ price: 0, quantity: 1 });
@@ -259,7 +280,8 @@ export class ManageProductsComponent implements OnInit {
          }
        }
 
-      private resetStagedChanges(images: string[] = []) {
+     // Reset staged changes: selected files, deleted images, previews, errors
+     private resetStagedChanges(images: string[] = []) {
           this.deletedImageIds = [];
           this.selectedFiles = [];
           this.updateImagePreviews(images);
@@ -267,18 +289,25 @@ export class ManageProductsComponent implements OnInit {
           this.formErrors = {};
         }
 
+      // Update image previews based on existing image IDs and newly selected files
       private updateImagePreviews(existingImageIds: string[]) {
-         const existing = existingImageIds.map(id => ({
-            url: id,
-            isNew: false,
-            identifier: id
-          }));
-         const newFiles = this.selectedFiles.map(file => ({
-            url: URL.createObjectURL(file),
-            isNew: true,
-            identifier: file
-          }));
-          this.imagePreviews = [...existing, ...newFiles];
+         const filteredIds = existingImageIds.filter(id =>
+             id && id !== 'default_product.png' && id !== 'assets/product_image_placeholder.png'
+           );
+
+           const existing = filteredIds.map(id => ({
+             url: id,
+             isNew: false,
+             identifier: id
+           }));
+
+           const newFiles = this.selectedFiles.map(file => ({
+             url: URL.createObjectURL(file),
+             isNew: true,
+             identifier: file
+           }));
+
+           this.imagePreviews = [...existing, ...newFiles];
         }
       }
 

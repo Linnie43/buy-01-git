@@ -28,7 +28,19 @@ pipeline {
         stage('Build Backend') {
             steps {
                 echo "Building backend microservices"
-                dir('backend') {
+                dir('backend/discovery') {
+                    sh 'mvn clean package -DskipTests -Dspring-boot.repackage.skip=true'
+                }
+                dir('backend/gateway') {
+                    sh 'mvn clean package -DskipTests -Dspring-boot.repackage.skip=true'
+                }
+                dir('backend/user-service') {
+                    sh 'mvn clean package -DskipTests -Dspring-boot.repackage.skip=true'
+                }
+                dir('backend/product-service') {
+                    sh 'mvn clean package -DskipTests -Dspring-boot.repackage.skip=true'
+                }
+                dir('backend/media-service') {
                     sh 'mvn clean package -DskipTests -Dspring-boot.repackage.skip=true'
                 }
             }
@@ -39,7 +51,7 @@ pipeline {
                 echo "Building frontend application"
                 dir('frontend') {
                 sh 'npm install'
-                sh 'npm install --save-dev karma-chrome-launcher'
+                sh 'npm install --save-dev karma-chrome-launcher karma-junit-reporter'
                 sh 'npm run build'
                 withEnv(["CHROMIUM_BIN=/usr/bin/chromium", "CHROME_BIN=/usr/bin/chromium"]) {
                 sh 'npm test'
@@ -94,16 +106,15 @@ pipeline {
                                 try {
                                     echo "Deploying version: ${VERSION}"
 
-                                    // 1. Deploy the NEW version
+                                    // Deploy the NEW version
                                     // We do NOT run 'down' here to avoid downtime during the switch
                                     withEnv(["IMAGE_TAG=${VERSION}"]) {
                                         sh 'docker compose -f docker-compose.dev.yml up -d'
 
-                                        // 2. Health Check / Verification
+                                        // Health Check / Verification
                                         echo "Waiting for services to stabilize..."
                                         sleep 15 // Give Spring Boot time to start up
 
-                                        // Simple Check: Are the containers running?
                                         // This looks for any container in the stack that has "Exit" (crashed)
                                         sh """
                                             if docker compose -f docker-compose.dev.yml ps | grep "Exit"; then
@@ -115,9 +126,7 @@ pipeline {
 
                                     echo "Deployment Verification Passed!"
 
-                                    // 3. Promote to Stable (The Magic Step)
-                                    // Since it worked, we retag these specific images as 'stable'
-                                    // This ensures next time we rollback, we go back to THIS state.
+                                    // TAG the new version as 'stable' since deployment succeeded
                                     sh "docker tag frontend:${VERSION} frontend:${STABLE_TAG}"
                                     sh "docker tag user-service:${VERSION} user-service:${STABLE_TAG}"
                                     sh "docker tag product-service:${VERSION} product-service:${STABLE_TAG}"
@@ -129,20 +138,31 @@ pipeline {
                                 } catch (Exception e) {
                                     echo "Deployment failed or crashed! Initiating Rollback..."
 
-                                    // 4. ROLLBACK
+                                    // ROLLBACK
                                     // We redeploy using the 'stable' tag
                                     try {
                                         withEnv(["IMAGE_TAG=${STABLE_TAG}"]) {
                                             sh 'docker compose -f docker-compose.dev.yml up -d'
                                         }
                                         echo "Rolled back to previous stable version."
+                                        // Slack notification for successful rollback
+                                        sh """
+                                        curl -X POST -H 'Content-type: application/json' --data '{
+                                            "text": ":information_source: Rollback SUCCESSFUL!\n*Job:* ${env.JOB_NAME}\n*Build:* ${env.BUILD_NUMBER}\n*Branch:* ${params.BRANCH}"
+                                        }' ${env.SLACK_WEBHOOK}
+                                        """
                                     } catch (Exception rollbackErr) {
-                                        echo "FATAL: Rollback failed (maybe no stable version exists yet)."
-                                        sh """curl -X POST -H 'Content-type: application/json' --data '{"text": "Rollback FAILED! Manual intervention needed."}' ${env.SLACK_WEBHOOK}"""
+                                        echo "FATAL: Rollback failed!"
+                                            echo "Reason: ${rollbackErr.getMessage()}"
+                                            sh """
+                                            curl -X POST -H 'Content-type: application/json' --data '{
+                                                "text": ":rotating_light: Rollback FAILED!\n*Reason:* ${rollbackErr.getMessage()}\n*Job:* ${env.JOB_NAME}\n*Build:* ${env.BUILD_NUMBER}\n*Branch:* ${params.BRANCH}\nManual intervention needed!"
+                                            }' ${env.SLACK_WEBHOOK}
+                                            """
                                     }
 
-                                    // Fail the build so we get a notification
-                                    error "Deployment Failed - Rolled back."
+                                    // Fail the build
+                                    error "Deployment Failed"
                                 }
                             }
                         }
@@ -153,23 +173,38 @@ pipeline {
     post {
         always {
             script {
+                // Backend test reports
+                junit 'backend/*/target/surefire-reports/*.xml'
+                archiveArtifacts artifacts: 'backend/*/target/surefire-reports/*.xml', allowEmptyArchive: true
+
+                // Frontend reports
+                junit 'frontend/test-results/junit/*.xml'
+                archiveArtifacts artifacts: 'frontend/test-results/junit/*.xml', allowEmptyArchive: true
+
                 if (env.WORKSPACE) {
                     cleanWs notFailBuild: true //clean the workspace after build
                 } else {
                     echo "No workspace available; skipping cleanWs"
                 }
-          }
+            }
         }
 
         success {
             echo "Build succeeded!"
-            sh """curl -X POST -H 'Content-type: application/json' --data '{"text": "Build and deployment SUCCESS"}' ${env.SLACK_WEBHOOK}"""
+            sh """
+            curl -X POST -H 'Content-type: application/json' --data '{
+                "text": ":white_check_mark: Build SUCCESS\n*Job:* ${env.JOB_NAME}\n*Build:* ${env.BUILD_NUMBER}\n*Branch:* ${params.BRANCH}"
+            }' ${env.SLACK_WEBHOOK}
+            """
         }
+
         failure {
             echo "Build failed!"
-            sh """curl -X POST -H 'Content-type: application/json' --data '{"text": "Build FAILED, rolling back"}' ${env.SLACK_WEBHOOK}"""
+            sh """
+            curl -X POST -H 'Content-type: application/json' --data '{
+                "text": ":x: Build FAILED\n*Job:* ${env.JOB_NAME}\n*Build:* ${env.BUILD_NUMBER}\n*Branch:* ${params.BRANCH}\n*Error:* ${currentBuild.currentResult}"
+            }' ${env.SLACK_WEBHOOK}
+            """
         }
-
     }
-
 }

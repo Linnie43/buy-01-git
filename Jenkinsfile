@@ -5,6 +5,7 @@ pipeline {
             SLACK_WEBHOOK = credentials('slack-webhook')
             VERSION = "v${env.BUILD_NUMBER}"
             STABLE_TAG = "stable"
+            SONAR_SCANNER_HOME = tool 'SonarScanner'
         }
 
     parameters {
@@ -14,7 +15,6 @@ pipeline {
     tools {
         maven 'maven'
         nodejs 'NodeJS-20'
-        sonarRunner 'SonarScanner'
     }
 
     stages {

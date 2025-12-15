@@ -14,6 +14,7 @@ pipeline {
     tools {
         maven 'maven'
         nodejs 'NodeJS-20'
+        sonarQubeScanner 'SonarScanner'
     }
 
     stages {
@@ -56,23 +57,11 @@ pipeline {
             }
        }
 
-       stage('Test Frontend') {
-              steps {
-                echo "Running frontend tests"
-                dir('frontend') {
-                    sh 'npm install --save-dev karma-chrome-launcher karma-junit-reporter'
-                     withEnv(["CHROMIUM_BIN=/usr/bin/chromium", "CHROME_BIN=/usr/bin/chromium"]) {
-                          sh 'npm test'
-                     }
-                }
-              }
-       }
-
        stage('SonarQube Analysis') {
            steps {
                echo "Running SonarQube analysis"
                 withSonarQubeEnv('SonarQube') {
-                    sh 'sonar-scanner'
+                    sh "${SONAR_SCANNER_HOME}/bin/sonar-scanner"
                 }
            }
        }
@@ -84,6 +73,18 @@ pipeline {
                    waitForQualityGate abortPipeline: true
                }
            }
+       }
+
+       stage('Test Frontend') {
+            steps {
+                echo "Running frontend tests"
+                dir('frontend') {
+                    sh 'npm install --save-dev karma-chrome-launcher karma-junit-reporter'
+                     withEnv(["CHROMIUM_BIN=/usr/bin/chromium", "CHROME_BIN=/usr/bin/chromium"]) {
+                          sh 'npm test'
+                     }
+                }
+            }
        }
 
        stage('Test User Service') {

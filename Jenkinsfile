@@ -8,7 +8,7 @@ pipeline {
         }
 
     parameters {
-        string(name: 'BRANCH', defaultValue: 'deployment-test', description: 'Branch to build')
+        string(name: 'BRANCH', defaultValue: 'main', description: 'Branch to build')
     }
 
     tools {
@@ -21,7 +21,7 @@ pipeline {
             steps {
                 echo "Checking out branch: ${params.BRANCH}"
                 git branch: "${params.BRANCH}",
-                    url: 'https://github.com/Linnie43/buy-01-git'
+                    url: 'https://github.com/fannielf/e-commerce'
             }
         }
 

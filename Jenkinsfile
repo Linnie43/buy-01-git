@@ -14,7 +14,7 @@ pipeline {
     tools {
         maven 'maven'
         nodejs 'NodeJS-20'
-        sonarQubeScanner 'SonarScanner'
+        sonarRunner 'SonarScanner'
     }
 
     stages {

@@ -105,7 +105,7 @@ pipeline {
                     -Dsonar.projectKey=ecommerce-microservices \
                     -Dsonar.sources=backend,frontend \
                     -Dsonar.exclusions=**/node_modules/**,**/vendor/**,**/dist/**,**/target/** \
-                    -Dsonar.cpd.exclusions=**/dto/**, **/JwtUtil.java \
+                    -Dsonar.cpd.exclusions=**/dto/**,**/JwtUtil.java \
                     -Dsonar.java.binaries=backend/**/target/classes \
                     -Dsonar.javascript.lcov.reportPaths=coverage/frontend/lcov.info \
                     -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \

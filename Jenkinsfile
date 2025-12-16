@@ -63,7 +63,7 @@ pipeline {
                 dir('frontend') {
                     sh 'npm install --save-dev karma-chrome-launcher karma-junit-reporter karma-coverage'
                      withEnv(["CHROMIUM_BIN=/usr/bin/chromium", "CHROME_BIN=/usr/bin/chromium"]) {
-                          sh 'npm test'
+                        sh 'npm test -- --code-coverage'
                      }
                 }
             }

@@ -1,5 +1,4 @@
 process.env.CHROME_BIN = process.env.CHROMIUM_BIN || '/usr/bin/chromium';
-const path = require('path');
 
 module.exports = function (config) {
   config.set({
@@ -17,9 +16,10 @@ module.exports = function (config) {
       },
       clearContext: false // leave Jasmine Spec Runner output visible in browser
     },
-    reporters: ['progress', 'junit'],
+    reporters: ['progress', 'junit', 'coverage'],
     coverageReporter: {
-      dir: path.join(__dirname, 'coverage', 'frontend'),
+      dir: require('path').join(__dirname, 'coverage'),
+      subdir: '.',
       reporters: [
         { type: 'lcovonly', file: 'lcov.info' },
         { type: 'text-summary' }

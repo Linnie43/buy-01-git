@@ -107,8 +107,7 @@ pipeline {
                     -Dsonar.exclusions=**/node_modules/**,**/vendor/**,**/dist/**,**/target/** \
                     -Dsonar.cpd.exclusions=**/dto/**,**/JwtUtil.java \
                     -Dsonar.java.binaries=backend/**/target/classes \
-                    -Dsonar.javascript.lcov.reportPaths=coverage/frontend/lcov.info \
-                    -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
+                    -Dsonar.javascript.lcov.reportPaths=frontend/coverage/lcov.info \
                     -Dsonar.host.url=http://host.docker.internal:9000
                     """
                 }

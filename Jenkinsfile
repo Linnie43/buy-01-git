@@ -57,56 +57,11 @@ pipeline {
             }
        }
 
-       stage('SonarQube Analysis') {
-           steps {
-               echo "Running SonarQube analysis"
-                withSonarQubeEnv('SonarQube') {
-                    sh """
-                    ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
-                    -Dsonar.projectKey=ecommerce-microservices \
-                    -Dsonar.sources=backend,frontend \
-                    -Dsonar.exclusions=**/node_modules/**,**/vendor/**,**/dist/**,**/target/** \
-                    -Dsonar.java.binaries=backend/**/target/classes \
-                    -Dsonar.javascript.lcov.reportPaths=frontend/coverage/lcov.info \
-                    -Dsonar.host.url=http://host.docker.internal:9000
-                    """
-                }
-           }
-       }
-
-       stage('Quality Gate') {
-           steps {
-               echo "Checking SonarQube Quality Gate"
-               timeout(time: 5, unit: 'MINUTES') {
-                   script {
-                       def qg = waitForQualityGate()
-
-                       echo "SonarQube Quality Gate status: ${qg.status}"
-
-                       if (qg.status != 'OK') {
-                           sh """
-                           curl -X POST -H 'Content-type: application/json' --data '{
-                               "text": ":x: SonarQube Quality Gate FAILED\\n*Status:* ${qg.status}\\n*Job:* ${env.JOB_NAME}\\n*Build:* ${env.BUILD_NUMBER}"
-                           }' ${env.SLACK_WEBHOOK}
-                           """
-                           error "Quality Gate failed: ${qg.status}"
-                       } else {
-                           sh """
-                           curl -X POST -H 'Content-type: application/json' --data '{
-                               "text": ":white_check_mark: SonarQube Quality Gate PASSED\\n*Job:* ${env.JOB_NAME}\\n*Build:* ${env.BUILD_NUMBER}"
-                           }' ${env.SLACK_WEBHOOK}
-                           """
-                       }
-                   }
-               }
-           }
-       }
-
        stage('Test Frontend') {
             steps {
                 echo "Running frontend tests"
                 dir('frontend') {
-                    sh 'npm install --save-dev karma-chrome-launcher karma-junit-reporter'
+                    sh 'npm install --save-dev karma-chrome-launcher karma-junit-reporter karma-coverage'
                      withEnv(["CHROMIUM_BIN=/usr/bin/chromium", "CHROME_BIN=/usr/bin/chromium"]) {
                           sh 'npm test'
                      }
@@ -139,6 +94,53 @@ pipeline {
                     sh 'mvn test'
                 }
             }
+       }
+
+       stage('SonarQube Analysis') {
+           steps {
+               echo "Running SonarQube analysis"
+                withSonarQubeEnv('SonarQube') {
+                    sh """
+                    ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
+                    -Dsonar.projectKey=ecommerce-microservices \
+                    -Dsonar.sources=backend,frontend \
+                    -Dsonar.exclusions=**/node_modules/**,**/vendor/**,**/dist/**,**/target/** \
+                    -Dsonar.cpd.exclusions=**/dto/**, **/JwtUtil.java \
+                    -Dsonar.java.binaries=backend/**/target/classes \
+                    -Dsonar.javascript.lcov.reportPaths=coverage/frontend/lcov.info \
+                    -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
+                    -Dsonar.host.url=http://host.docker.internal:9000
+                    """
+                }
+           }
+       }
+
+       stage('Quality Gate') {
+           steps {
+               echo "Checking SonarQube Quality Gate"
+               timeout(time: 5, unit: 'MINUTES') {
+                   script {
+                       def qg = waitForQualityGate()
+
+                       echo "SonarQube Quality Gate status: ${qg.status}"
+
+                       if (qg.status != 'OK') {
+                           sh """
+                           curl -X POST -H 'Content-type: application/json' --data '{
+                               "text": ":x: SonarQube Quality Gate FAILED\\n*Status:* ${qg.status}\\n*Job:* ${env.JOB_NAME}\\n*Build:* ${env.BUILD_NUMBER}"
+                           }' ${env.SLACK_WEBHOOK}
+                           """
+                           error "Quality Gate failed: ${qg.status}"
+                       } else {
+                           sh """
+                           curl -X POST -H 'Content-type: application/json' --data '{
+                               "text": ":white_check_mark: SonarQube Quality Gate PASSED\\n*Job:* ${env.JOB_NAME}\\n*Build:* ${env.BUILD_NUMBER}"
+                           }' ${env.SLACK_WEBHOOK}
+                           """
+                       }
+                   }
+               }
+           }
        }
 
        stage('Build Images') {

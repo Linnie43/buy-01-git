@@ -1,4 +1,5 @@
 process.env.CHROME_BIN = process.env.CHROMIUM_BIN || '/usr/bin/chromium';
+const path = require('path');
 
 module.exports = function (config) {
   config.set({
@@ -16,15 +17,14 @@ module.exports = function (config) {
       },
       clearContext: false // leave Jasmine Spec Runner output visible in browser
     },
+    reporters: ['progress', 'junit'],
     coverageReporter: {
-      dir: require('path').join(__dirname, './coverage/frontend'),
-      subdir: '.',
+      dir: path.join(__dirname, 'coverage', 'frontend'),
       reporters: [
-        { type: 'html' },
+        { type: 'lcovonly', file: 'lcov.info' },
         { type: 'text-summary' }
       ]
     },
-    reporters: ['progress', 'junit'],
     junitReporter: {
       outputDir: 'test-results/junit', // results will be saved as $outputDir/$browserName.xml
       outputFile: 'TEST-frontend.xml', // if included, results will be saved as $outputDir/$browserName/$outputFile

@@ -16,12 +16,12 @@ module.exports = function (config) {
       },
       clearContext: false // leave Jasmine Spec Runner output visible in browser
     },
-    reporters: ['progress', 'junit', 'coverage'],
+    reporters: ['progress', 'junit'],
     coverageReporter: {
       dir: require('path').join(__dirname, 'coverage'),
       subdir: '.',
       reporters: [
-        { type: 'lcovonly', file: 'lcov.info' },
+        { type: 'lcovonly' },
         { type: 'text-summary' }
       ]
     },

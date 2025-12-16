@@ -118,26 +118,7 @@ pipeline {
            steps {
                echo "Checking SonarQube Quality Gate"
                timeout(time: 5, unit: 'MINUTES') {
-                   script {
-                       def qg = waitForQualityGate()
-
-                       echo "SonarQube Quality Gate status: ${qg.status}"
-
-                       if (qg.status != 'OK') {
-                           sh """
-                           curl -X POST -H 'Content-type: application/json' --data '{
-                               "text": ":x: SonarQube Quality Gate FAILED\\n*Status:* ${qg.status}\\n*Job:* ${env.JOB_NAME}\\n*Build:* ${env.BUILD_NUMBER}"
-                           }' ${env.SLACK_WEBHOOK}
-                           """
-                           error "Quality Gate failed: ${qg.status}"
-                       } else {
-                           sh """
-                           curl -X POST -H 'Content-type: application/json' --data '{
-                               "text": ":white_check_mark: SonarQube Quality Gate PASSED\\n*Job:* ${env.JOB_NAME}\\n*Build:* ${env.BUILD_NUMBER}"
-                           }' ${env.SLACK_WEBHOOK}
-                           """
-                       }
-                   }
+                  waitForQualityGate abortPipeline: true
                }
            }
        }

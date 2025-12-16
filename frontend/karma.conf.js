@@ -16,15 +16,15 @@ module.exports = function (config) {
       },
       clearContext: false // leave Jasmine Spec Runner output visible in browser
     },
+    reporters: ['progress', 'junit'],
     coverageReporter: {
-      dir: require('path').join(__dirname, './coverage/frontend'),
+      dir: require('path').join(__dirname, 'coverage'),
       subdir: '.',
       reporters: [
-        { type: 'html' },
+        { type: 'lcovonly' },
         { type: 'text-summary' }
       ]
     },
-    reporters: ['progress', 'junit'],
     junitReporter: {
       outputDir: 'test-results/junit', // results will be saved as $outputDir/$browserName.xml
       outputFile: 'TEST-frontend.xml', // if included, results will be saved as $outputDir/$browserName/$outputFile

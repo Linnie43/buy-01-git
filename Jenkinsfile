@@ -57,39 +57,13 @@ pipeline {
             }
        }
 
-       stage('SonarQube Analysis') {
-           steps {
-               echo "Running SonarQube analysis"
-                withSonarQubeEnv('SonarQube') {
-                    sh """
-                    ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
-                    -Dsonar.projectKey=ecommerce-microservices \
-                    -Dsonar.sources=backend,frontend \
-                    -Dsonar.exclusions=**/node_modules/**,**/vendor/**,**/dist/**,**/target/** \
-                    -Dsonar.java.binaries=backend/**/target/classes \
-                    -Dsonar.javascript.lcov.reportPaths=frontend/coverage/lcov.info \
-                    -Dsonar.host.url=http://host.docker.internal:9000
-                    """
-                }
-           }
-       }
-
-       stage('Quality Gate') {
-           steps {
-               echo "Checking SonarQube Quality Gate"
-               timeout(time: 5, unit: 'MINUTES') {
-                   waitForQualityGate abortPipeline: true
-               }
-           }
-       }
-
        stage('Test Frontend') {
             steps {
                 echo "Running frontend tests"
                 dir('frontend') {
-                    sh 'npm install --save-dev karma-chrome-launcher karma-junit-reporter'
+                    sh 'npm install --save-dev karma-chrome-launcher karma-junit-reporter karma-coverage'
                      withEnv(["CHROMIUM_BIN=/usr/bin/chromium", "CHROME_BIN=/usr/bin/chromium"]) {
-                          sh 'npm test'
+                        sh 'npm test -- --code-coverage'
                      }
                 }
             }
@@ -120,6 +94,26 @@ pipeline {
                     sh 'mvn test'
                 }
             }
+       }
+
+       stage('SonarQube Analysis') {
+           steps {
+               echo "Running SonarQube analysis"
+                withSonarQubeEnv('SonarQube') {
+                    sh """
+                    ${SONAR_SCANNER_HOME}/bin/sonar-scanner -Dproject.settings=sonar-project.properties
+                    """
+                }
+           }
+       }
+
+       stage('Quality Gate') {
+           steps {
+               echo "Checking SonarQube Quality Gate"
+               timeout(time: 5, unit: 'MINUTES') {
+                  waitForQualityGate abortPipeline: true
+               }
+           }
        }
 
        stage('Build Images') {
@@ -209,11 +203,11 @@ pipeline {
         always {
             script {
                 // Backend test reports
-                junit 'backend/*/target/surefire-reports/*.xml'
+                junit allowEmptyResults: true, testResults: 'backend/*/target/surefire-reports/*.xml'
                 archiveArtifacts artifacts: 'backend/*/target/surefire-reports/*.xml', allowEmptyArchive: true
 
                 // Frontend reports
-                junit 'frontend/test-results/junit/*.xml'
+                junit allowEmptyResults: true, testResults: 'frontend/test-results/junit/*.xml'
                 archiveArtifacts artifacts: 'frontend/test-results/junit/*.xml', allowEmptyArchive: true
 
                 if (env.WORKSPACE) {

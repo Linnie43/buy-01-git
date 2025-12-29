@@ -1,0 +1,55 @@
+spring:
+  application:
+    name: order-service
+  data:
+    mongodb:
+      database: buy01
+  cloud:
+    inetutils:
+      preferredNetworks:
+        -"172."
+  kafka:
+    bootstrap-servers: kafka:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: order-service-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 11MB
+
+kafka:
+  topic:
+    user-deleted: USER_DELETED
+    product-deleted: PRODUCT_DELETED
+
+server:
+  port: 8083
+  address: 0.0.0.0
+  ssl:
+    enabled: false
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  server:
+    port: 8081
+
+eureka:
+  instance:
+    hostname: ${SERVICE_NAME}
+    instance-id: ${SERVICE_NAME}:${server.port}
+    prefer-ip-address: false
+  client:
+    service-url:
+      defaultZone: http://discovery:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+
+jwt:
+  secret: very-long-secret-key-string-with-at-least-32-chars

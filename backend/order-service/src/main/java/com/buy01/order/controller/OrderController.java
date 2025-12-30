@@ -1,6 +1,5 @@
 package com.buy01.order.controller;
 
-import com.buy01.order.model.Order;
 import com.buy01.order.security.AuthDetails;
 import com.buy01.order.service.OrderService;
 import org.apache.coyote.BadRequestException;
@@ -8,13 +7,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import com.buy01.order.dto.OrderResponseDTO;
 import com.buy01.order.security.SecurityUtils;
 import com.buy01.order.dto.OrderUpdateRequest;
-import com.buy01.order.dto.OrderCreateDTO;
 import jakarta.validation.Valid;
 
 @RestController
@@ -31,17 +27,16 @@ public class OrderController {
 
     @PostMapping
     public ResponseEntity<?> createOrder(
-            @RequestHeader("Authorization") String authHeader,
-            @Valid @ModelAttribute OrderCreateDTO request) throws IOException {
+            @RequestHeader("Authorization") String authHeader) throws IOException {
 
         AuthDetails currentUser = securityUtils.getAuthDetails(authHeader);
-
 
         if (!currentUser.getRole().equals("CLIENT")) {
             throw new BadRequestException("Current user is not a CLIENT");
         }
 
         // ORDER CREATION LOGIC
+        // fetch cart for userId and transform to order
 
         return ResponseEntity.ok("new order created");
     }

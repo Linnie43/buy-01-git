@@ -15,13 +15,13 @@ public class Order {
     private String userId;
     private List<OrderItem> items;
     private double totalPrice;
-    private String status; // CREATED, PAID, SHIPPED, DELIVERED, CANCELED
+    private OrderStatus status;
     private Date createdAt;
     private Date updatedAt;
 
     // constructor - both constructors are needed, empty one for Spring Data and one with parameters for creating objects
     public Order() {}
-    public Order(String userId, List<OrderItem> items, double totalPrice, String status) {
+    public Order(String userId, List<OrderItem> items, double totalPrice, OrderStatus status) {
         this.userId = userId;
         this.items = items;
         this.totalPrice = totalPrice;
@@ -31,7 +31,7 @@ public class Order {
     }
 
     // Testing purpose constructor
-    protected Order(String id, String userId, List<OrderItem> items, double totalPrice, String status) {
+    protected Order(String id, String userId, List<OrderItem> items, double totalPrice, OrderStatus status) {
         this.id = id;
         this.userId = userId;
         this.items = items;
@@ -53,8 +53,8 @@ public class Order {
     public double getTotalPrice() {return totalPrice;}
     public void setTotalPrice(double totalPrice) {this.totalPrice = totalPrice;}
 
-    public String getStatus() {return status;}
-    public void setStatus(String status) {this.status = status;}
+    public OrderStatus getStatus() {return status;}
+    public void setStatus(OrderStatus status) {this.status = status;}
 
     public Date getCreatedAt() {return createdAt;}
     public void setCreatedAt(Date createdAt) {this.createdAt = createdAt;}

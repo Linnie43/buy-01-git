@@ -75,6 +75,7 @@ No manual Maven or Angular build is required.
 Docker uses multi-stage builds to compile all services automatically.
 
 ```
+export IMAGE_TAG=latest
 docker compose build
 ```
 

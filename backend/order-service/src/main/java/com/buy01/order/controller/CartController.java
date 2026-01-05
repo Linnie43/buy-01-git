@@ -29,7 +29,7 @@ public class CartController {
     @PostMapping
     public ResponseEntity<?> addToCart(
             @RequestHeader("Authorization") String authHeader,
-            @Valid @ModelAttribute CartItemRequestDTO newItem) throws IOException {
+            @Valid @RequestBody CartItemRequestDTO newItem) throws IOException {
 
         AuthDetails currentUser = securityUtils.getAuthDetails(authHeader);
 
@@ -40,12 +40,17 @@ public class CartController {
         // CART LOGIC
         // fetch cart for userId and create one or add item to it
         // product details fetched from product service, not trusting client information
+        Cart updatedCart = cartService.addToCart(
+                currentUser.getCurrentUserId(),
+                newItem.getProductId(),
+                newItem.getQuantity()
+        );
 
-        return ResponseEntity.ok("new item added to cart");
+        return ResponseEntity.ok(updatedCart);
     }
 
     @GetMapping
-    public ResponseEntity<?> getCurrentCart(
+    public ResponseEntity<?> getActiveCart(
             @RequestHeader("Authorization") String authHeader
             ) throws BadRequestException {
         AuthDetails currentUser = securityUtils.getAuthDetails(authHeader);
@@ -54,7 +59,7 @@ public class CartController {
             throw new BadRequestException("Current user is not a CLIENT");
         }
 
-        Cart cart = cartService.getCurrentCart(currentUser.getCurrentUserId());
+        Cart cart = cartService.getActiveCart(currentUser.getCurrentUserId());
         List<ItemDTO> itemsDto = cart.getItems().stream()
                 .map(item -> new ItemDTO(
                         item.getProductId(),

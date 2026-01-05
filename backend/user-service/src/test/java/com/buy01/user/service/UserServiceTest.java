@@ -129,7 +129,7 @@ class UserServiceTest {
         when(productClient.getUsersProducts("123"))
                 .thenReturn(List.of(new ProductDTO()));
 
-        List<ProductDTO> result = userService.getProductsForCurrentUser(new AuthDetails("123", "SELLER"));
+        List<ProductDTO> result = userService.getProductsForCurrentUser(new AuthDetails("123", Role.SELLER));
 
         assertEquals(1, result.size());
         verify(productClient).getUsersProducts("123");
@@ -138,7 +138,7 @@ class UserServiceTest {
     @Test
     void getProductsForCurrentUser_invalidRole_throws() {
         assertThrows(ForbiddenException.class,
-                () -> userService.getProductsForCurrentUser(new AuthDetails("123", "BUYER")));
+                () -> userService.getProductsForCurrentUser(new AuthDetails("123", Role.CLIENT)));
     }
 
     // Update User Tests
@@ -166,7 +166,7 @@ class UserServiceTest {
 
     @Test
     void deleteUser_callsRepositoryAndPublishesEvent() {
-        userService.deleteUser("123", new AuthDetails("123", "SELLER"));
+        userService.deleteUser("123", new AuthDetails("123", Role.SELLER));
 
         verify(userRepository).deleteById("123");
         verify(userEventService).publishUserDeletedEvent("123");

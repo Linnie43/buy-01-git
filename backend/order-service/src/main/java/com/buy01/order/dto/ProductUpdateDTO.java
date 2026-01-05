@@ -4,12 +4,14 @@ public class ProductUpdateDTO {
     private String productId;
     private String productName;
     private Double productPrice;
+    private int quantity;
 
     public ProductUpdateDTO() {}
-    public ProductUpdateDTO(String productId, String productName, Double productPrice) {
+    public ProductUpdateDTO(String productId, String productName, Double productPrice, int quantity) {
         this.productId = productId;
         this.productName = productName;
         this.productPrice = productPrice;
+        this.quantity = quantity;
     }
 
     public String getProductId() {return productId;}
@@ -20,4 +22,7 @@ public class ProductUpdateDTO {
 
     public Double getProductPrice() {return productPrice;}
     public void setProductPrice(Double productPrice) {this.productPrice = productPrice;}
+
+    public int getQuantity() {return quantity;}
+    public void setQuantity(int quantity) {this.quantity = quantity;}
 }

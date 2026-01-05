@@ -1,8 +1,7 @@
-package com.buy01.user.dto;
+package com.buy01.product.dto;
 
-import com.buy01.user.model.Role;
+import com.buy01.product.model.Role;
 
-// for internal id and role checks
 public class UserDTO {
     private String id;
     private Role role;
@@ -22,4 +21,3 @@ public class UserDTO {
         return role;
     }
 }
-

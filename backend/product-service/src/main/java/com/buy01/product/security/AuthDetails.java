@@ -1,6 +1,6 @@
-package com.buy01.user.security;
+package com.buy01.product.security;
 
-import com.buy01.user.model.Role;
+import com.buy01.product.model.Role;
 
 public class AuthDetails {
 

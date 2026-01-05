@@ -6,9 +6,7 @@ import com.buy01.order.model.Cart;
 import com.buy01.order.model.CartStatus;
 import com.buy01.order.model.OrderItem;
 import com.buy01.order.repository.CartRepository;
-import com.buy01.order.repository.OrderRepository;
 import com.buy01.order.security.AuthDetails;
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

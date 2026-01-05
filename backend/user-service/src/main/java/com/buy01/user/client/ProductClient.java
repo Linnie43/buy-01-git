@@ -15,7 +15,7 @@ public class ProductClient {
     private final RestTemplate restTemplate;
     private final String productServiceBaseUrl;
 
-    public ProductClient(RestTemplate restTemplate, RestTemplateBuilder builder) {
+    public ProductClient(RestTemplateBuilder builder) {
         this.restTemplate = builder.build();
         // Local dev URL; will switch to container name in Docker
         this.productServiceBaseUrl = "http://product-service:8081/api/products";
@@ -24,13 +24,10 @@ public class ProductClient {
     public List<ProductDTO> getUsersProducts(String userId) {
         try {
             String url = productServiceBaseUrl + "/internal/my-products/" + userId;
-            System.out.println("Requesting URL: " + url); // Debugging line
-            List<ProductDTO> products = restTemplate.getForObject(
-                    productServiceBaseUrl + "/internal/my-products/" + userId,
-                    List.class
-            );
 
-            if (products.isEmpty()) {
+            List<ProductDTO> products = restTemplate.getForObject(url, List.class);
+
+            if (products == null || products.isEmpty()) {
                 return List.of();
             } else {
                 return products;

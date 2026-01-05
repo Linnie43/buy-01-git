@@ -59,7 +59,7 @@ public class UserController {
     public UserDTO getUserById(@PathVariable String userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found"));
-        return new UserDTO(user.getId(), user.getRole().toString());
+        return new UserDTO(user.getId(), user.getRole());
     }
 
 
@@ -119,7 +119,7 @@ public class UserController {
 //                           @RequestHeader("Authorization") String authHeader) {
 //        // Check if user has ADMIN role
 //        if (auth == null || auth.getAuthorities().stream()
-//                .noneMatch(a -> a.getAuthority().equals("ADMIN"))) {
+//                .noneMatch(a -> a.getAuthority().equals(Role.ADMIN))) {
 //            throw new ForbiddenException("Forbidden - only admin can delete users");
 //        }
 //

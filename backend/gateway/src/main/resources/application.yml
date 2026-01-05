@@ -35,6 +35,16 @@ spring:
           predicates:
             - Path=/api/media/**
 
+        - id: order-service-orders
+          uri: lb://ORDER-SERVICE
+          predicates:
+            - Path=/api/orders/**
+
+        - id: order-service-cart
+          uri: lb://ORDER-SERVICE
+          predicates:
+            - Path=/api/cart/**
+
 server:
   port: 8443
   ssl:

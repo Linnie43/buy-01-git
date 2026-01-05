@@ -131,6 +131,25 @@ services:
     networks:
       - FKML_secret_network
 
+  order-service:
+    build: backend/order-service
+    image: order-service:${IMAGE_TAG}
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATA_MONGODB_URI: mongodb://admin:password@buy01:27017/buy01?authSource=admin
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SERVICE_NAME: order-service
+    expose:
+      - "8083"
+    depends_on:
+      discovery:
+        condition: service_healthy
+      gateway:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - FKML_secret_network
+
   # ANGULAR FRONTEND
   frontend:
     build: frontend

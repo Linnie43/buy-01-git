@@ -85,7 +85,7 @@ public class UserService {
         User user = findById(currentUser.getCurrentUserId())
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
-        if (currentUser.getRole().equals("ADMIN") || currentUser.getRole().equals("SELLER")) {
+        if (currentUser.getRole().equals(Role.ADMIN) || currentUser.getRole().equals(Role.SELLER)) {
             log.info("Fetching products for user with role: {}", currentUser.getRole());
             // get products from product service
             List<ProductDTO> products = getProductsForCurrentUser(currentUser);
@@ -138,7 +138,7 @@ public class UserService {
 
     public List<ProductDTO> getProductsForCurrentUser(AuthDetails currentUser) throws IOException {
         // Call product-service to get products for the user
-        if (!currentUser.getRole().equals("ADMIN") && !currentUser.getRole().equals("SELLER")) {
+        if (!currentUser.getRole().equals(Role.ADMIN) && !currentUser.getRole().equals(Role.SELLER)) {
             throw new ForbiddenException("Invalid role to fetch products");
         }
 
@@ -180,7 +180,7 @@ public class UserService {
     // sending an API call for users products to be deleted and then deletes the user
     public void deleteUser(String userId, AuthDetails currentUser) {
 
-        if (!currentUser.getCurrentUserId().equals(userId) || !currentUser.getRole().equals("ADMIN")) {
+        if (!currentUser.getCurrentUserId().equals(userId) || !currentUser.getRole().equals(Role.ADMIN)) {
             throw new ForbiddenException("You don't have permission to delete this user");
         }
 

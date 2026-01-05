@@ -44,6 +44,8 @@ pipeline {
                 dir('backend/media-service') {
                     sh 'mvn clean package -DskipTests -Dspring-boot.repackage.skip=true'
                 }
+                dir('backend/order-service') {
+                    sh 'mvn clean package -DskipTests -Dspring-boot.repackage.skip=true'
             }
         }
 
@@ -95,6 +97,15 @@ pipeline {
                 }
             }
        }
+
+       stage('Test Order Service') {
+            steps {
+                 echo "Running order service tests"
+                 dir('backend/order-service') {
+                      sh 'mvn test'
+                 }
+            }
+         }
 
        stage('SonarQube Analysis') {
            steps {
@@ -160,6 +171,7 @@ pipeline {
                                     sh "docker tag user-service:${VERSION} user-service:${STABLE_TAG}"
                                     sh "docker tag product-service:${VERSION} product-service:${STABLE_TAG}"
                                     sh "docker tag media-service:${VERSION} media-service:${STABLE_TAG}"
+                                    sh "docker tag order-service:${VERSION} order-service:${STABLE_TAG}"
                                     sh "docker tag gateway:${VERSION} gateway:${STABLE_TAG}"
                                     sh "docker tag discovery:${VERSION} discovery:${STABLE_TAG}"
 

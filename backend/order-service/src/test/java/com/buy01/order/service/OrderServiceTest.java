@@ -3,6 +3,7 @@ package com.buy01.order.service;
 import com.buy01.order.model.Order;
 import com.buy01.order.model.OrderItem;
 import com.buy01.order.model.OrderStatus;
+import com.buy01.order.model.ShippingAddress;
 import com.buy01.order.repository.OrderRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,8 +27,8 @@ public class OrderServiceTest {
     private OrderService orderService;
 
     static class TestOrder extends Order {
-        TestOrder(String id, String userId, List<OrderItem> items, double totalPrice, OrderStatus status) {
-            super(id, userId, items, totalPrice, status);
+        TestOrder(String id, String userId, List<OrderItem> items, double totalPrice, OrderStatus status, ShippingAddress shippingAddress) {
+            super(id, userId, items, totalPrice, status, shippingAddress);
         }
     }
 

@@ -31,6 +31,18 @@
             Manage Product
           </button>
 
+          <div class="quantity-selector mt-2">
+            <label for="quantity">Quantity:</label>
+            <input
+              type="number"
+              id="quantity"
+              [(ngModel)]="selectedQuantity"
+              [min]="1"
+              [max]="product.quantity"
+              class="form-control"
+            />
+          </div>
+
           <button *ngIf="!product.isProductOwner && isLoggedIn" class="btn btn-success w-100" [disabled]="product.quantity === 0">
             Add to Cart
           </button>

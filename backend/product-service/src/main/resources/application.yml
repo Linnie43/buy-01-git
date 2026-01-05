@@ -26,6 +26,7 @@ kafka:
   topic:
     user-deleted: USER_DELETED
     product-deleted: PRODUCT_DELETED
+    product-updated: PRODUCT_UPDATED
 
 server:
   port: 8081

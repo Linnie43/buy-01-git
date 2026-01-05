@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CartResponseDTO, CartItemRequestDTO, CartItemUpdateDTO } from '../models/cart.model';
 import { BASE_URL } from '../constants/constants';
@@ -14,15 +14,16 @@ export class CartService {
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
-  private getAuthHeaders(): { [header: string]: string } {
+  private getAuthHeaders(): HttpHeaders {
     const token = this.authService.getToken();
+    let headers = new HttpHeaders();
     if (token) {
-      return { 'Authorization': `Bearer ${token}` };
-    } else {
-      return {};
+    headers = headers.set('Authorization', `Bearer ${token}`);
     }
-  }
+      return headers;
+    }
 
+//HTTP QUERIES FOR CART OPERATIONS
   addToCart(newItem: CartItemRequestDTO): Observable<CartResponseDTO> {
     return this.http.post<CartResponseDTO>(this.apiUrl, newItem, { headers: this.getAuthHeaders() });
   }

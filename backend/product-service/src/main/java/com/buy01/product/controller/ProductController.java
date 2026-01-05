@@ -69,7 +69,7 @@ public class ProductController {
                             p.getQuantity(),
                             p.getUserId(),
                             images,
-                            currentUser.getCurrentUserId() != null && currentUser.getCurrentUserId().equals(p.getUserId())
+                            currentUser != null && currentUser.getCurrentUserId().equals(p.getUserId())
                     );
                 })
                 .toList();

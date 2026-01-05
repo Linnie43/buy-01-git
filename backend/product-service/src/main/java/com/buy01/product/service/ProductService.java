@@ -3,6 +3,7 @@ package com.buy01.product.service;
 import com.buy01.product.client.MediaClient;
 import com.buy01.product.client.UserClient;
 import com.buy01.product.dto.ProductResponseDTO;
+import com.buy01.product.dto.ProductUpdateDTO;
 import com.buy01.product.exception.ConflictException;
 import com.buy01.product.exception.ForbiddenException;
 import com.buy01.product.exception.NotFoundException;
@@ -188,6 +189,15 @@ public class ProductService {
 
         Product updatedProduct = productRepository.save(product);
 
+        // send productUpdate via Kafka
+        productEventService.publishProductUpdatedEvent(new ProductUpdateDTO(
+                updatedProduct.getProductId(),
+                updatedProduct.getName(),
+                updatedProduct.getDescription(),
+                updatedProduct.getPrice(),
+                updatedProduct.getQuantity()
+        ));
+
         // return the full, current list of images for the product (existing minus deleted + newly uploaded)
         return new ProductResponseDTO(
                 updatedProduct.getProductId(),
@@ -212,6 +222,15 @@ public class ProductService {
         product.setQuantity(newQuantity);
         product.setUpdateTime(new Date());
         productRepository.save(product);
+
+        // send productUpdate via Kafka
+        productEventService.publishProductUpdatedEvent(new ProductUpdateDTO(
+                product.getProductId(),
+                product.getName(),
+                product.getDescription(),
+                product.getPrice(),
+                product.getQuantity()
+        ));
     }
 
     // Deleting product, accessible only by ADMIN or product owner

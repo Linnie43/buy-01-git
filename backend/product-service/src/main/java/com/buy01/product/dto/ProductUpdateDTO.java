@@ -6,17 +6,15 @@ public class ProductUpdateDTO {
     private String description;
     private double price;
     private int quantity;
-    private String ownerId;
 
     public ProductUpdateDTO() {}
 
-    public ProductUpdateDTO(String productId, String name, String description, double price, int quantity, String ownerId) {
+    public ProductUpdateDTO(String productId, String name, String description, double price, int quantity) {
         this.productId = productId;
         this.name = name;
         this.description = description;
         this.price = price;
         this.quantity = quantity;
-        this.ownerId = ownerId;
     }
 
     public String getProductId() { return productId; }
@@ -33,8 +31,5 @@ public class ProductUpdateDTO {
 
     public int getQuantity() { return quantity; }
     public void setQuantity(int quantity) { this.quantity = quantity; }
-
-    public String getOwnerId() { return ownerId; }
-    public void setOwnerId(String ownerId) { this.ownerId = ownerId; }
 
 }

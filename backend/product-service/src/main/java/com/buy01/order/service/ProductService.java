@@ -8,11 +8,14 @@ import com.buy01.order.exception.NotFoundException;
 import com.buy01.order.model.Product;
 import com.buy01.order.repository.ProductRepository;
 import jakarta.ws.rs.BadRequestException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,6 +32,8 @@ public class ProductService {
     private final MediaClient mediaClient;
     private final UserClient userClient;
     private final ProductEventService productEventService;
+    private static final Logger log = LoggerFactory.getLogger(ProductService.class);
+
 
     @Autowired
     public ProductService(ProductRepository productRepository, MediaClient mediaClient, UserClient userClient, ProductEventService productEventService) {
@@ -43,11 +48,9 @@ public class ProductService {
 
         // validate that user can create products
         if (currentUserId.isEmpty() || (!role.equals("ADMIN") && !role.equals("SELLER"))) {
-            System.out.println("Forbidden: User ID is empty or role is not allowed - Role: " + role);
+            log.info("Forbidden: User ID is empty or role is not allowed - Role: {}", role);
             throw new ForbiddenException("Your current role cannot create a product.");
         }
-
-        String productOwnerId = currentUserId;
 
         // validate name
         validateProductName(request.getName());
@@ -60,34 +63,29 @@ public class ProductService {
         // validate userId
         validateUserId(request.getUserId());
 
-        Product product = new Product();
-        product.setName(request.getName().trim());
-        product.setDescription(request.getDescription().trim());
-        product.setPrice(request.getPrice());
-        product.setQuantity(request.getQuantity());
-        product.setUserId(request.getUserId());
+        Product product = new Product(request.getName().trim(), request.getDescription().trim(),
+                request.getPrice(), request.getQuantity(), request.getUserId());
 
         if (request.getImagesList() != null && request.getImagesList().size() > 5) {
             throw new BadRequestException("You can upload up to 5 images.");
         }
 
         Product savedProduct = productRepository.save(product);
-        System.out.println("Saved product : " + savedProduct);
 
         List<String> mediaIds = List.of();
 
         if (request.getImagesList() != null) {
-            System.out.println("Number of images uploaded: " + request.getImagesList().size());
+            log.info("Number of images uploaded: {}", request.getImagesList().size());
             try {
                 mediaIds = mediaClient.postProductImages(savedProduct.getProductId(), request.getImagesList());
-                System.out.println("Uploaded product images: " + mediaIds);
+                log.info("Uploaded product images: {}", mediaIds);
             } catch (Exception e) {
-                System.out.println("Failed to upload images: " + e.getMessage());
-                // decide: either fail entire request or continue without images
+                log.info("Failed to upload images: {}", e.getMessage());
+                // continue without images
             }
         }
 
-        System.out.println("Uploaded product images: " + mediaIds);
+        log.info("Uploaded product images: {}", mediaIds);
 
         return new ProductResponseDTO(
                 savedProduct.getProductId(),
@@ -182,6 +180,7 @@ public class ProductService {
         product.setDescription(request.getDescription().trim());
         product.setPrice(request.getPrice());
         product.setQuantity(request.getQuantity());
+        product.setUpdateTime(new Date());
 
 
         Product updatedProduct = productRepository.save(product);
@@ -253,7 +252,7 @@ public class ProductService {
     private void validateProductDescription(String productDescription) {
         productDescription = productDescription.trim();
 
-        if (productDescription == null || productDescription.length() < 1 || productDescription.length() > 500) {
+        if (productDescription == null || productDescription.isEmpty() || productDescription.length() > 500) {
             throw new IllegalArgumentException("Product description must be between 1 - 500 characters");
         }
     }

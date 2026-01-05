@@ -4,19 +4,23 @@ import com.buy01.user.client.MediaClient;
 import com.buy01.user.client.ProductClient;
 import com.buy01.user.dto.*;
 import com.buy01.user.exception.ForbiddenException;
+import com.buy01.user.exception.NotFoundException;
 import com.buy01.user.model.Role;
 import com.buy01.user.model.User;
 import com.buy01.user.repository.UserRepository;
+import com.buy01.user.security.AuthDetails;
 import jakarta.ws.rs.InternalServerErrorException;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class UserService {
@@ -26,6 +30,8 @@ public class UserService {
     private final UserEventService userEventService;
     private final ProductClient productClient;
     private final MediaClient mediaClient;
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
+
 
     public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, UserEventService userEventService, ProductClient productClient, MediaClient mediaClient) {
         this.userRepository = userRepository;
@@ -36,34 +42,89 @@ public class UserService {
     }
 
     // method to create user with validations
-    public User createUser(User user, MultipartFile avatar) throws IOException {
+    public User createUser(UserCreateDTO newUser) throws IOException {
 
-        checkEmailUniqueness(user);
-        validateName(user.getName());
-        user.setPassword(validatePassword(user.getPassword()));
+        checkEmailUniqueness(newUser.getEmail(), "");
+        String name = newUser.getFirstname().trim() + " " + newUser.getLastname().trim();
+        validateName(name);
+        newUser.setPassword(validatePassword(newUser.getPassword().trim()));
 
-        if (user.getRole() == null) {
+        if (newUser.getRole() == null) {
             throw new IllegalArgumentException("Please select a role");
         }
 
         AvatarResponseDTO avatarResponseDTO = null;
 
-        if (avatar != null && !avatar.isEmpty() && user.getRole().equals(Role.SELLER)) {
-            System.out.println("Avatar received in user service: " + avatar.getOriginalFilename());
+        if (newUser.getAvatar() != null && !newUser.getAvatar().isEmpty() && newUser.getRole().equals(Role.SELLER)) {
+            log.info("Avatar received in user service: {}", newUser.getAvatar().getOriginalFilename());
 
             // Call media-service through MediaClient
-             avatarResponseDTO = mediaClient.saveAvatar(new AvatarCreateDTO(avatar));
+             avatarResponseDTO = mediaClient.saveAvatar(new AvatarCreateDTO(newUser.getAvatar()));
 
         }
+
+        // Create the user entity
+        User user = new User();
+        user.setName(name);
+        user.setEmail(newUser.getEmail().toLowerCase().trim());
+        user.setPassword(newUser.getPassword());
+        user.setRole(newUser.getRole());
 
         if (avatarResponseDTO != null) {
             user.setAvatarUrl(avatarResponseDTO.getAvatarUrl());
         }
 
         // Save the user only if the avatar upload is successful or no avatar is provided
+        user.setCreateTime(new Date());
+        user.setUpdateTime(new Date());
         return userRepository.save(user);
     }
 
+    public UserResponseDTO getCurrentUser(AuthDetails currentUser) throws IOException {
+
+        User user = findById(currentUser.getCurrentUserId())
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        if (currentUser.getRole().equals("ADMIN") || currentUser.getRole().equals("SELLER")) {
+            log.info("Fetching products for user with role: {}", currentUser.getRole());
+            // get products from product service
+            List<ProductDTO> products = getProductsForCurrentUser(currentUser);
+            return new SellerResponseDTO(user, products);
+        }
+
+        return new UserResponseDTO(
+                user.getName(),
+                user.getEmail(),
+                user.getRole(),
+                user.getAvatarUrl(),
+                true
+        );
+    }
+
+    public UserResponseDTO updateCurrentUser(AuthDetails currentUser, SellerUpdateRequest request) throws IOException {
+        User user = userRepository.findUserByUserId(currentUser.getCurrentUserId())
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        if (user.getRole() != Role.SELLER && user.getRole() != Role.ADMIN) {
+            throw new ForbiddenException("Your role is not able to update the profile");
+        }
+
+        if (request.getAvatar() != null) {
+            String oldAvatar = user.getAvatarUrl() != null ? user.getAvatarUrl() : "";
+            String avatarUrl = updateUserAvatar(request.getAvatar(), oldAvatar);
+            user.setAvatarUrl(avatarUrl);
+        }
+        user.setUpdateTime(new Date());
+        userRepository.save(user);
+
+        return new UserResponseDTO(
+                user.getName(),
+                user.getEmail(),
+                user.getRole(),
+                user.getAvatarUrl(),
+                true
+        );
+    }
 
     // method to find user by id, needs validation what information is sent if own profile
     public Optional<User> findById(String userId) { // optional means it may or may not contain a non-null value
@@ -75,13 +136,13 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
-    public List<ProductDTO> getProductsForCurrentUser(String userId, String role) {
+    public List<ProductDTO> getProductsForCurrentUser(AuthDetails currentUser) throws IOException {
         // Call product-service to get products for the user
-        if (!role.equals("ADMIN") && !role.equals("SELLER")) {
+        if (!currentUser.getRole().equals("ADMIN") && !currentUser.getRole().equals("SELLER")) {
             throw new ForbiddenException("Invalid role to fetch products");
         }
 
-        return productClient.getUsersProducts(userId);
+        return productClient.getUsersProducts(currentUser.getCurrentUserId());
     }
 
     // method to update user, only admin can update currently
@@ -98,6 +159,7 @@ public class UserService {
             existingUser.setPassword(passwordEncoder.encode(request.getPassword()));
         }
 
+        existingUser.setUpdateTime(new Date());
         return userRepository.save(existingUser);
     }
 
@@ -108,7 +170,7 @@ public class UserService {
                 mediaClient.updateAvatar(new AvatarUpdateRequest(oldAvatarUrl, avatar));
 
         if (avatarResponseDTO != null) {
-            System.out.println("avatarResponseDTO filled: " + avatarResponseDTO);
+            log.info("avatarResponseDTO filled: {}",  avatarResponseDTO);
             return avatarResponseDTO.getAvatarUrl();
         } else {
             throw new InternalServerErrorException("Failed to update avatar");
@@ -116,18 +178,22 @@ public class UserService {
     }
 
     // sending an API call for users products to be deleted and then deletes the user
-    public void deleteUser(String userId, String token) {
+    public void deleteUser(String userId, AuthDetails currentUser) {
+
+        if (!currentUser.getCurrentUserId().equals(userId) || !currentUser.getRole().equals("ADMIN")) {
+            throw new ForbiddenException("You don't have permission to delete this user");
+        }
 
         userRepository.deleteById(userId);
         userEventService.publishUserDeletedEvent(userId);
     }
 
     // Check if email is unique for that role, ignoring the user themselves
-    private void checkEmailUniqueness(User user) {
-            Optional<User> existing = userRepository.findByEmail(user.getEmail());
+    private void checkEmailUniqueness(String email, String userId) {
+            Optional<User> existing = userRepository.findByEmail(email);
 
-            if (existing.isPresent() && !existing.get().getId().equals(user.getId())) {
-                String message = String.format("User with this email already exists");
+            if (existing.isPresent() && !existing.get().getId().equals(userId)) {
+                String message = "User with this email already exists";
                 throw new IllegalArgumentException(message);
             }
 
@@ -136,7 +202,7 @@ public class UserService {
     // Validate name length (add validation for only alphabets)
     private void validateName(String name) {
         name = name.trim();
-            if (name == null || name.isEmpty()) {
+            if (name.isEmpty()) {
                 throw new IllegalArgumentException("Name cannot be null or empty");
             }
             if (name.length() < 2 || name.length() > 25) {

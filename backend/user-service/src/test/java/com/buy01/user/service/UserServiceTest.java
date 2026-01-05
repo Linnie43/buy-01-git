@@ -7,6 +7,7 @@ import com.buy01.user.exception.ForbiddenException;
 import com.buy01.user.model.Role;
 import com.buy01.user.model.User;
 import com.buy01.user.repository.UserRepository;
+import com.buy01.user.security.AuthDetails;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class UserServiceTest {
+class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
@@ -56,8 +57,9 @@ public class UserServiceTest {
     @Test
     @MockitoSettings(strictness = Strictness.LENIENT)
     void createUser_success_whenNoAvatar() throws IOException {
-        User user = new User();
-        user.setName("Anna");
+        UserCreateDTO user = new UserCreateDTO();
+        user.setFirstname("Anna");
+        user.setLastname("Test");
         user.setEmail("anna@test.com");
         user.setPassword("pass123");
         user.setRole(Role.CLIENT);
@@ -67,7 +69,7 @@ public class UserServiceTest {
 
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        User result = userService.createUser(user, null);
+        User result = userService.createUser(user);
 
         assertNotNull(result);
         assertNotEquals("pass123", result.getPassword());
@@ -78,8 +80,9 @@ public class UserServiceTest {
     @Test
     @MockitoSettings(strictness = Strictness.LENIENT)
     void createUser_success_withAvatar_whenSeller() throws IOException {
-        User user = new User();
-        user.setName("Seller");
+        UserCreateDTO user = new UserCreateDTO();
+        user.setFirstname("Seller");
+        user.setLastname("Test");
         user.setEmail("seller@test.com");
         user.setPassword("pass123");
         user.setRole(Role.SELLER);
@@ -93,7 +96,7 @@ public class UserServiceTest {
         when(mediaClient.saveAvatar(any())).thenReturn(avatarResponse);
         when(userRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
-        User result = userService.createUser(user, avatar);
+        User result = userService.createUser(user);
 
         assertEquals("http://avatar.com/myimg.png", result.getAvatarUrl());
         assertTrue(passwordEncoder.matches("pass123", result.getPassword()));
@@ -108,24 +111,25 @@ public class UserServiceTest {
         when(userRepository.findByEmail("exists@test.com"))
                 .thenReturn(Optional.of(existingUser));
 
-        User newUser = new User();
+        UserCreateDTO newUser = new UserCreateDTO();
         newUser.setEmail("exists@test.com");
-        newUser.setName("Test");
+        newUser.setFirstname("Ebba");
+        newUser.setLastname("Exists");
         newUser.setPassword("test123");
         newUser.setRole(Role.CLIENT);
 
         assertThrows(IllegalArgumentException.class,
-                () -> userService.createUser(newUser, null));
+                () -> userService.createUser(newUser));
     }
 
     // Get products tests
 
     @Test
-    void getProductsForCurrentUser_validRole_callsProductService() {
+    void getProductsForCurrentUser_validRole_callsProductService()throws IOException {
         when(productClient.getUsersProducts("123"))
                 .thenReturn(List.of(new ProductDTO()));
 
-        List<ProductDTO> result = userService.getProductsForCurrentUser("123", "SELLER");
+        List<ProductDTO> result = userService.getProductsForCurrentUser(new AuthDetails("123", "SELLER"));
 
         assertEquals(1, result.size());
         verify(productClient).getUsersProducts("123");
@@ -134,7 +138,7 @@ public class UserServiceTest {
     @Test
     void getProductsForCurrentUser_invalidRole_throws() {
         assertThrows(ForbiddenException.class,
-                () -> userService.getProductsForCurrentUser("123", "BUYER"));
+                () -> userService.getProductsForCurrentUser(new AuthDetails("123", "BUYER")));
     }
 
     // Update User Tests
@@ -162,7 +166,7 @@ public class UserServiceTest {
 
     @Test
     void deleteUser_callsRepositoryAndPublishesEvent() {
-        userService.deleteUser("123", "token123");
+        userService.deleteUser("123", new AuthDetails("123", "SELLER"));
 
         verify(userRepository).deleteById("123");
         verify(userEventService).publishUserDeletedEvent("123");

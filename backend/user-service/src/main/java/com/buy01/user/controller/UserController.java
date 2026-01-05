@@ -6,6 +6,7 @@ import com.buy01.user.exception.NotFoundException;
 import com.buy01.user.model.Role;
 import com.buy01.user.model.User;
 import com.buy01.user.repository.UserRepository;
+import com.buy01.user.security.AuthDetails;
 import com.buy01.user.security.SecurityUtils;
 import com.buy01.user.service.UserService;
 import jakarta.validation.Valid;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import com.buy01.user.security.JwtUtil;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -65,30 +67,10 @@ public class UserController {
     @GetMapping("/me")
     public UserResponseDTO getCurrentUser(
             @RequestHeader("Authorization") String authHeader
-            ) {
-        System.out.println("Getting current user profile");
-        String currentUserId = securityUtils.getCurrentUserId(authHeader);
-        String role = securityUtils.getRole(authHeader);
-        System.out.println("Current user ID: " + currentUserId + ", role: " + role);
+            ) throws IOException {
+        AuthDetails currentUser = securityUtils.getAuthDetails(authHeader);
 
-        User user = userService.findById(currentUserId)
-                .orElseThrow(() -> new NotFoundException("User not found"));
-
-        if (role.equals("ADMIN") || role.equals("SELLER")) {
-            System.out.println("Fetching products for user with role: " + role);
-            // get products from product service
-            List<ProductDTO> products = userService.getProductsForCurrentUser(currentUserId, role);
-            return new SellerResponseDTO(user, products);
-        }
-
-        System.out.println("Fetching profile for user with role: " + role);
-        return new UserResponseDTO(
-                user.getName(),
-                user.getEmail(),
-                user.getRole(),
-                user.getAvatarUrl(),
-                true
-        );
+        return userService.getCurrentUser(currentUser);
     }
 
     // endpoint for seller to update their avatar
@@ -97,30 +79,9 @@ public class UserController {
             @RequestHeader("Authorization") String authHeader,
             @ModelAttribute @Valid SellerUpdateRequest request
     ) throws IOException {
-        String currentUserId = securityUtils.getCurrentUserId(authHeader);
-        System.out.println("PUT for users/me called, changing avatar");
+        AuthDetails currentUser = securityUtils.getAuthDetails(authHeader);
 
-        User user = userRepository.findUserByUserId(currentUserId)
-                .orElseThrow(() -> new NotFoundException("User not found"));
-
-        if (user.getRole() != Role.SELLER && user.getRole() != Role.ADMIN) {
-            throw new ForbiddenException("Your role is not able to update the profile");
-        }
-
-        if (request.getAvatar() != null) {
-            String oldAvatar = user.getAvatarUrl() != null ? user.getAvatarUrl() : "";
-            String avatarUrl = userService.updateUserAvatar(request.getAvatar(), oldAvatar);
-            user.setAvatarUrl(avatarUrl);
-        }
-        userRepository.save(user);
-
-        return new UserResponseDTO(
-                user.getName(),
-                user.getEmail(),
-                user.getRole(),
-                user.getAvatarUrl(),
-                true
-        );
+        return userService.updateCurrentUser(currentUser, request);
 
     }
 
@@ -149,7 +110,7 @@ public class UserController {
 //    public void deleteUser(@RequestHeader("Authorization") String authHeader) {
 //        String currentUserId = securityUtils.getCurrentUserId(authHeader);
 //        String token = jwtUtil.getToken(authHeader);
-//        userService.deleteUser(currentUserId, token);
+//        userService.deleteUser(currentUserId, authHeader);
 //    }
 
     // deleting user by id, only admin can access this endpoint
@@ -166,7 +127,7 @@ public class UserController {
 //        String token = jwtUtil.getToken(authHeader);
 //
 //        // Call service method
-//        userService.deleteUser(userId, token);
+//        userService.deleteUser(userId, authHeader);
 //    }
 
 }

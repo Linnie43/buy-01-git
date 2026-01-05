@@ -14,40 +14,26 @@ public class SecurityUtils {
         this.jwtUtil = jwtUtil;
     }
 
-    public String getCurrentUserId(String authHeader) {
-        String userId = null;
+    public AuthDetails getAuthDetails(String authHeader) {
+
+        String userId;
+        String role;
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
             try {
-                Claims claims = jwtUtil.extractClaims(token); // you can use same JwtUtil as in Gateway
+                Claims claims = jwtUtil.extractClaims(token);
                 userId = claims.getSubject();
+                role = claims.get("role", String.class);
             } catch (Exception e) {
                 throw new ForbiddenException("Invalid JWT token", e);
             }
-        }
-
-        if (userId == null) {
+        } else {
             throw new ForbiddenException("User not authenticated");
         }
 
-        return userId;
+        return new AuthDetails(userId, role);
 
     }
 
-    //get the current role of the user
-    public String getRole(String authHeader) {
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return "";
-        }
-
-        String token = authHeader.substring(7);
-        try {
-            Claims claims = jwtUtil.extractClaims(token);
-            return claims.get("role", String.class);
-        } catch (Exception e) {
-            System.out.println("FAILS IN GET ROLE " + e.getMessage());
-            return "";
-        }
-    }
 }

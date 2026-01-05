@@ -1,5 +1,6 @@
 package com.buy01.user.controller;
 import com.buy01.user.exception.NotFoundException;
+import com.buy01.user.security.AuthDetails;
 import com.buy01.user.security.JwtUtil;
 import com.buy01.user.security.SecurityUtils;
 import com.buy01.user.service.UserService;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Map;
 import jakarta.validation.Valid;
 import com.buy01.user.dto.UserCreateDTO;
@@ -60,23 +62,16 @@ public class AuthController {
             @ModelAttribute @Valid UserCreateDTO request
     ) throws IOException {
         // Prevent logged-in users from creating new accounts
-        final String currentUserId = (authHeader != null) ? securityUtils.getCurrentUserId(authHeader) : null;
-        if (currentUserId != null) {
+        final AuthDetails currentUser = (authHeader != null) ? securityUtils.getAuthDetails(authHeader) : null;
+        if (currentUser != null) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body("Logged-in users cannot create new accounts");
         }
 
         System.out.println("Received DTO: " + request);
 
-        // Create the user entity
-        User user = new User();
-        user.setName(request.getFirstname().trim() + " " + request.getLastname().trim());
-        user.setEmail(request.getEmail().toLowerCase().trim());
-        user.setPassword(request.getPassword().trim());
-        user.setRole(request.getRole());
-
         // Save the user and avatar
-        User created = userService.createUser(user, request.getAvatar());
+        User created = userService.createUser(request);
 
         // Set avatarUrl — if no avatar, use empty string
         String avatarUrl = (created.getAvatarUrl() != null && !created.getAvatarUrl().isEmpty())

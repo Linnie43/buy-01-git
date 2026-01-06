@@ -38,7 +38,7 @@ public class OrderController {
 
     // get all orders for the current user (client or seller)
     @GetMapping
-    public ResponseEntity<?> getOwnOrders(
+    public ResponseEntity<List<OrderResponseDTO>> getOwnOrders(
             @RequestHeader("Authorization") String authHeader
             ) throws IOException {
         AuthDetails currentUser = securityUtils.getAuthDetails(authHeader);
@@ -49,7 +49,7 @@ public class OrderController {
         } else if (currentUser.getRole().equals(Role.SELLER)) {
             orders = orderService.getSellerOrders(currentUser);
         } else {
-            return ResponseEntity.badRequest().body("Invalid role for fetching own orders");
+            throw new BadRequestException("Invalid role" + currentUser.getRole().toString() + " for fetching own orders");
         }
 
         return ResponseEntity.ok(orders);
@@ -81,7 +81,7 @@ public class OrderController {
 
     // Client can delete their own orders with status "CREATED", ADMIN can delete any order
     @DeleteMapping("/{orderId}")
-    public ResponseEntity<?> deleteProduct(
+    public ResponseEntity<Void> deleteProduct(
             @RequestHeader("Authorization") String authHeader,
             @PathVariable String orderId
     ) {

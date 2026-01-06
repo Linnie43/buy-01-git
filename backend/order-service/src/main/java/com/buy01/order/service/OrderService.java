@@ -98,6 +98,12 @@ public class OrderService {
             throw new BadRequestException("Order status cannot be null");
         }
 
+        // Restrict clients: only allow CANCELED
+        if (currentUser.getRole().equals(Role.CLIENT)
+                && orderUpdate.getStatus() != OrderStatus.CANCELED) {
+            throw new ForbiddenException("Clients can only cancel orders");
+        }
+
         if (!existingOrder.getStatus().canTransitionTo(orderUpdate.getStatus())) {
             throw new BadRequestException(
                     "Order has status " + existingOrder.getStatus() +

@@ -28,7 +28,7 @@ public class Cart {
         this.updateTime = new Date();
     }
 
-    private Cart(String id, String userId, List<OrderItem> items, double totalPrice,  CartStatus cartStatus) {
+    protected Cart(String id, String userId, List<OrderItem> items, double totalPrice, CartStatus cartStatus) {
         this.id = id;
         this.userId = userId;
         this.items = items;

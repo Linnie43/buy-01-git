@@ -145,7 +145,7 @@ public class OrderService {
 
     // convert OrderItem to ItemDTO
     public ItemDTO toItemDTO(OrderItem item) {
-        log.info("Item: {}", item);
+        log.info("Item to DTO: ID {}, name {}, price {}, quantity {}", item.getProductId(), item.getProductName(), item.getPrice(), item.getQuantity());
         return new ItemDTO(
                 item.getProductId(),
                 item.getProductName(),

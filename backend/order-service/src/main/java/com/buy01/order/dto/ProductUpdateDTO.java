@@ -1,10 +1,15 @@
 package com.buy01.order.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class ProductUpdateDTO {
     private String productId;
+    @JsonProperty("name")
     private String productName;
+    @JsonProperty("price")
     private double productPrice;
     private int quantity;
+    @JsonProperty("userId")
     private String sellerId;
 
     public ProductUpdateDTO() {}

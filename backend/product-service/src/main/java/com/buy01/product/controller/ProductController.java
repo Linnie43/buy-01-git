@@ -137,7 +137,7 @@ public class ProductController {
     ) {
 
         Product product = productService.getProductById(productId);
-        log.info("Get product and price: {} {}", product.getProductId(), product.getPrice() );
+        log.info("Get product and price: {} {} {} {} {}", product.getProductId(), product.getPrice(), product.getName(), product.getQuantity(), product.getUserId() );
 
         return new ProductResponseDTO(
                 product.getProductId(),

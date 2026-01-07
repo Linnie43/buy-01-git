@@ -27,8 +27,10 @@ public class ProductClient {
         try {
             String url = productServiceBaseUrl + "/internal/" + productId;
             log.info("Get product by id {}", url);
-            return restTemplate.getForObject(url, ProductUpdateDTO.class);
-
+            ProductUpdateDTO product = restTemplate.getForObject(url, ProductUpdateDTO.class);
+            log.info("Product from product service: Id {}, name {}, price {}, quantity {}, sellerId {}",
+                    product.getProductId(), product.getProductName(), product.getProductPrice(), product.getQuantity(), product.getSellerId());
+            return product;
         } catch (HttpClientErrorException e) {
             throw new NotFoundException("Product not found with ID: " + productId);
         }

@@ -67,6 +67,7 @@ public class CartService {
         if (product == null) throw new NotFoundException("Product not found");
         if (product.getQuantity() <= 0) throw new ConflictException("Product is out of stock");
 
+        log.info("newItem ID {}, name {}, quantity {}, price {}", newItem.getProductId(), product.getProductName(), newItem.getQuantity(), product.getProductPrice());
         OrderItem itemAdded = new OrderItem(product.getProductId(), product.getProductName(), newItem.getQuantity(), product.getProductPrice(), product.getSellerId()); // create new order item
         Cart cart = getCurrentCart(currentUser); // get or create active cart for user
 
@@ -145,8 +146,6 @@ public class CartService {
     }
 
     public CartResponseDTO mapToDTO(Cart cart) {
-
-        log.info("mapToDTO cart = {}", cart);
 
         return new CartResponseDTO(
                 cart.getId(),

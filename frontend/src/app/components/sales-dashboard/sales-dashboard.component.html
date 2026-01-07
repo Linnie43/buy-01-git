@@ -1,0 +1,69 @@
+<div class="container mt-4">
+  <h1 class="mb-4">Sales Dashboard</h1>
+
+  <!-- Loading and Error States -->
+  <div *ngIf="isLoading" class="text-center">
+    <p>Loading sales data...</p>
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!isLoading && !errorMessage">
+    <!-- Summary Section -->
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <div class="card text-white bg-primary mb-3">
+          <div class="card-header">Total Sales</div>
+          <div class="card-body">
+            <h4 class="card-title">{{ totalSales | currency:'EUR' }}</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card text-white bg-info mb-3">
+          <div class="card-header">Total Orders</div>
+          <div class="card-body">
+            <h4 class="card-title">{{ totalOrders }}</h4>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Orders Section -->
+    <h2>Recent Orders</h2>
+    <div *ngIf="orders.length > 0; else noOrders" class="table-responsive">
+      <table class="table table-striped table-hover">
+        <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Date</th>
+          <th>Status</th>
+          <th class="text-end">Total</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let order of orders">
+          <td>{{ order.orderId }}</td>
+          <td>{{ order.createdAt | date:'mediumDate' }}</td>
+          <td>
+              <span class="badge text-uppercase" [ngClass]="{
+                'bg-secondary': order.status === 'CREATED' || order.status === 'PROCESSING',
+                'bg-warning': order.status === 'SHIPPED',
+                'bg-success': order.status === 'DELIVERED',
+                'bg-danger': order.status === 'CANCELED'
+              }">{{ order.status }}</span>
+          </td>
+          <td class="text-end">{{ order.totalPrice | currency:'EUR' }}</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ng-template #noOrders>
+      <p>No sales data available.</p>
+    </ng-template>
+  </div>
+</div>

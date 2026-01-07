@@ -5,6 +5,7 @@ import com.buy01.order.dto.CartItemUpdateDTO;
 import com.buy01.order.dto.CartResponseDTO;
 import com.buy01.order.dto.ItemDTO;
 import com.buy01.order.model.Cart;
+import com.buy01.order.model.Role;
 import com.buy01.order.security.AuthDetails;
 import com.buy01.order.security.SecurityUtils;
 import com.buy01.order.service.CartService;
@@ -29,69 +30,29 @@ public class CartController {
     }
 
     @PostMapping
-    public ResponseEntity<?> addToCart(
+    public ResponseEntity<CartResponseDTO> addToCart(
             @RequestHeader("Authorization") String authHeader,
             @Valid @RequestBody CartItemRequestDTO newItem) throws IOException {
 
         AuthDetails currentUser = securityUtils.getAuthDetails(authHeader);
 
-        if (!currentUser.getRole().equals("CLIENT")) {
-            throw new BadRequestException("Current user is not a CLIENT");
-        }
-
-        // CART LOGIC
-        // fetch cart for userId and create one or add item to it
-        // product details fetched from product service, not trusting client information
-        Cart updatedCart = cartService.addToCart(
-                currentUser.getCurrentUserId(),
-                newItem.getProductId(),
-                newItem.getQuantity()
-        );
-
-        List<ItemDTO> itemsDto = updatedCart.getItems().stream()
-                .map(item -> new ItemDTO(
-                        item.getProductId(),
-                        item.getProductName(),
-                        item.getQuantity(),
-                        item.getPrice(),
-                        item.getPrice() * item.getQuantity()
-                ))
-                .toList();
-
-        return ResponseEntity.ok(new CartResponseDTO(
-                updatedCart.getId(),
-                itemsDto,
-                itemsDto.stream().mapToDouble(ItemDTO::getTotal).sum()
-        ));
+        return ResponseEntity.ok(cartService.addToCart(
+                currentUser,
+                newItem
+                ));
     }
 
     @GetMapping
-    public ResponseEntity<?> getCurrentCart(
+    public ResponseEntity<CartResponseDTO> getCurrentCart(
             @RequestHeader("Authorization") String authHeader
-            ) throws BadRequestException {
+            ) throws IOException {
+
         AuthDetails currentUser = securityUtils.getAuthDetails(authHeader);
 
-        if (!currentUser.getRole().equals("CLIENT")) {
-            throw new BadRequestException("Current user is not a CLIENT");
-        }
-
-        Cart cart = cartService.getCurrentCart(currentUser.getCurrentUserId());
-        List<ItemDTO> itemsDto = cart.getItems().stream()
-                .map(item -> new ItemDTO(
-                        item.getProductId(),
-                        item.getProductName(),
-                        item.getQuantity(),
-                        item.getPrice(),
-                        item.getPrice() * item.getQuantity(),
-                        item.getSellerId()
-                ))
-                .toList();
-
-        return ResponseEntity.ok(new CartResponseDTO(
-                cart.getId(),
-                itemsDto,
-                itemsDto.stream().mapToDouble(ItemDTO::getPrice).sum()
-        ));
+        return ResponseEntity.ok(
+                cartService.mapToDTO(
+                        cartService.getCurrentCart(currentUser)
+                ));
     }
 
     @PutMapping("/{productId}")

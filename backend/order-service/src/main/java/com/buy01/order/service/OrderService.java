@@ -139,7 +139,7 @@ public class OrderService {
     // Helper methods
 
     // convert OrderItem to ItemDTO
-    private ItemDTO toItemDTO(OrderItem item) {
+    public ItemDTO toItemDTO(OrderItem item) {
         return new ItemDTO(
                 item.getProductId(),
                 item.getProductName(),

@@ -224,7 +224,7 @@ public class MediaService {
                 System.out.println("File not found: " + filePath);
             }
         } catch (IOException e) {
-            throw new InternalServerErrorException("Failed to delete file: " + filePath, e);
+            throw new ConflictException("Failed to delete file: " + filePath, e);
         }
     }
 

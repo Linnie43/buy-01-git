@@ -42,7 +42,7 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         if (retries == 0) {
-            throw new RuntimeException("MongoDB not ready after multiple attempts");
+            throw new IllegalStateException("MongoDB not ready after multiple attempts");
         }
     }
 }

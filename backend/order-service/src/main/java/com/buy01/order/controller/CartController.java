@@ -42,6 +42,17 @@ public class CartController {
                 ));
     }
 
+    @PostMapping("redo/{orderId}")
+    public ResponseEntity<CartResponseDTO> redoCartFromOrder(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable String orderId) throws IOException {
+        AuthDetails currentUser = securityUtils.getAuthDetails(authHeader);
+        return ResponseEntity.ok(cartService.addToCartFromOrder(
+                currentUser,
+                orderId
+        ));
+    }
+
     @GetMapping
     public ResponseEntity<CartResponseDTO> getCurrentCart(
             @RequestHeader("Authorization") String authHeader

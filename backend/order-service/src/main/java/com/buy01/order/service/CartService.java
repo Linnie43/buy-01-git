@@ -1,16 +1,12 @@
 package com.buy01.order.service;
 
-import com.buy01.order.dto.CartItemRequestDTO;
-import com.buy01.order.dto.CartItemUpdateDTO;
-import com.buy01.order.dto.CartResponseDTO;
-import com.buy01.order.dto.ProductUpdateDTO;
+import com.buy01.order.dto.*;
 import com.buy01.order.exception.ConflictException;
+import com.buy01.order.exception.ForbiddenException;
 import com.buy01.order.exception.NotFoundException;
-import com.buy01.order.model.Cart;
-import com.buy01.order.model.CartStatus;
-import com.buy01.order.model.OrderItem;
-import com.buy01.order.model.Role;
+import com.buy01.order.model.*;
 import com.buy01.order.repository.CartRepository;
+import com.buy01.order.repository.OrderRepository;
 import com.buy01.order.security.AuthDetails;
 import org.apache.coyote.BadRequestException;
 import org.slf4j.Logger;
@@ -33,14 +29,16 @@ public class CartService {
     private final CartRepository cartRepository;
     private final ProductClient productClient;
     private final OrderService orderService;
+    private final OrderRepository orderRepository;
     private static final Logger log = LoggerFactory.getLogger(CartService.class);
 
 
     @Autowired
-    public CartService(CartRepository cartRepository, ProductClient productClient, OrderService orderService) {
+    public CartService(CartRepository cartRepository, ProductClient productClient, OrderService orderService, OrderRepository orderRepository) {
         this.cartRepository = cartRepository;
         this.productClient = productClient;
         this.orderService = orderService;
+        this.orderRepository = orderRepository;
     }
 
     public Cart getCurrentCart(AuthDetails currentUser) throws IOException {
@@ -72,26 +70,39 @@ public class CartService {
         OrderItem itemAdded = new OrderItem(product.getProductId(), product.getProductName(), newItem.getQuantity(), product.getProductPrice(), product.getSellerId()); // create new order item
         Cart cart = getCurrentCart(currentUser); // get or create active cart for user
 
-        boolean exists = false;
-        for (OrderItem item : cart.getItems()) { // iterate through existing items
-            if (item.getProductId().equals(itemAdded.getProductId())) { // check if item already exists in cart
-                item.setQuantity(item.getQuantity() + itemAdded.getQuantity()); // update quantity
-                exists = true;
-                break;
-            }
-        }
+        addOrUpdateItemInCart(cart, itemAdded); // add or update item in cart
+        updateCartTotalAndTime(cart);
 
-        if (!exists) { // if item does not exist in cart
-            cart.getItems().add(itemAdded); // add new item to cart
-        }
-        // update product quantity in product service
-        productClient.updateQuantity(newItem.getProductId(), -newItem.getQuantity());
-
-        cart.setTotalPrice(calculateTotal(cart.getItems()));  // renew total price
-        cart.setUpdateTime(new Date());            // refresh update time
-        log.info("Cart before saving: {}", cart);
         return mapToDTO(cartRepository.save(cart));  // save and return updated cart
 
+    }
+
+    public CartResponseDTO addToCartFromOrder(AuthDetails currentUser, String orderId) throws IOException {
+        if (!currentUser.getRole().equals(Role.CLIENT)) {
+            throw new BadRequestException("Current user is not a CLIENT");
+        }
+
+        Order order = orderRepository.getOrderById(orderId)
+                .orElseThrow(() -> new NotFoundException("Order not found with orderId: " + orderId));
+
+        if (!order.getUserId().equals(currentUser.getCurrentUserId()) ) {
+            throw new ForbiddenException("Order does not belong to the current userId " + currentUser.getCurrentUserId());
+        }
+
+        Cart cart = getCurrentCart(currentUser);
+
+        for (OrderItem itemAdded : order.getItems()) {
+            ProductUpdateDTO product = productClient.getProductById(itemAdded.getProductId());
+            if (product == null) break;
+            if (product.getQuantity() < itemAdded.getQuantity()) {
+                itemAdded.setQuantity(product.getQuantity());
+            }
+            addOrUpdateItemInCart(cart, itemAdded);
+        }
+
+        updateCartTotalAndTime(cart);
+
+        return mapToDTO(cartRepository.save(cart));  // save and return updated cart
     }
 
     public CartResponseDTO updateCart(AuthDetails currentUser, String productId, CartItemUpdateDTO newQuantity) throws IOException {
@@ -110,8 +121,7 @@ public class CartService {
         productClient.updateQuantity(itemToUpdate.get().getProductId(), -quantityDifference);
 
         itemToUpdate.get().setQuantity(newQuantity.getQuantity());
-        cart.setTotalPrice(calculateTotal(cart.getItems()));
-        cart.setUpdateTime(new Date());
+        updateCartTotalAndTime(cart);
 
         return mapToDTO(cartRepository.save(cart));
     }
@@ -129,7 +139,7 @@ public class CartService {
         int quantity = itemToRemove.get().getQuantity();
 
         cart.getItems().remove(itemToRemove.get());
-        cart.setTotalPrice(calculateTotal(cart.getItems()));
+        updateCartTotalAndTime(cart);
         cartRepository.save(cart);
 
         // return item to the stock in product service
@@ -146,12 +156,38 @@ public class CartService {
 
     // Helper methods
 
-    private double calculateTotal(List<OrderItem> items) { // calculate total price of items in cart
+    // add new item to cart if it isn't there yet or update quantity for existing item
+    private void addOrUpdateItemInCart(Cart cart, OrderItem itemAdded) {
+        boolean exists = false;
+        for (OrderItem item : cart.getItems()) { // iterate through existing items
+            if (item.getProductId().equals(itemAdded.getProductId())) { // check if item already exists in cart
+                item.setQuantity(item.getQuantity() + itemAdded.getQuantity()); // update quantity
+                exists = true;
+                break;
+            }
+        }
+
+        if (!exists) { // if item does not exist in cart
+            cart.getItems().add(itemAdded); // add new item to cart
+        }
+
+        productClient.updateQuantity(itemAdded.getProductId(), itemAdded.getQuantity());
+    }
+
+    // update total price and update time of cart
+    private void updateCartTotalAndTime(Cart cart) {
+        cart.setTotalPrice(calculateTotal(cart.getItems()));
+        cart.setUpdateTime(new Date());
+    }
+
+    // calculate total price of items in cart
+    private double calculateTotal(List<OrderItem> items) {
         return items.stream()
                 .mapToDouble(item -> item.getPrice() * item.getQuantity())
                 .sum();
     }
 
+    // mapping Cart to CartResponseDTO
     public CartResponseDTO mapToDTO(Cart cart) {
 
         return new CartResponseDTO(

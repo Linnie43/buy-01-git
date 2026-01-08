@@ -43,6 +43,7 @@ export class CartComponent implements OnInit {
           this.snackBar.open('Quantity must be a positive number.', 'Close', { duration: 3000 });
           return;
         }
+      item.quantity = newQty;
 
     this.cartService.updateCartItem(item.productId, { quantity: newQty }).subscribe({
       next: (res: CartResponseDTO) => {

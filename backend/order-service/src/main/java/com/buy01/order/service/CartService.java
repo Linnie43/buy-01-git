@@ -104,12 +104,16 @@ public class CartService {
         if (cart == null) {
             throw new NotFoundException("Cart not found");
         }
-        boolean removed = cart.getItems().removeIf(item -> item.getProductId().equals(id));
 
-        if (!removed) {
+        Optional<OrderItem> itemToRemove = cart.getItems().stream()
+                .filter(item -> item.getProductId().equals(id))
+                .findFirst();
+
+        if (itemToRemove.isEmpty()) {
             throw new NotFoundException("Item not found in cart");
         }
 
+        cart.getItems().remove(itemToRemove.get());
         cart.setTotalPrice(calculateTotal(cart.getItems()));
         cartRepository.save(cart);
     }

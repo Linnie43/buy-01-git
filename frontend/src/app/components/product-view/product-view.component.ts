@@ -72,7 +72,7 @@ export class ProductViewComponent implements OnInit {
           console.log('Added to cart', res);
           this.cart = res;
            this.snackBar.open('Product added to cart!', 'Close', {
-                  duration: 3000, // ms
+                  duration: 3000,
                   verticalPosition: 'top',
                   horizontalPosition: 'right',
                   panelClass: ['snack-bar-success']

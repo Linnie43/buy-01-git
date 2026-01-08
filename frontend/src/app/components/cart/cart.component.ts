@@ -40,6 +40,12 @@ export class CartComponent implements OnInit {
     this.cartService.updateCartItem(item.productId, { quantity: newQty }).subscribe({
       next: (res: CartResponseDTO) => {
         this.cart = res;
+
+        // update local item quantity to reflect server state
+         const updatedItem = this.cart.items.find(i => i.productId === item.productId);
+              if (updatedItem) {
+                item.quantity = updatedItem.quantity;
+              }
       },
       error: (err: unknown) => {
         console.error('Cannot update quantity:', err);

@@ -1,7 +1,21 @@
-<div class="client-profile">
-  <img *ngIf="user; else loading" src="../assets/default.jpg" alt="Profile" class="profile-img" />
+<div class="container mt-4">
   <div *ngIf="user; else loading">
-    <h1 class="h3 mb-0">{{ user.name }}</h1>
+    <!-- User profile section with avatar and name -->
+    <div class="d-flex flex-column flex-md-row align-items-center mb-4">
+      <div class="text-center mb-3 mb-md-0 me-md-4">
+        <img
+          src="assets/default.jpg"
+          alt="Profile of {{ user.name }}"
+          class="profile-img"
+        />
+      </div>
+      <h1 class="h3 mb-0">{{ user.name }}</h1>
+    </div>
+
+    <!-- Dashboard section -->
+    <div class="d-flex justify-content-start align-items-center mb-3">
+      <button class="btn btn-success" routerLink="/my-dashboard" title="View your purchase dashboard">My Dashboard</button>
+    </div>
   </div>
 
   <ng-template #loading>

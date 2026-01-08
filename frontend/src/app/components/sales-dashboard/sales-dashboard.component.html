@@ -15,55 +15,77 @@
     <!-- Summary Section -->
     <div class="row mb-4">
       <div class="col-md-6">
-        <div class="card text-white bg-primary mb-3">
-          <div class="card-header">Total Sales</div>
+        <div class="card text-white bg-success mb-3">
+          <div class="card-header">Total Revenue</div>
           <div class="card-body">
             <h4 class="card-title">{{ totalSales | currency:'EUR' }}</h4>
           </div>
         </div>
       </div>
       <div class="col-md-6">
-        <div class="card text-white bg-info mb-3">
-          <div class="card-header">Total Orders</div>
+        <div class="card text-white mb-3 dashboard-bg">
+          <div class="card-header">Total Units Sold</div>
           <div class="card-body">
-            <h4 class="card-title">{{ totalOrders }}</h4>
+            <h4 class="card-title">{{ totalUnitsSold }}</h4>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Recent Orders Section -->
-    <h2>Recent Orders</h2>
-    <div *ngIf="orders.length > 0; else noOrders" class="table-responsive">
-      <table class="table table-striped table-hover">
-        <thead>
-        <tr>
-          <th>Order ID</th>
-          <th>Date</th>
-          <th>Status</th>
-          <th class="text-end">Total</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr *ngFor="let order of orders">
-          <td>{{ order.orderId }}</td>
-          <td>{{ order.createdAt | date:'mediumDate' }}</td>
-          <td>
-              <span class="badge text-uppercase" [ngClass]="{
-                'bg-secondary': order.status === 'CREATED' || order.status === 'PROCESSING',
-                'bg-warning': order.status === 'SHIPPED',
-                'bg-success': order.status === 'DELIVERED',
-                'bg-danger': order.status === 'CANCELED'
-              }">{{ order.status }}</span>
-          </td>
-          <td class="text-end">{{ order.totalPrice | currency:'EUR' }}</td>
-        </tr>
-        </tbody>
-      </table>
-    </div>
+    <!-- Top Selling and Recent Orders Section -->
+    <div class="row">
+      <div class="col-lg-4 mb-4">
+        <h2>Top Selling Products</h2>
+        <div *ngIf="topSellingItems.length > 0; else noTopItems">
+          <ul class="list-group">
+            <li *ngFor="let item of topSellingItems" class="list-group-item d-flex justify-content-between align-items-center">
+              {{ item.name }}
+              <span class="badge rounded-pill dashboard-bg">{{ item.quantity }} sold</span>
+            </li>
+          </ul>
+        </div>
+        <ng-template #noTopItems>
+          <p>No top selling product data available.</p>
+        </ng-template>
+      </div>
 
-    <ng-template #noOrders>
-      <p>No sales data available.</p>
-    </ng-template>
+      <div class="col-lg-8">
+        <h2>Recent Orders</h2>
+        <div *ngIf="orders.length > 0; else noOrders" class="card overflow-hidden">
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-striped mb-0">
+                <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th class="text-end">Total</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor="let order of orders">
+                  <td>{{ order.orderId }}</td>
+                  <td>{{ order.createdAt | date:'mediumDate' }}</td>
+                  <td>
+                      <span class="badge text-uppercase" [ngClass]="{
+                        'bg-secondary': order.status === 'CREATED' || order.status === 'PROCESSING',
+                        'bg-warning': order.status === 'SHIPPED',
+                        'bg-success': order.status === 'DELIVERED',
+                        'bg-danger': order.status === 'CANCELED'
+                      }">{{ order.status }}</span>
+                  </td>
+                  <td class="text-end">{{ order.totalPrice | currency:'EUR' }}</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <ng-template #noOrders>
+          <p>No recent order data available.</p>
+        </ng-template>
+      </div>
+    </div>
   </div>
 </div>

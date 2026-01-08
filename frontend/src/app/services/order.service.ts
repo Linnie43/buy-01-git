@@ -1,4 +1,3 @@
-// in frontend/src/app/services/order.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -14,7 +13,11 @@ export class OrderService {
   constructor(private http: HttpClient) { }
 
   getSalesDashboard(): Observable<OrderDashboardDTO> {
-    // The AuthInterceptor will automatically add the Authorization header
+
+    return this.http.get<OrderDashboardDTO>(this.apiUrl);
+  }
+
+  getOrders(): Observable<OrderDashboardDTO> {
     return this.http.get<OrderDashboardDTO>(this.apiUrl);
   }
 }

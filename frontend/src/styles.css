@@ -135,3 +135,7 @@ button:hover, .btn:hover, .btn:active, button:active, .btn:focus-visible, button
   color: var(--danger-color);
   font-weight: bold;
 }
+
+.dashboard-bg {
+  background-color: var(--primary-color);
+}

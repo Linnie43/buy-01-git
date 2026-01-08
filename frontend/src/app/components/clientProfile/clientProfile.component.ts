@@ -1,14 +1,14 @@
-import { Component } from '@angular/core';
-import { OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
 import { User } from '../../models/user.model';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router'; // Import RouterLink
 
 @Component({
   selector: 'app-clientProfile',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink], // Add RouterLink to imports
   templateUrl: './clientProfile.component.html',
   styleUrl: './clientProfile.component.css'
 })

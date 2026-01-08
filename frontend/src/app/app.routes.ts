@@ -11,6 +11,7 @@ import { NotFoundComponent } from './components/not-found/not-found.component';
 import { productOwnerGuard } from './guards/product-owner.guard';
 import { SessionGuard } from './guards/session.guard';
 import { SalesDashboardComponent } from './components/sales-dashboard/sales-dashboard.component';
+import { ClientDashboardComponent } from './components/client-dashboard/client-dashboard.component';
 
 
 export const routes: Routes = [
@@ -22,6 +23,7 @@ export const routes: Routes = [
   { path: 'seller-profile', component: SellerProfileComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'SELLER' }  },
   { path: 'client-profile', component: ClientProfileComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'CLIENT' }  },
   { path: 'sales-dashboard', component: SalesDashboardComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'SELLER' } },
+  { path: 'my-dashboard', component: ClientDashboardComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'CLIENT' } },
   { path: '404', component: NotFoundComponent },
   { path: '**', redirectTo: '/404' }
 ];

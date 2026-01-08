@@ -24,8 +24,10 @@ export class CartService {
     }
 
   updateCartItem(productId: string, update: CartItemUpdateDTO): Observable<CartResponseDTO> {
-    return this.http.put<CartResponseDTO>(`${this.apiUrl}/${productId}`, update);
-  }
+      const formData = new FormData();
+      formData.append('quantity', update.quantity.toString());
+      return this.http.put<CartResponseDTO>(`${this.apiUrl}/${productId}`, formData);
+    }
 
   deleteItemById(productId: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${productId}`);

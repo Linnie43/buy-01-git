@@ -60,6 +60,8 @@ services:
   gateway:
     build: backend/gateway
     image: gateway:${IMAGE_TAG}
+#    environment:
+#      JWT_SECRET: ${JWT_SECRET}
     ports:
       - "8443:8443"
     depends_on:
@@ -82,6 +84,7 @@ services:
       SPRING_DATA_MONGODB_URI: mongodb://admin:password@buy01:27017/buy01?authSource=admin
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       SERVICE_NAME: user-service
+#      JWT_SECRET: ${JWT_SECRET}
     expose:
       - "8080"
     depends_on:
@@ -101,6 +104,7 @@ services:
       SPRING_DATA_MONGODB_URI: mongodb://admin:password@buy01:27017/buy01?authSource=admin
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       SERVICE_NAME: product-service
+#      JWT_SECRET: ${JWT_SECRET}
     expose:
       - "8081"
     depends_on:
@@ -120,6 +124,7 @@ services:
       SPRING_DATA_MONGODB_URI: mongodb://admin:password@buy01:27017/buy01?authSource=admin
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       SERVICE_NAME: media-service
+#      JWT_SECRET: ${JWT_SECRET}
     expose:
       - "8082"
     depends_on:
@@ -139,6 +144,7 @@ services:
       SPRING_DATA_MONGODB_URI: mongodb://admin:password@buy01:27017/buy01?authSource=admin
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       SERVICE_NAME: order-service
+#      JWT_SECRET: ${JWT_SECRET}
     expose:
       - "8083"
     depends_on:

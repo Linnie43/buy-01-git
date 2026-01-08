@@ -1,9 +1,6 @@
 package com.buy01.order.service;
 
-import com.buy01.order.dto.ItemDTO;
-import com.buy01.order.dto.OrderCreateDTO;
-import com.buy01.order.dto.OrderResponseDTO;
-import com.buy01.order.dto.OrderUpdateRequest;
+import com.buy01.order.dto.*;
 import com.buy01.order.exception.ForbiddenException;
 import com.buy01.order.exception.NotFoundException;
 import com.buy01.order.model.*;
@@ -159,7 +156,7 @@ public class OrderService {
                         .toList(),
                 order.getTotalPrice(),
                 order.getStatus(),
-                order.getShippingAddress(),
+                new ShippingAddressMaskedDTO(order.getShippingAddress()),
                 order.getCreatedAt()
         );
     }

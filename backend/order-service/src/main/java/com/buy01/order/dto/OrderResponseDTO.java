@@ -11,7 +11,7 @@ public class OrderResponseDTO {
     private List<ItemDTO> items;
     private double totalPrice;
     private OrderStatus status;
-    private ShippingAddress shippingAddress;
+    private ShippingAddressMaskedDTO shippingAddress;
     private boolean paid;
     private Date deliveryDate;
     private String trackingNumber;
@@ -19,7 +19,7 @@ public class OrderResponseDTO {
     private Date updatedAt;
 
     public OrderResponseDTO() {}
-    public OrderResponseDTO(String orderId, List<ItemDTO> items, double totalPrice, OrderStatus status, ShippingAddress shippingAddress, Date createdAt) {
+    public OrderResponseDTO(String orderId, List<ItemDTO> items, double totalPrice, OrderStatus status, ShippingAddressMaskedDTO shippingAddress, Date createdAt) {
         this.orderId = orderId;
         this.items = items;
         this.totalPrice = totalPrice;
@@ -40,8 +40,8 @@ public class OrderResponseDTO {
     public OrderStatus getStatus() {return status;}
     public void setStatus(OrderStatus status) {this.status = status;}
 
-    public ShippingAddress getShippingAddress() {return shippingAddress;}
-    public void setShippingAddress(ShippingAddress shippingAddress) {this.shippingAddress = shippingAddress;}
+    public ShippingAddressMaskedDTO getShippingAddress() {return shippingAddress;}
+    public void setShippingAddress(ShippingAddressMaskedDTO shippingAddress) {this.shippingAddress = shippingAddress;}
 
     public Date getCreatedAt() {return createdAt;}
     public void setCreatedAt(Date createdAt) {this.createdAt = createdAt;}

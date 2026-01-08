@@ -6,6 +6,7 @@ pipeline {
             VERSION = "v${env.BUILD_NUMBER}"
             STABLE_TAG = "stable"
             SONAR_SCANNER_HOME = tool 'SonarScanner'
+//             JWT_SECRET = credentials('JWT_SECRET')
         }
 
     parameters {

@@ -79,6 +79,15 @@ export IMAGE_TAG=latest
 docker compose build
 ```
 
+**Update for security utils, commented out so far:**
+If running with Jenkins, add secret to Jenkins credentials as JWT_SECRET.
+
+```
+export IMAGE_TAG=latest
+export JWT_SECRET=very-long-secret-key-string-with-at-least-32-chars
+docker compose build
+```
+
 This will:
 
 * build all Spring Boot services (using Maven inside Docker)

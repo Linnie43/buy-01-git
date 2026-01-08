@@ -1,5 +1,6 @@
 package com.buy01.user.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import com.buy01.user.model.Role;
@@ -12,6 +13,7 @@ public class User {
     private String userId;
     private String name;
     private String email;
+    @JsonIgnore
     private String password;
     private Role role;
     private String avatarUrl;

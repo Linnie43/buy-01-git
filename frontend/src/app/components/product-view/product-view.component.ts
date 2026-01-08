@@ -11,6 +11,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { CartService } from '../../services/cart.service';
 import { FormsModule } from '@angular/forms';
 import { CartResponseDTO } from '../../models/cart.model';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-product-view',
@@ -23,13 +24,16 @@ export class ProductViewComponent implements OnInit {
   product: Product | null = null;
   isLoggedIn = false;
   selectedQuantity = 1;
+  cart: CartResponseDTO | null = null;
 
   constructor(
     private route: ActivatedRoute,
     private productService: ProductService,
     private cartService: CartService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private snackBar: MatSnackBar
+
   ) {}
 
   ngOnInit(): void {
@@ -66,11 +70,22 @@ export class ProductViewComponent implements OnInit {
       }).subscribe({
         next: (res: CartResponseDTO) => {
           console.log('Added to cart', res);
-          alert('Product added to cart!');
+          this.cart = res;
+           this.snackBar.open('Product added to cart!', 'Close', {
+                  duration: 3000, // ms
+                  verticalPosition: 'top',
+                  horizontalPosition: 'right',
+                  panelClass: ['snack-bar-success']
+                });
         },
         error: (err) => {
           console.error('Cannot add to cart', err);
-          alert('Cannot add more than available quantity!');
+          this.snackBar.open('Cannot add more than available quantity!', 'Close', {
+                  duration: 3000,
+                  verticalPosition: 'top',
+                  horizontalPosition: 'right',
+                  panelClass: ['snack-bar-error']
+                });
         }
       });
     }

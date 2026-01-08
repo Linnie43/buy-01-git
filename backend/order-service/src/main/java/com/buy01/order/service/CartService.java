@@ -163,7 +163,6 @@ public class CartService {
         );
     }
 
-
     // kafka logic for updating product info
     public void updateCartProducts(ProductUpdateDTO productUpdate) {
         List<Cart> carts = cartRepository.findByItemsProductId(productUpdate.getProductId());
@@ -190,6 +189,4 @@ public class CartService {
     }
 
     //kafka logic for deleting products that are no longer available
-
-    //fetch products from product service (needs productClient)
 }

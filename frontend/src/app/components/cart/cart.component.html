@@ -8,9 +8,6 @@
       <!-- Product info -->
       <div>
         <h5 class="mb-1">{{ item.name || 'Unnamed product' }}</h5>
-        <small class="text-muted">
-          Price: {{ item.price | currency:'EUR' }}
-        </small>
       </div>
 
       <!-- Quantity -->
@@ -22,6 +19,7 @@
           style="width: 80px"
           [value]="item.quantity"
           min="1"
+          [max]="item.quantity"
           (change)="updateQuantity(item, $any($event.target).value)"
         />
       </div>

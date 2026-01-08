@@ -1,20 +1,61 @@
-<div *ngIf="cart && cart.items.length > 0; else emptyCart">
-  <h2>My Cart</h2>
-  <table>
-    <tr *ngFor="let item of cart.items">
-      <td>{{ item.productName }}</td>
-      <td>
-        <input type="number" [value]="item.quantity" (change)="updateQuantity(item, $any($event.target).value)">
-      </td>
-      <td>{{ item.price | currency:'EUR' }}</td>
-      <td>{{ item.total | currency:'EUR' }}</td>
-      <td><button (click)="removeItem(item)">Remove</button></td>
-    </tr>
-  </table>
-  <p>Total: {{ getTotalPrice() | currency:'EUR' }}</p>
+<div class="container mt-4" *ngIf="cart && cart.items.length > 0; else emptyCart">
+  <h2 class="mb-4 text-center">My Cart</h2>
+
+  <!-- Cart items -->
+  <div class="card mb-3" *ngFor="let item of cart.items">
+    <div class="card-body d-flex align-items-center justify-content-between">
+
+      <!-- Product info -->
+      <div>
+        <h5 class="mb-1">{{ item.productName || 'Unnamed product' }}</h5>
+        <small class="text-muted">
+          Price: {{ item.price | currency:'EUR' }}
+        </small>
+      </div>
+
+      <!-- Quantity -->
+      <div class="d-flex align-items-center gap-2">
+        <label class="me-1">Qty</label>
+        <input
+          type="number"
+          class="form-control"
+          style="width: 80px"
+          [value]="item.quantity"
+          min="1"
+          (change)="updateQuantity(item, $any($event.target).value)"
+        />
+      </div>
+
+      <!-- Subtotal -->
+      <div class="fw-bold">
+        {{ (item.price * item.quantity) | currency:'EUR' }}
+      </div>
+
+      <!-- Remove -->
+      <button class="btn btn-outline-danger btn-sm"
+              (click)="removeItem(item)">
+        ✕
+      </button>
+    </div>
+  </div>
+
+  <!-- Cart summary -->
+  <div class="card p-3">
+    <div class="d-flex justify-content-between fs-5">
+      <span>Total</span>
+      <strong>{{ cart.totalPrice() | currency:'EUR' }}</strong>
+    </div>
+
+    <button class="btn btn-success mt-3 w-100">
+      Proceed to Checkout
+    </button>
+  </div>
 </div>
 
+<!-- Empty cart -->
 <ng-template #emptyCart>
-  <p>Your cart is empty.</p>
+  <div class="text-center mt-5 text-muted">
+    <h4>Your cart is empty 🛒</h4>
+    <p>Add some products to continue.</p>
+  </div>
 </ng-template>
-

@@ -4,7 +4,7 @@ export interface ItemDTO {
   productName: string;
   quantity: number;
   price: number;
-  total: number;
+  //total: number;
 }
 
 // GET request to retrieve cart details

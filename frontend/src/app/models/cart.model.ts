@@ -1,7 +1,7 @@
 // shopping cart item
 export interface ItemDTO {
   productId: string;
-  productName: string;
+  name: string;
   quantity: number;
   price: number;
   total: number;

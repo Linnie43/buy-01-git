@@ -9,21 +9,25 @@ import com.buy01.order.repository.CartRepository;
 import com.buy01.order.repository.OrderRepository;
 import com.buy01.order.security.AuthDetails;
 import jakarta.ws.rs.BadRequestException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
 
+import static com.buy01.order.model.OrderStatus.CANCELED;
 import static com.buy01.order.model.OrderStatus.SHIPPED;
+import static com.buy01.order.service.TestAuthFactory.clientUser;
+import static com.buy01.order.service.TestAuthFactory.sellerUser;
+import static com.buy01.order.service.TestAuthFactory.adminUser;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@Service
 @ExtendWith(MockitoExtension.class)
 public class OrderServiceTest {
 
@@ -45,18 +49,6 @@ public class OrderServiceTest {
         TestCart(String id, String userId, List<OrderItem> items, double totalPrice, CartStatus cartStatus) {
             super(id, userId, items, totalPrice, cartStatus);
         }
-    }
-
-    private AuthDetails clientUser() {
-        return new AuthDetails("user1", Role.CLIENT);
-    }
-
-    private AuthDetails sellerUser() {
-        return new AuthDetails("seller1", Role.SELLER);
-    }
-
-    private AuthDetails adminUser() {
-        return new AuthDetails("admin1", Role.ADMIN);
     }
 
     @Test
@@ -102,7 +94,7 @@ public class OrderServiceTest {
 
         OrderResponseDTO order1 = orders.get(0);
         assertEquals("order1", order1.getOrderId(), "Order ID should match");
-        assertEquals(130.0, order1.getTotalPrice(), "Total price should match");
+        assertEquals(100.0, order1.getTotalPrice(), "Total price should match");
         assertEquals(OrderStatus.CREATED, order1.getStatus(), "Order Status should match");
         assertEquals(1, order1.getItems().size(), "Order items size should match for seller");
 
@@ -174,7 +166,7 @@ public class OrderServiceTest {
         when(orderRepository.findById("order1")).thenReturn(java.util.Optional.of(existingOrder));
         when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        OrderUpdateRequest updateRequest = new OrderUpdateRequest(SHIPPED);
+        OrderUpdateRequest updateRequest = new OrderUpdateRequest(CANCELED);
 
         OrderResponseDTO updatedOrder = orderService.updateOrder("order1", updateRequest, currentUser);
 

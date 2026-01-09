@@ -55,6 +55,6 @@ public class ShippingAddressMaskedDTO {
     }
 
     private String maskCity(String city) {
-        return "*".repeat(city.length());
+        return city != null ?"*".repeat(city.length()) : "***";
     }
 }

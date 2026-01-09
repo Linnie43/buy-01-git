@@ -2,12 +2,12 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { ProductService } from './product.service';
 import { Product } from '../models/product.model';
-import { BASE_URL } from '../constants/constants';
+import { PRODUCT_BASE_URL } from '../constants/constants';
 
 describe('ProductService', () => {
   let service: ProductService;
   let httpTestingController: HttpTestingController;
-  const apiUrl = `${BASE_URL}/api/products`;
+  const apiUrl = `${PRODUCT_BASE_URL}`;
 
   const mockApiProduct: any = {
     productId: 'prod-1',

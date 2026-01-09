@@ -2,16 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, map } from 'rxjs';
 import { Product } from '../models/product.model';
-import { BASE_URL } from '../constants/constants';
+import { PRODUCT_BASE_URL } from '../constants/constants';
 import { tap } from 'rxjs/operators';
-import { MEDIA_BASE_URL } from '../constants/constants';
-
 @Injectable({
   providedIn: 'root'
 })
 export class ProductService {
 
-  private apiUrl = `${BASE_URL}/api/products`;  // endpoint
+  private apiUrl = `${PRODUCT_BASE_URL}`;
 
   constructor(private http: HttpClient) {}
 

@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
 import { Router } from '@angular/router';
-import { BASE_URL } from '../constants/constants';
+import { USER_BASE_URL, AUTH_BASE_URL } from '../constants/constants';
 import { User } from './user.service';
 import { WINDOW } from '../window.token';
 
@@ -12,7 +12,7 @@ interface DecodedToken { sub?: string; userId?: string; id?: string; role: strin
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private apiUrl = `${BASE_URL}/api/auth`;
+  private apiUrl = `${AUTH_BASE_URL}`;
   private decodedToken: DecodedToken | null = null;
   private avatarUrl: string | null = null;
   private window = inject(WINDOW);
@@ -32,7 +32,7 @@ export class AuthService {
   }
 
   getToken(): string | null { return localStorage.getItem('token'); }
-  getCurrentUser(): Observable<User> { return this.http.get<User>(`${BASE_URL}/api/users/me`); }
+  getCurrentUser(): Observable<User> { return this.http.get<User>(`${USER_BASE_URL}/me`); }
   getUserId(): string | null { return this.decodedToken?.userId || this.decodedToken?.id || this.decodedToken?.sub || null; }
   setAvatar(url: string) { this.avatarUrl = url; }
   getAvatar(): string | null { return this.avatarUrl; }

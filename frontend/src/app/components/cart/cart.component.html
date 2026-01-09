@@ -16,7 +16,7 @@
 
         <button
           class="btn btn-outline-secondary btn-sm"
-          (click)="updateQuantity(item, - 1)"
+          (click)="updateQuantity(item, item.quantity - 1)"
           [disabled]="item.quantity <= 1 || item.updating"
         >
           −
@@ -32,7 +32,7 @@
 
         <button
           class="btn btn-outline-secondary btn-sm"
-          (click)="updateQuantity(item, + 1)"
+          (click)="updateQuantity(item, item.quantity + 1)"
           [disabled]="item.updating"
         >
           +

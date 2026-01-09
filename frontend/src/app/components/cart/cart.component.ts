@@ -34,11 +34,8 @@ export class CartComponent implements OnInit {
     });
   }
 
-  updateQuantity(item: ItemDTO, delta: number): void {
-    const originalQty = item.quantity;
-    const newQty = originalQty + delta;
-
-    if (newQty <= 0 || newQty === originalQty) {
+  updateQuantity(item: ItemDTO, newQty: number): void {
+    if (newQty <= 0 || newQty === item.quantity) {
       return;
     }
 
@@ -51,14 +48,11 @@ export class CartComponent implements OnInit {
         const updatedItem = res.items.find(i => i.productId === item.productId);
         if (updatedItem) {
           item.quantity = updatedItem.quantity;
-        } else {
-          item.quantity = originalQty;
         }
 
         item.updating = false;
       },
       error: () => {
-        item.quantity = originalQty;
         item.updating = false;
 
         this.snackBar.open(

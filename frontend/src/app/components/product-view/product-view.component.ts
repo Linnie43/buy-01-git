@@ -25,6 +25,7 @@ export class ProductViewComponent implements OnInit {
   isLoggedIn = false;
   selectedQuantity = 1;
   cart: CartResponseDTO | null = null;
+  updating = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -89,4 +90,17 @@ export class ProductViewComponent implements OnInit {
         }
       });
     }
+
+  changeQuantity(delta: number) {
+    if (!this.product) return;
+
+    const newQty = this.selectedQuantity + delta;
+
+    if (newQty <= 0 || newQty > this.product.quantity) {
+      return;
+    }
+
+    this.selectedQuantity = newQty;
+  }
+
 }

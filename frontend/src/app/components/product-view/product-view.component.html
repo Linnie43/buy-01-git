@@ -31,17 +31,32 @@
             Manage Product
           </button>
 
-          <div class="quantity-selector mt-2">
-            <label for="quantity">Quantity:</label>
+          <div class="quantity-selector mt-2 d-flex align-items-center gap-2">
+            <label class="me-1">Qty</label>
+
+            <button
+              class="btn btn-outline-secondary btn-sm"
+              (click)="changeQuantity(-1)"
+              [disabled]="selectedQuantity <= 1 || !product || product.quantity === 0 || updating"
+            >
+              −
+            </button>
+
             <input
-              type="number"
-              id="quantity"
-              [(ngModel)]="selectedQuantity"
-              [min]="1"
-              [max]="product.quantity"
-              class="form-control"
-              [disabled]="product.quantity === 0"
+              type="text"
+              class="form-control text-center"
+              style="width: 60px"
+              [value]="selectedQuantity"
+              readonly
             />
+
+            <button
+              class="btn btn-outline-secondary btn-sm"
+              (click)="changeQuantity(+1)"
+              [disabled]="!product || selectedQuantity >= product.quantity || product.quantity === 0 || updating"
+            >
+              +
+            </button>
           </div>
 
           <button *ngIf="!product.isProductOwner && isLoggedIn"

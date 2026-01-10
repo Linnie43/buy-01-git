@@ -4,7 +4,6 @@ import { AuthService } from '../../services/auth.service';
 import { OrderService } from '../../services/order.service';
 import { OrderResponseDTO, OrderStatusList } from '../../models/order.model';
 import { Component, OnInit } from '@angular/core';
-import { DashboardComponent } from '../dashboard/dashboard.component';
 
 
 @Component({
@@ -23,7 +22,6 @@ export class OrderViewComponent implements OnInit {
     private route: ActivatedRoute,
     private orderService: OrderService,
     private authService: AuthService,
-    private dashboardComponent: DashboardComponent,
     private router: Router
   ) {}
 
@@ -75,8 +73,8 @@ export class OrderViewComponent implements OnInit {
     }
   }
 
-  goToProduct(productId: string): void {
-    this.dashboardComponent.goToProduct(productId);
-  }
+    goToProduct(productId: string) {
+      this.router.navigate(['/products', productId]);
+    }
 
 }

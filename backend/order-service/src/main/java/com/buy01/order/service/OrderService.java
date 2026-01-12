@@ -1,6 +1,7 @@
 package com.buy01.order.service;
 
 import com.buy01.order.dto.*;
+import com.buy01.order.exception.BadRequestException;
 import com.buy01.order.exception.ForbiddenException;
 import com.buy01.order.exception.NotFoundException;
 import com.buy01.order.model.*;
@@ -8,20 +9,13 @@ import com.buy01.order.repository.CartRepository;
 import com.buy01.order.repository.OrderRepository;
 import com.buy01.order.security.AuthDetails;
 import io.jsonwebtoken.io.IOException;
-import jakarta.ws.rs.BadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.ArithmeticOperators;
-import org.springframework.data.mongodb.core.query.Criteria;
+
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
-
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 // Service layer is responsible for business logic, validation, verification and data manipulation.
 // It chooses how to handle data and interacts with the repository layer.

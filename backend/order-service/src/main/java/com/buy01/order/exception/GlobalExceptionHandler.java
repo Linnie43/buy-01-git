@@ -105,4 +105,11 @@ public class GlobalExceptionHandler {
         body.put("FORBIDDEN_ERROR", ex.getMessage());
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
     }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<Map<String, String>> handleBadRequest(BadRequestException ex) {
+        Map<String, String> body = new HashMap<>();
+        body.put("BAD_REQUEST_ERROR", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
 }

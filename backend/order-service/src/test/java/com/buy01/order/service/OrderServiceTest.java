@@ -9,7 +9,6 @@ import com.buy01.order.model.*;
 import com.buy01.order.repository.CartRepository;
 import com.buy01.order.repository.OrderRepository;
 import com.buy01.order.security.AuthDetails;
-import jakarta.ws.rs.BadRequestException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.HttpClientErrorException;
+import com.buy01.order.exception.BadRequestException;
 
 import java.io.IOException;
 import java.util.List;
@@ -37,7 +37,8 @@ public class OrderServiceTest {
     private OrderService orderService;
 
     static class TestOrder extends Order {
-        TestOrder(String id, String userId, List<OrderItem> items, double totalPrice, OrderStatus status, ShippingAddress shippingAddress) {
+        TestOrder(String id, String userId, List<OrderItem> items, double totalPrice, OrderStatus status,
+                ShippingAddress shippingAddress) {
             super(id, userId, items, totalPrice, status, shippingAddress);
         }
     }
@@ -67,8 +68,7 @@ public class OrderServiceTest {
 
         when(orderRepository.findOrdersByUserId("user1")).thenReturn(List.of(
                 new TestOrder("order1", "user1", List.of(new OrderItem()), 100.0, OrderStatus.CREATED, null),
-                new TestOrder("order2", "user1", List.of(), 200.0, SHIPPED, null)
-        ));
+                new TestOrder("order2", "user1", List.of(), 200.0, SHIPPED, null)));
 
         OrderDashboardDTO orderDashboard = orderService.getClientOrders(currentUser);
 
@@ -90,12 +90,9 @@ public class OrderServiceTest {
         when(orderRepository.findByItemsSellerId("seller1")).thenReturn(List.of(
                 new TestOrder("order1", "user1", List.of(
                         new OrderItem("prod1", "Product 1", 2, 50.0, "seller1"),
-                        new OrderItem("prod2", "Product 2", 1, 30.0, "seller2")
-                ), 130.0, OrderStatus.CREATED, null),
+                        new OrderItem("prod2", "Product 2", 1, 30.0, "seller2")), 130.0, OrderStatus.CREATED, null),
                 new TestOrder("order2", "user2", List.of(
-                        new OrderItem("prod3", "Product 3", 3, 20.0, "seller1")
-                ), 60.0, SHIPPED, null)
-        ));
+                        new OrderItem("prod3", "Product 3", 3, 20.0, "seller1")), 60.0, SHIPPED, null)));
 
         OrderDashboardDTO orderDashboard = orderService.getSellerOrders(currentUser);
 
@@ -124,9 +121,7 @@ public class OrderServiceTest {
         when(orderRepository.findById("order1")).thenReturn(java.util.Optional.of(
                 new TestOrder("order1", "user1", List.of(
                         new OrderItem("prod1", "Product 1", 2, 50.0, "seller1"),
-                        new OrderItem("prod2", "Product 2", 1, 30.0, "seller2")
-                ), 130.0, OrderStatus.CREATED, null)
-        ));
+                        new OrderItem("prod2", "Product 2", 1, 30.0, "seller2")), 130.0, OrderStatus.CREATED, null)));
         OrderResponseDTO order = orderService.getOrderById("order1", currentUser);
         assertEquals("order1", order.getOrderId(), "Order ID should match");
         assertEquals(130.0, order.getTotalPrice(), "Total price should match");
@@ -143,13 +138,12 @@ public class OrderServiceTest {
         when(cartRepository.findByUserId("user1")).thenReturn(
                 new TestCart("cart1", "user1", List.of(
                         new OrderItem("prod1", "Product 1", 2, 50.0, "seller1"),
-                        new OrderItem("prod2", "Product 2", 1, 30.0, "seller2")
-                ), 130.0, CartStatus.CHECKOUT
-        ));
+                        new OrderItem("prod2", "Product 2", 1, 30.0, "seller2")), 130.0, CartStatus.CHECKOUT));
 
         when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> {
             Order order = invocation.getArgument(0);
-            return new TestOrder("order1", order.getUserId(), order.getItems(), order.getTotalPrice(), order.getStatus(), order.getShippingAddress());
+            return new TestOrder("order1", order.getUserId(), order.getItems(), order.getTotalPrice(),
+                    order.getStatus(), order.getShippingAddress());
         });
 
         OrderResponseDTO orderResponse = orderService.createOrder(new OrderCreateDTO(), currentUser);
@@ -169,8 +163,7 @@ public class OrderServiceTest {
         AuthDetails currentUser = clientUser();
 
         TestOrder existingOrder = new TestOrder("order1", "user1", List.of(
-                new OrderItem("prod1", "Product 1", 2, 50.0, "seller1")
-        ), 100.0, OrderStatus.CONFIRMED, null);
+                new OrderItem("prod1", "Product 1", 2, 50.0, "seller1")), 100.0, OrderStatus.CONFIRMED, null);
 
         when(orderRepository.findById("order1")).thenReturn(java.util.Optional.of(existingOrder));
         when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -180,7 +173,8 @@ public class OrderServiceTest {
         OrderResponseDTO updatedOrder = orderService.updateOrder("order1", updateRequest, currentUser);
 
         assertEquals("order1", updatedOrder.getOrderId(), "Order ID should match");
-        assertEquals(updateRequest.getStatus(), updatedOrder.getStatus(), "Order Status should be updated " + updateRequest.getStatus());
+        assertEquals(updateRequest.getStatus(), updatedOrder.getStatus(),
+                "Order Status should be updated " + updateRequest.getStatus());
 
         verify(orderRepository, times(1)).findById("order1");
         verify(orderRepository, times(1)).save(any(Order.class));
@@ -192,8 +186,7 @@ public class OrderServiceTest {
         AuthDetails currentUser = clientUser();
 
         TestOrder existingOrder = new TestOrder("order1", "user1", List.of(
-                new OrderItem("prod1", "Product 1", 2, 50.0, "seller1")
-        ), 100.0, SHIPPED, null);
+                new OrderItem("prod1", "Product 1", 2, 50.0, "seller1")), 100.0, SHIPPED, null);
 
         when(orderRepository.findById("order1")).thenReturn(java.util.Optional.of(existingOrder));
 
@@ -203,8 +196,7 @@ public class OrderServiceTest {
         BadRequestException exception = assertThrows(
                 BadRequestException.class,
                 () -> orderService.updateOrder("order1", updateRequest, currentUser),
-                "Expected BadRequestException for invalid status transition"
-        );
+                "Expected BadRequestException for invalid status transition");
 
         assertTrue(exception.getMessage().contains("cannot be updated"),
                 "Exception message should indicate invalid transition");
@@ -220,8 +212,7 @@ public class OrderServiceTest {
         AuthDetails currentUser = adminUser();
 
         TestOrder existingOrder = new TestOrder("order1", "user1", List.of(
-                new OrderItem("prod1", "Product 1", 2, 50.0, "seller1")
-        ), 100.0, OrderStatus.CONFIRMED, null);
+                new OrderItem("prod1", "Product 1", 2, 50.0, "seller1")), 100.0, OrderStatus.CONFIRMED, null);
 
         when(orderRepository.findById("order1")).thenReturn(java.util.Optional.of(existingOrder));
         orderService.deleteOrderById("order1", currentUser);
@@ -235,16 +226,14 @@ public class OrderServiceTest {
         AuthDetails currentUser = clientUser();
 
         TestOrder existingOrder = new TestOrder("order1", "user1", List.of(
-                new OrderItem("prod1", "Product 1", 2, 50.0, "seller1")
-        ), 100.0, OrderStatus.CONFIRMED, null);
+                new OrderItem("prod1", "Product 1", 2, 50.0, "seller1")), 100.0, OrderStatus.CONFIRMED, null);
 
         when(orderRepository.findById("order1")).thenReturn(java.util.Optional.of(existingOrder));
         // Act & Assert
         ForbiddenException exception = assertThrows(
                 ForbiddenException.class,
                 () -> orderService.deleteOrderById("order1", currentUser),
-                "Expected ForbiddenException for unauthorized delete"
-        );
+                "Expected ForbiddenException for unauthorized delete");
         assertTrue(exception.getMessage().contains("Only ADMIN can delete orders"),
                 "Exception message should indicate forbidden delete");
         // Verify repository delete was never called

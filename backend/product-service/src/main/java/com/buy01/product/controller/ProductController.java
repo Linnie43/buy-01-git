@@ -137,6 +137,7 @@ public class ProductController {
     ) {
 
         Product product = productService.getProductById(productId);
+        log.info("Get product and price: {} {} {} {} {}", product.getProductId(), product.getPrice(), product.getName(), product.getQuantity(), product.getUserId() );
 
         return new ProductResponseDTO(
                 product.getProductId(),
@@ -152,8 +153,9 @@ public class ProductController {
     @PutMapping("/internal/quantity/{productId}")
     public ResponseEntity<Void> updateProductQuantityInternal(
             @PathVariable String productId,
-            @RequestParam int quantityChange
+            @RequestBody int quantityChange
     ) {
+        log.info("Update product quantity: {} {}", productId, quantityChange);
         productService.updateProductQuantity(productId, quantityChange);
         return ResponseEntity.ok().build();
     }

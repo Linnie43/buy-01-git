@@ -31,8 +31,40 @@
             Manage Product
           </button>
 
-          <button *ngIf="!product.isProductOwner && isLoggedIn" class="btn btn-success w-100" [disabled]="product.quantity === 0">
-            Buy
+          <div class="quantity-selector mt-2 d-flex align-items-center gap-2">
+            <label class="me-1">Qty</label>
+
+            <button
+              class="btn btn-outline-secondary btn-sm"
+              (click)="changeQuantity(-1)"
+              [disabled]="selectedQuantity <= 1 || !product || product.quantity === 0 || updating"
+            >
+              −
+            </button>
+
+            <input
+              type="text"
+              class="form-control text-center"
+              style="width: 60px"
+              [value]="selectedQuantity"
+              readonly
+            />
+
+            <button
+              class="btn btn-outline-secondary btn-sm"
+              (click)="changeQuantity(+1)"
+              [disabled]="!product || selectedQuantity >= product.quantity || product.quantity === 0 || updating"
+            >
+              +
+            </button>
+          </div>
+
+          <button *ngIf="!product.isProductOwner && isLoggedIn"
+                  class="btn btn-success w-100"
+                  [disabled]="product.quantity === 0"
+                  (click)="addToCart()"
+          >
+            Add to Cart
           </button>
 
           <p *ngIf="!isLoggedIn" class="text-muted mt-2 text-center">Please log in to buy this product.</p>

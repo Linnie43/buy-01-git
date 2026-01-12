@@ -5,6 +5,16 @@
   </a>
 
   <div class="header-right">
+
+    <a
+      *ngIf="showProfile && !isSeller"
+      routerLink="/cart"
+      class="cart-link"
+      title="My cart"
+    >
+      <img src="assets/cart.png" alt="Cart" class="cart-icon" />
+    </a>
+
     <button *ngIf="showProfile" (click)="logout()" class="login-btn">
       Logout
     </button>

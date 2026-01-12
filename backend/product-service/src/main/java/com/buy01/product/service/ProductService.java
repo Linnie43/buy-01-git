@@ -51,7 +51,8 @@ public class ProductService {
     public ProductResponseDTO createProduct(ProductCreateDTO request, AuthDetails currentUser) throws IOException {
 
         // validate that user can create products
-        if (currentUser.getCurrentUserId().isEmpty() || (!currentUser.getRole().equals(Role.ADMIN) && !currentUser.getRole().equals(Role.SELLER))) {
+        if (currentUser.getCurrentUserId().isEmpty() ||
+            (!currentUser.getRole().equals(Role.ADMIN) && !currentUser.getRole().equals(Role.SELLER))) {
             log.info("Forbidden: User ID is empty or role is not allowed - Role: {}", currentUser.getRole());
             throw new ForbiddenException("Your current role cannot create a product.");
         }
@@ -211,10 +212,12 @@ public class ProductService {
     }
 
     // Update product quantity, called when product quantity is changed in the cart
-    public void updateProductQuantity(String productId, int requestedQuantity) {
+    public void updateProductQuantity(String productId, int delta) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new NotFoundException(productId));
-        int newQuantity = product.getQuantity() + requestedQuantity;
+
+        int newQuantity = product.getQuantity() + delta;
+
         if (newQuantity < 0) {
             throw new ConflictException("Insufficient product quantity, remaining quantity" + product.getQuantity());
         }
@@ -222,13 +225,6 @@ public class ProductService {
         product.setUpdateTime(new Date());
         productRepository.save(product);
 
-        // send productUpdate via Kafka
-        productEventService.publishProductUpdatedEvent(new ProductUpdateDTO(
-                product.getProductId(),
-                product.getName(),
-                product.getPrice(),
-                product.getQuantity()
-        ));
     }
 
     // Deleting product, accessible only by ADMIN or product owner
@@ -254,19 +250,6 @@ public class ProductService {
     }
 
     // Helper methods
-
-    // Validate product details
-    private void validateProduct(Product product) {
-        if (product.getName() == null || product.getName().isEmpty()) {
-            throw new IllegalArgumentException("Product name is required");
-        }
-        if (product.getPrice() == null) {
-            throw new IllegalArgumentException("Price is required");
-        }
-        if (product.getPrice() <= 0) {
-            throw new IllegalArgumentException("Price must be positive");
-        }
-    }
 
     private void validateProductName(String productName) {
         if (productName == null || productName.isBlank()) {

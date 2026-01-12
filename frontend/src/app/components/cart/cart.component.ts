@@ -61,7 +61,6 @@ export class CartComponent implements OnInit {
                 'Close',
                 { duration: 3000, panelClass: ['snack-bar-error'] }
               );
-            // this.loadCart(); // reload cart to reflect actual state - necessary or not?
             }
           });
         }

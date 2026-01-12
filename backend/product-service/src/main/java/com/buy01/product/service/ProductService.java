@@ -221,10 +221,30 @@ public class ProductService {
         if (newQuantity < 0) {
             throw new ConflictException("Insufficient product quantity, remaining quantity" + product.getQuantity());
         }
+        updateReservedQuantity(product, -delta);
         product.setQuantity(newQuantity);
         product.setUpdateTime(new Date());
         productRepository.save(product);
 
+    }
+
+    public void removeReserveQuantityForOrderPlaced(String productId, int delta) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new NotFoundException(productId));
+        updateReservedQuantity(product, delta);
+        product.setUpdateTime(new Date());
+        productRepository.save(product);
+    }
+
+    public void updateReservedQuantity(Product product, int delta) {
+
+        int newReservedQuantity = product.getReservedQuantity() + delta;
+
+        if (newReservedQuantity < 0 ) {
+            throw new ConflictException("Invalid reserved quantity operation.");
+        }
+
+        product.setReservedQuantity(newReservedQuantity);
     }
 
     // Deleting product, accessible only by ADMIN or product owner
@@ -233,6 +253,9 @@ public class ProductService {
                .orElseThrow(() -> new NotFoundException(productId));
 
         authProductOwner(product, currentUser.getCurrentUserId(), currentUser.getRole());
+        if (product.getReservedQuantity() > 0) {
+            throw new ConflictException("Cannot delete product that is in the shopping cart with quantity: " + product.getReservedQuantity());
+        }
 
         productRepository.deleteById(productId);
         productEventService.publishProductDeletedEvent(productId);

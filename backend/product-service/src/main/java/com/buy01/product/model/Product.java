@@ -13,6 +13,7 @@ public class Product {
     private String description;
     private Double price;
     private int quantity;
+    private int reservedQuantity;
     private String userId;
     private Date createTime;
     private Date updateTime;
@@ -24,6 +25,7 @@ public class Product {
         this.description = description;
         this.price = price;
         this.quantity = quantity;
+        this.reservedQuantity = 0;
         this.userId = userId;
         this.createTime = new Date();
         this.updateTime = new Date();
@@ -36,6 +38,7 @@ public class Product {
         this.description = description;
         this.price = price;
         this.quantity = quantity;
+        this.reservedQuantity = 0;
         this.userId = userId;
     }
 
@@ -49,6 +52,8 @@ public class Product {
     public void setPrice(Double price) { this.price = price; }
     public int getQuantity() { return quantity; }
     public void setQuantity(int quantity) { this.quantity = quantity; }
+    public int getReservedQuantity() { return reservedQuantity; }
+    public void setReservedQuantity(int reservedQuantity) { this.reservedQuantity = reservedQuantity; }
     public String getUserId() { return userId; }
     public void setUserId(String userId) { this.userId = userId; }
     public Date getCreateTime() { return createTime; }

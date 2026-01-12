@@ -55,4 +55,23 @@ public class ProductClient {
             throw e;
         }
     }
+
+    public void placeOrder(String productId, int quantity) {
+        try {
+            String url = productServiceBaseUrl + "/internal/order/" + productId;
+            restTemplate.put(url, quantity);
+        } catch (HttpClientErrorException e) {
+
+            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
+                throw new NotFoundException("Product not found with ID: " + productId);
+            }
+
+            if (e.getStatusCode() == HttpStatus.CONFLICT) {
+                log.info("Conflict when placing order for productId: {}", productId);
+                throw new ConflictException("Requested quantity is not available");
+            }
+
+            throw e;
+        }
+    }
 }

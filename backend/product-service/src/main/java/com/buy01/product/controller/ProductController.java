@@ -160,6 +160,16 @@ public class ProductController {
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping("internal/order/{productId}")
+    public ResponseEntity<Void> updateReserveQuantityInternal(
+            @PathVariable String productId,
+            @RequestBody int reserveChange
+    ) {
+        log.info("Update product reserved quantity: {} {}", productId, reserveChange);
+        productService.removeReserveQuantityForOrderPlaced(productId, reserveChange);
+        return ResponseEntity.ok().build();
+    }
+
 
     // update a specific product by ID
     @PutMapping("/{productId}")

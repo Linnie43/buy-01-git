@@ -12,6 +12,7 @@ import io.jsonwebtoken.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import com.buy01.order.client.ProductClient;
 
 import org.springframework.stereotype.Service;
 
@@ -25,11 +26,13 @@ public class OrderService {
     private static final Logger log = LoggerFactory.getLogger(OrderService.class);
     private final OrderRepository orderRepository;
     private final CartRepository cartRepository;
+    private final ProductClient productClient;
 
     @Autowired
-    public OrderService(OrderRepository orderRepository, CartRepository cartRepository) {
+    public OrderService(OrderRepository orderRepository, CartRepository cartRepository, ProductClient productClient) {
         this.orderRepository = orderRepository;
         this.cartRepository = cartRepository;
+        this.productClient = productClient;
     }
 
     public OrderDashboardDTO getClientOrders(AuthDetails currentUser) {
@@ -87,6 +90,7 @@ public class OrderService {
         if (cart == null || cart.getItems().isEmpty()) {
             throw new BadRequestException("Cart is empty. Cannot create order.");
         }
+        updateProductStock(cart.getItems());
 
         Order order = orderRepository.save(
                 new Order(
@@ -131,8 +135,6 @@ public class OrderService {
         existingOrder.setStatus(orderUpdate.getStatus());
         existingOrder.setUpdatedAt(new Date());
 
-        // WHAT ELSE CAN BE UPDATED??
-
         return mapToDTO(orderRepository.save(existingOrder));
     }
 
@@ -156,7 +158,7 @@ public class OrderService {
     // Helper methods
 
     // convert OrderItem to ItemDTO
-    private ItemDTO toItemDTO(OrderItem item) {
+    public ItemDTO toItemDTO(OrderItem item) {
         return new ItemDTO(
                 item.getProductId(),
                 item.getProductName(),
@@ -209,6 +211,13 @@ public class OrderService {
                 .sum();
         order.setTotalPrice(sellerTotal);
         return order;
+    }
+
+    // update reserved quantity for each ordered product in product service
+    private void updateProductStock(List<OrderItem> orderItems) {
+        for (OrderItem orderItem : orderItems) {
+            productClient.updateQuantity(orderItem.getProductId(), -orderItem.getQuantity());
+        }
     }
 
 }

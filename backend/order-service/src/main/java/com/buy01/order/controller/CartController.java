@@ -42,7 +42,7 @@ public class CartController {
                 ));
     }
 
-    @PostMapping("redo/{orderId}")
+    @PostMapping("reorder/{orderId}")
     public ResponseEntity<CartResponseDTO> redoCartFromOrder(
             @RequestHeader("Authorization") String authHeader,
             @PathVariable String orderId) throws IOException {

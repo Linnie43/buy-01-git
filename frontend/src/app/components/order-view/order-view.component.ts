@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { OrderService } from '../../services/order.service';
+import { CartService } from '../../services/cart.service';
 import { OrderResponseDTO, OrderStatusList } from '../../models/order.model';
 import { Component, OnInit } from '@angular/core';
 
@@ -17,10 +18,12 @@ export class OrderViewComponent implements OnInit {
   order: OrderResponseDTO | null = null;
   isLoggedIn = false;
   statusSteps: string[] = OrderStatusList as unknown as string[];
+  showReorderModal = false;
 
   constructor(
     private route: ActivatedRoute,
     private orderService: OrderService,
+    private cartService: CartService,
     private authService: AuthService,
     private router: Router
   ) {}
@@ -88,4 +91,23 @@ export class OrderViewComponent implements OnInit {
       this.router.navigate(['/products', productId]);
     }
 
+    openReorderModal() {
+      this.showReorderModal = true;
+    }
+
+    confirmReorder() {
+      if (!this.order) return;
+
+      // Call service to reorder items
+      this.cartService.reorderItems(this.order.orderId).subscribe({
+        next: (CartResponseDTO) => {
+          console.log('Items reordered successfully:', CartResponseDTO);
+          this.showReorderModal = false;
+          this.router.navigate(['/cart']);
+        },
+        error: (err: unknown) => {
+          console.error('Error reordering items:', err);
+        }
+      });
+    }
 }

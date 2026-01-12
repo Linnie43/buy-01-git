@@ -82,6 +82,9 @@
     </div>
 
     <div class="d-flex justify-content-end align-items-center mt-auto border-top pt-3">
+      <button (click)="openReorderModal()" class="btn btn-primary">
+        <i class="bi bi-arrow-repeat me-2"></i>Order Again
+      </button>
       <button *ngIf="order.status === 'CREATED' || order.status === 'CONFIRMED'"
               (click)="cancelOrder()"
               class="btn btn-outline-danger">
@@ -93,6 +96,23 @@
       </div>
     </div>
 
+    <div *ngIf="showReorderModal" class="reorder-modal-overlay">
+      <div class="card shadow reorder-modal-content">
+        <div class="card-body">
+          <h5 class="card-title fw-bold">Confirm Re-Order</h5>
+          <p class="card-text text-muted">
+            All items from this order will be added to your cart with their <strong>current prices</strong>. 
+            We will add the same quantity or the maximum available stock.
+          </p>
+          <div class="alert alert-warning py-2 small">
+            <i class="bi bi-info-circle me-2"></i>Please control the cart for updated quantities and prices before checkout.
+          </div>
+          <div class="d-flex justify-content-end gap-2">
+            <button (click)="showReorderModal = false" class="btn btn-light">Cancel</button>
+            <button (click)="confirmReorder()" class="btn btn-primary">Confirm Re-Order</button>
+          </div>
+        </div>
+      </div>
   </div>
 
   <div *ngIf="!order" class="text-center mt-5">

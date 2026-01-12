@@ -29,6 +29,10 @@ export class CartService {
       return this.http.put<CartResponseDTO>(`${this.apiUrl}/${productId}`, formData);
     }
 
+  reorderItems(orderId: string): Observable<CartResponseDTO> {
+    return this.http.post<CartResponseDTO>(`${this.apiUrl}/reorder/${orderId}`, {});
+  }
+
   deleteItemById(productId: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${productId}`);
   }

@@ -14,6 +14,7 @@ import { SessionGuard } from './guards/session.guard';
 import { CartComponent } from './components/cart/cart.component';
 import { SalesDashboardComponent } from './components/sales-dashboard/sales-dashboard.component';
 import { ClientDashboardComponent } from './components/client-dashboard/client-dashboard.component';
+import { CheckoutComponent } from './components/checkout/checkout.component';
 
 
 export const routes: Routes = [
@@ -28,6 +29,7 @@ export const routes: Routes = [
   { path: 'my-dashboard', component: ClientDashboardComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'CLIENT' } },
   { path: 'order/:id', component: OrderViewComponent, canActivate: [AuthGuard]},
   { path: 'cart', component: CartComponent },
+  { path: 'checkout', component: CheckoutComponent},
   { path: '404', component: NotFoundComponent },
   { path: '**', redirectTo: '/404' }
 ];

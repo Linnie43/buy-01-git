@@ -74,7 +74,7 @@ public class CartController {
         return ResponseEntity.ok(cartService.updateCart(currentUser, productId, itemUpdate));
     }
 
-    @PutMapping
+    @PutMapping("/status")
     public ResponseEntity<CartResponseDTO> updateCartStatus(
             @RequestHeader("Authorization") String authHeader,
             @Valid @RequestBody CartUpdateRequest updateRequest

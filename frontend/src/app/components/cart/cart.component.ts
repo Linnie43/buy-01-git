@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { OnInit } from '@angular/core';
 import { CartService } from '../../services/cart.service';
 import { AuthService } from '../../services/auth.service';
@@ -17,7 +18,7 @@ import { FormsModule } from '@angular/forms';
 export class CartComponent implements OnInit {
   cart: CartResponseDTO | null = null;
 
-  constructor(private cartService: CartService, private authService: AuthService, private snackBar: MatSnackBar) {}
+  constructor(private cartService: CartService, private authService: AuthService, private snackBar: MatSnackBar, private router: Router) {}
 
   ngOnInit(): void {
     if (this.authService.isLoggedIn()) {
@@ -71,6 +72,10 @@ export class CartComponent implements OnInit {
       next: () => this.loadCart(),
       error: (err: unknown) => console.error('Error removing item from cart:', err)
     });
+  }
+
+  proceedToCheckout() {
+    this.router.navigate(['/checkout']);
   }
 
 }

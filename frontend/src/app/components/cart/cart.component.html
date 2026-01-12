@@ -62,7 +62,7 @@
       <strong>{{ cart.totalPrice | currency:'EUR' }}</strong>
     </div>
 
-    <button class="btn btn-success mt-3 w-100">
+    <button class="btn btn-success mt-3 w-100" (click)="proceedToCheckout()">
       Proceed to Checkout
     </button>
   </div>

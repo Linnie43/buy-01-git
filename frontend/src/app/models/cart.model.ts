@@ -25,3 +25,13 @@ export interface CartItemRequestDTO {
 export interface CartItemUpdateDTO {
   quantity: number;
 }
+
+export interface CartUpdateRequest {
+  cartStatus: CartStatus;
+}
+
+export enum CartStatus {
+  ACTIVE = 'ACTIVE',
+  CHECKOUT = 'CHECKOUT',
+  ABANDONED = 'ABANDONED'
+}

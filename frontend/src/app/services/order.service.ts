@@ -35,15 +35,20 @@ export class OrderService {
         country: item.shippingAddress.country
       },
       paid: item.paid,
-      deliveryDate: new Date(item.deliveryDate) || null,
+      deliveryDate: item.deliveryDate ? new Date(item.deliveryDate) : null,
       trackingNumber: item.trackingNumber || null,
       createdAt: new Date(item.createdAt),
-      updatedAt: new Date(item.updatedAt) || null
+      updatedAt: item.updatedAt ? new Date(item.updatedAt) : null
     };
   }
 
-  getSalesDashboard(): Observable<OrderDashboardDTO> {
+  createOrder(orderRequest: any): Observable<OrderResponseDTO> {
+    return this.http.post<any>(this.apiUrl, orderRequest).pipe(
+      map(order => this.mapOrder(order))
+    );
+  }
 
+  getSalesDashboard(): Observable<OrderDashboardDTO> {
     return this.http.get<OrderDashboardDTO>(this.apiUrl);
   }
 

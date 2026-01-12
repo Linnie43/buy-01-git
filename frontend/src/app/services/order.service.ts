@@ -57,7 +57,9 @@ export class OrderService {
     );
   }
 
-  cancelOrder(orderId: string): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/${orderId}`, { status: Status.CANCELLED });
+  cancelOrder(orderId: string): Observable<OrderResponseDTO> {
+    return this.http
+      .put<any>(`${this.apiUrl}/${orderId}`, { status: Status.CANCELLED })
+      .pipe(map(order => this.mapOrder(order)));
   }
 }

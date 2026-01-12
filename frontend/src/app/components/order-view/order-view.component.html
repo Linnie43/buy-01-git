@@ -1,6 +1,6 @@
 <div class="container mt-4 d-flex justify-content-center">
   <div *ngIf="order" class="card p-4 order-view-card w-100" style="background-color: transparent; max-width: 900px;">
-    
+
     <div class="d-flex justify-content-between align-items-start mb-4 border-bottom pb-3">
       <div>
         <h2 class="mb-1">Order #{{ order.orderId }}</h2>
@@ -8,7 +8,7 @@
       </div>
       <div class="text-end">
         <h3 class="text-primary">{{ order.totalPrice | currency:'EUR':'symbol' }}</h3>
-        <span class="badge rounded-pill" 
+        <span class="badge rounded-pill"
               [ngClass]="{
                 'bg-warning text-dark': order.status === 'CREATED',
                 'bg-info text-dark': order.status === 'CONFIRMED',
@@ -24,7 +24,7 @@
     <div class="status-tracker-container mb-5 d-none d-md-block" *ngIf="order.status !== 'CANCELLED'">
       <div class="d-flex justify-content-between position-relative">
         <div class="position-absolute top-50 start-0 w-100 translate-middle-y bg-secondary" style="height: 4px; z-index: 0; opacity: 0.2;"></div>
-        
+
         <div *ngFor="let step of statusSteps; let i = index" class="d-flex flex-column align-items-center position-relative" style="z-index: 1;">
           <div class="rounded-circle d-flex align-items-center justify-content-center mb-2"
                style="width: 40px; height: 40px; border: 2px solid;"
@@ -55,20 +55,17 @@
     </div>
 
 <h4 class="mb-3">Items</h4>
-    
+
     <div class="d-flex flex-column gap-3 mb-4">
-      <div *ngFor="let item of order.items" 
-           class="product-card-uniform card p-3 shadow-sm" 
-           (click)="goToProduct(item.productId)" 
+      <div *ngFor="let item of order.items"
+           class="product-card-uniform card p-3 shadow-sm"
+           (click)="goToProduct(item.productId)"
            style="cursor: pointer; background-color: transparent;">
-           
+
         <div class="d-flex justify-content-between align-items-center">
-          
+
           <div>
             <h5 class="mb-1 fw-bold">{{ item.productName }}</h5>
-            <small class="text-muted" style="font-size: 0.85rem;">
-              Product ID: {{ item.productId }}
-            </small>
           </div>
 
           <div class="text-end">
@@ -85,8 +82,8 @@
     </div>
 
     <div class="d-flex justify-content-end align-items-center mt-auto border-top pt-3">
-      <button *ngIf="order.status === 'CREATED' || order.status === 'CONFIRMED'" 
-              (click)="cancelOrder()" 
+      <button *ngIf="order.status === 'CREATED' || order.status === 'CONFIRMED'"
+              (click)="cancelOrder()"
               class="btn btn-outline-danger">
         <i class="bi bi-x-circle me-2"></i>Cancel Order
       </button>
@@ -97,7 +94,7 @@
     </div>
 
   </div>
-  
+
   <div *ngIf="!order" class="text-center mt-5">
     <div class="spinner-border text-primary" role="status">
       <span class="visually-hidden">Loading...</span>

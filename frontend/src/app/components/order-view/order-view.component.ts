@@ -67,9 +67,20 @@ export class OrderViewComponent implements OnInit {
   }
 
   cancelOrder() {
+    if (!this.order) return;
+
     if(confirm('Are you sure you want to cancel this order?')) {
       // Call service to cancel order
-      console.log('Cancelling order...');
+      this.orderService.cancelOrder(this.order.orderId).subscribe({
+        next: (updatedOrder) => {
+          this.order = updatedOrder;
+          console.log('Order cancelled successfully.');
+
+        },
+        error: (err: unknown) => {
+          console.error('Error cancelling order:', err);
+        }
+      });
     }
   }
 

@@ -12,6 +12,7 @@ import com.buy01.order.security.AuthDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import com.buy01.order.client.ProductClient;
 
@@ -147,8 +148,14 @@ public class CartService {
         return mapToDTO(cartRepository.save(cart));
     }
 
-    public void deleteItemById(String id, AuthDetails currentUser) throws IOException{
-        Cart cart = getCurrentCart(currentUser);
+    @PreAuthorize("hasRole('CLIENT') || hasRole('ADMIN')")
+    public void deleteItemById(String id, AuthDetails currentUser) {
+
+        Cart cart = cartRepository.findByUserId(currentUser.getCurrentUserId());
+
+        if (cart == null) {
+            throw new NotFoundException("Cart not found");
+        }
         validStatusForChanges(cart);
 
         Optional<OrderItem> itemToRemove = cart.getItems().stream()
@@ -161,12 +168,17 @@ public class CartService {
         int quantity = itemToRemove.get().getQuantity();
 
         cart.getItems().remove(itemToRemove.get());
-        updateCartTotalAndTime(cart);
-        cartRepository.save(cart);
 
         // return item to the stock in product service if it was reserved (ACTIVE cart)
         if (cart.getCartStatus() == CartStatus.ACTIVE) {
             productClient.updateQuantity(id, quantity);
+        }
+
+        if (cart.getItems().isEmpty()) {
+            cartRepository.delete(cart);
+        } else {
+            updateCartTotalAndTime(cart);
+            cartRepository.save(cart);
         }
     }
 

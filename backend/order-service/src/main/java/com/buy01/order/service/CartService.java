@@ -1,14 +1,14 @@
 package com.buy01.order.service;
 
 import com.buy01.order.dto.*;
-import com.buy01.order.exception.ConflictException;
 import com.buy01.order.exception.ForbiddenException;
 import com.buy01.order.exception.NotFoundException;
+import com.buy01.order.exception.OutOfStockException;
+import com.buy01.order.exception.BadRequestException;
 import com.buy01.order.model.*;
 import com.buy01.order.repository.CartRepository;
 import com.buy01.order.repository.OrderRepository;
 import com.buy01.order.security.AuthDetails;
-import org.apache.coyote.BadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +53,10 @@ public class CartService {
             cartRepository.save(cart); // save new cart to repository
         }
 
+        if (cart.getCartStatus() == CartStatus.ABANDONED) {
+            cart = reactivateCart(cart.getId());
+        }
+
         return cart;
     }
 
@@ -62,13 +66,15 @@ public class CartService {
             throw new BadRequestException("Current user is not a CLIENT");
         }
 
+        Cart cart = getCurrentCart(currentUser); // get or create active cart for user
+        validStatusForChanges(cart);
+
         ProductUpdateDTO product = productClient.getProductById(newItem.getProductId()); // fetch product details from product service
         if (product == null) throw new NotFoundException("Product not found");
-        if (product.getQuantity() <= 0) throw new ConflictException("Product is out of stock");
+        if (product.getQuantity() <= 0) throw new OutOfStockException("Product is out of stock");
 
         log.info("newItem ID {}, name {}, quantity {}, price {}", newItem.getProductId(), product.getProductName(), newItem.getQuantity(), product.getProductPrice());
         OrderItem itemAdded = new OrderItem(product.getProductId(), product.getProductName(), newItem.getQuantity(), product.getProductPrice(), product.getSellerId()); // create new order item
-        Cart cart = getCurrentCart(currentUser); // get or create active cart for user
 
         addOrUpdateItemInCart(cart, itemAdded); // add or update item in cart
         updateCartTotalAndTime(cart);
@@ -91,6 +97,11 @@ public class CartService {
 
         Cart cart = getCurrentCart(currentUser);
 
+        if (cart.getCartStatus() == CartStatus.ABANDONED) {
+            cart = reactivateCart(cart.getId());
+        }
+        validStatusForChanges(cart);
+
         for (OrderItem itemAdded : order.getItems()) {
             ProductUpdateDTO product = productClient.getProductById(itemAdded.getProductId());
             if (product == null) break;
@@ -107,6 +118,7 @@ public class CartService {
 
     public CartResponseDTO updateCart(AuthDetails currentUser, String productId, CartItemUpdateDTO newQuantity) throws IOException {
         Cart cart = getCurrentCart(currentUser);
+        validStatusForChanges(cart);
 
         Optional<OrderItem> itemToUpdate = cart.getItems().stream()
                 .filter(item -> item.getProductId().equals(productId)).findFirst();
@@ -137,6 +149,7 @@ public class CartService {
 
     public void deleteItemById(String id, AuthDetails currentUser) throws IOException{
         Cart cart = getCurrentCart(currentUser);
+        validStatusForChanges(cart);
 
         Optional<OrderItem> itemToRemove = cart.getItems().stream()
                 .filter(item -> item.getProductId().equals(id))
@@ -151,8 +164,10 @@ public class CartService {
         updateCartTotalAndTime(cart);
         cartRepository.save(cart);
 
-        // return item to the stock in product service
-        productClient.updateQuantity(id, quantity);
+        // return item to the stock in product service if it was reserved (ACTIVE cart)
+        if (cart.getCartStatus() == CartStatus.ACTIVE) {
+            productClient.updateQuantity(id, quantity);
+        }
     }
 
     public void deleteCart(AuthDetails currentUser) {
@@ -160,10 +175,41 @@ public class CartService {
         if (cart == null) {
             throw new NotFoundException("Cart not found");
         }
+        if (cart.getCartStatus() == CartStatus.ACTIVE) {
+            for (OrderItem item : cart.getItems()) {
+                productClient.updateQuantity(item.getProductId(), item.getQuantity());
+            }
+        }
         cartRepository.deleteById(cart.getId());
     }
 
+
     // Helper methods
+
+    public Cart reactivateCart(String cartId) {
+        Cart cart = cartRepository.findById(cartId).orElseThrow();
+
+        if (cart.getCartStatus() == CartStatus.ABANDONED) {
+           try {
+               for (OrderItem orderItem : cart.getItems()) {
+                   ProductUpdateDTO product = productClient.getProductById(orderItem.getProductId());
+                   if (product.getQuantity() < orderItem.getQuantity()) {
+                       throw new OutOfStockException("Product " + product.getProductName() + " is out of stock.");
+                   } else {
+                       productClient.updateQuantity(orderItem.getProductId(), -orderItem.getQuantity());
+                   }
+               }
+                cart.setCartStatus(CartStatus.ACTIVE);
+                cart.setUpdateTime(new Date());
+                return cartRepository.save(cart);
+           } catch (Exception e) {
+               throw new OutOfStockException("Some items are no longer available.", e);
+           }
+
+        }
+        return cart;
+
+    }
 
     // add new item to cart if it isn't there yet or update quantity for existing item
     private void addOrUpdateItemInCart(Cart cart, OrderItem itemAdded) {
@@ -198,13 +244,18 @@ public class CartService {
 
     // mapping Cart to CartResponseDTO
     public CartResponseDTO mapToDTO(Cart cart) {
+        Date expiry = cart.getExpiryTime();
+        if (expiry == null) {
+            expiry = new Date(cart.getCreateTime().getTime() + (15 * 60 * 1000)); // 15 minutes from creation time
+        }
 
         return new CartResponseDTO(
                 cart.getId(),
                 cart.getItems().stream()
                         .map(orderService::toItemDTO)
                         .toList(),
-                calculateTotal(cart.getItems())
+                calculateTotal(cart.getItems()),
+                expiry
         );
     }
 
@@ -230,6 +281,13 @@ public class CartService {
         }
 
         cartRepository.saveAll(carts);
+
+    }
+
+    public void validStatusForChanges(Cart cart) {
+        if (cart.getCartStatus().equals(CartStatus.CHECKOUT)) {
+            throw new BadRequestException("Cannot update a CHECKOUT cart");
+        }
 
     }
 

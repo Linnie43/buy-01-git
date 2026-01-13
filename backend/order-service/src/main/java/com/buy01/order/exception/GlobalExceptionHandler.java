@@ -112,4 +112,11 @@ public class GlobalExceptionHandler {
         body.put("BAD_REQUEST_ERROR", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
+
+    @ExceptionHandler(OutOfStockException.class)
+    public ResponseEntity<Map<String, String>> handleOutOfStock(OutOfStockException ex) {
+        Map<String, String> body = new HashMap<>();
+        body.put("OUT_OF_STOCK_ERROR", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
+    }
 }

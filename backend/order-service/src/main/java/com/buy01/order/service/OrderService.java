@@ -132,6 +132,10 @@ public class OrderService {
             );
         }
 
+        if (orderUpdate.getStatus() == OrderStatus.CANCELLED) {
+            restoreProductStock(existingOrder.getItems());
+        }
+
         existingOrder.setStatus(orderUpdate.getStatus());
         existingOrder.setUpdatedAt(new Date());
 
@@ -152,6 +156,7 @@ public class OrderService {
                     + ". Access denied for userId: " + currentUser.getCurrentUserId()
             );
         }
+        restoreProductStock(existingOrder.getItems());
         orderRepository.delete(existingOrder);
     }
 
@@ -216,7 +221,13 @@ public class OrderService {
     // update reserved quantity for each ordered product in product service
     private void updateProductStock(List<OrderItem> orderItems) {
         for (OrderItem orderItem : orderItems) {
-            productClient.updateQuantity(orderItem.getProductId(), -orderItem.getQuantity());
+            productClient.placeOrder(orderItem.getProductId(), -orderItem.getQuantity());
+        }
+    }
+
+    public void restoreProductStock(List<OrderItem> orderItems) {
+        for (OrderItem orderItem : orderItems) {
+            productClient.updateQuantity(orderItem.getProductId(), orderItem.getQuantity());
         }
     }
 

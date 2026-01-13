@@ -38,7 +38,7 @@
         <h2>Top Selling Products</h2>
         <div *ngIf="topSellingItems.length > 0; else noTopItems">
           <ul class="list-group">
-            <li *ngFor="let item of topSellingItems" class="list-group-item d-flex justify-content-between align-items-center clickable-list-item" (click)="goToProduct(item.productId)" style="cursor: pointer;">
+            <li *ngFor="let item of topSellingItems" class="list-group-item d-flex justify-content-between align-items-center clickable-list-item" (click)="goToProduct(item.productId)">
               {{ item.productName }}
               <span class="badge rounded-pill dashboard-bg">{{ item.quantity }} sold</span>
             </li>

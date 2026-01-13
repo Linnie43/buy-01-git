@@ -30,7 +30,7 @@
         <h2>Most Bought Items</h2>
         <div *ngIf="dashboardData.topItems.length > 0; else noTopItems">
           <ul class="list-group">
-            <li *ngFor="let item of dashboardData.topItems" class="list-group-item d-flex justify-content-between align-items-center clickable-list-item" (click)="goToProduct(item.productId)" style="cursor: pointer;">
+            <li *ngFor="let item of dashboardData.topItems" class="list-group-item d-flex justify-content-between align-items-center clickable-list-item" (click)="goToProduct(item.productId)">
               {{ item.productName }}
               <span class="badge rounded-pill dashboard-bg">{{ item.quantity }} bought</span>
             </li>
@@ -84,7 +84,7 @@
                   <td>{{ order.createdAt | date:'mediumDate' }}</td>
                   <td>
                       <span class="badge text-uppercase" [ngClass]="{
-                        'bg-secondary': order.status === 'CREATED' || order.status === 'PROCESSING',
+                        'bg-secondary': order.status === 'CREATED' || order.status === 'CONFIRMED',
                         'bg-warning': order.status === 'SHIPPED',
                         'bg-success': order.status === 'DELIVERED',
                         'bg-danger': order.status === 'CANCELLED'

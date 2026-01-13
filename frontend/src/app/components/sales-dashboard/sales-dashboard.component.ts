@@ -38,7 +38,7 @@ export class SalesDashboardComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = null;
 
-    this.orderService.getSalesDashboard().subscribe({
+    this.orderService.getOrders().subscribe({
       next: (dashboardData) => {
         this.orders = dashboardData.orders;
         this.totalSales = dashboardData.total;
@@ -46,9 +46,9 @@ export class SalesDashboardComponent implements OnInit {
         this.topSellingItems = dashboardData.topItems;
 
         this.totalUnitsSold = dashboardData.orders
-          .filter(order => order.status !== 'CANCELED')
-          .reduce((total, order) =>
-            total + order.items.reduce((subTotal, item) => subTotal + item.quantity, 0), 0);
+          .filter(order => order.status !== 'CANCELLED')
+          .flatMap(order => order.items)
+          .reduce((sum, item) => sum + item.quantity, 0);
 
         this.applyFilters(); // Apply filters on initial load
         this.isLoading = false;

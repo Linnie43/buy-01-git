@@ -11,7 +11,7 @@ public interface OrderRepository extends MongoRepository<Order, String> {
     List<Order> findByItemsSellerId(String sellerId);
     @Aggregation(pipeline = {
             // 1. Optimization: Only pick orders that have this seller involved at all
-            "{ '$match': { 'items.sellerId': ?0 } }",
+            "{ '$match': { 'status': { '$ne': 'CANCELED' }, 'items.sellerId': ?0 } }",
 
             // 2. Explode the array: 1 Order with 5 items becomes 5 documents
             "{ '$unwind': '$items' }",
@@ -45,7 +45,7 @@ public interface OrderRepository extends MongoRepository<Order, String> {
     List<ItemDTO> findTopItemsBySellerId(String sellerId, int limit);
     @Aggregation(pipeline = {
             // 1. Filter by userId (Argument 0)
-            "{ '$match': { 'userId': ?0 } }",
+            "{ '$match': { 'userId': ?0, 'status': { '$ne': 'CANCELED' } } }",
 
             // 2. Flatten the items list
             "{ '$unwind': '$items' }",

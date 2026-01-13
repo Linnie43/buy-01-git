@@ -43,6 +43,7 @@ public class OrderService {
                 .toList();
         List<ItemDTO> topItems = orderRepository.findTopItemsByUserId(currentUser.getCurrentUserId(), 3);
         double totalSum = orders.stream()
+                .filter(order -> order.getStatus() != OrderStatus.CANCELED)
                 .mapToDouble(Order::getTotalPrice)
                 .sum();
 

@@ -44,8 +44,10 @@ export class SalesDashboardComponent implements OnInit {
         this.totalOrders = dashboardData.orders.length;
         this.topSellingItems = dashboardData.topItems;
 
-        this.totalUnitsSold = dashboardData.orders.reduce((total, order) =>
-          total + order.items.reduce((subTotal, item) => subTotal + item.quantity, 0), 0);
+        this.totalUnitsSold = dashboardData.orders
+          .filter(order => order.status !== 'CANCELED')
+          .reduce((total, order) =>
+            total + order.items.reduce((subTotal, item) => subTotal + item.quantity, 0), 0);
 
         this.applyFilters(); // Apply filters on initial load
         this.isLoading = false;

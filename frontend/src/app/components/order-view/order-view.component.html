@@ -82,10 +82,10 @@
     </div>
 
     <div class="d-flex justify-content-end align-items-center mt-auto border-top pt-3">
-      <button (click)="openReorderModal()" class="btn btn-primary">
+      <button *ngIf="!isSeller" (click)="openReorderModal()" class="btn btn-primary">
         <i class="bi bi-arrow-repeat me-2"></i>Order Again
       </button>
-      <button *ngIf="order.status === 'CREATED' || order.status === 'CONFIRMED'"
+      <button *ngIf="!isSeller && (order.status === 'CREATED' || order.status === 'CONFIRMED')"
               (click)="cancelOrder()"
               class="btn btn-outline-danger">
         <i class="bi bi-x-circle me-2"></i>Cancel Order

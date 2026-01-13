@@ -35,7 +35,7 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<OrderResponseDTO> createOrder(
             @RequestHeader("Authorization") String authHeader,
-            @Valid @ModelAttribute OrderCreateDTO orderDto) throws IOException {
+            @Valid @RequestBody OrderCreateDTO orderDto) throws IOException {
 
         AuthDetails currentUser = securityUtils.getAuthDetails(authHeader);
         return ResponseEntity.ok(orderService.createOrder(orderDto, currentUser));

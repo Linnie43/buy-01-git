@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { CartResponseDTO, CartItemRequestDTO, CartItemUpdateDTO } from '../models/cart.model';
+import { CartResponseDTO, CartItemRequestDTO, CartItemUpdateDTO, CartUpdateRequest } from '../models/cart.model';
 import { BASE_URL } from '../constants/constants';
 import { AuthService } from './auth.service';
 
@@ -39,5 +39,9 @@ export class CartService {
 
   deleteCart(): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/all`);
+  }
+
+  updateCartStatus(status: CartUpdateRequest): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/status`, status);
   }
 }

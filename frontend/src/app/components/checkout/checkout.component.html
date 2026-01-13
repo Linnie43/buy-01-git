@@ -1,0 +1,139 @@
+<div class="container mt-5 pb-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+
+      <!-- SUCCESS -->
+      <div class="card bg-transparent" *ngIf="createdOrder">
+        <div class="card-body p-5 text-center">
+          <div class="mb-4">
+            <h2 class="fw-bold">Order Successfully placed!</h2>
+          </div>
+
+          <div class="mb-4">
+            <p class="fs-5 text-muted">Estimated time of arrival:</p>
+            <h4 class="fw-bold">
+              <!-- do we have a deliveryDate? -->
+              {{ createdOrder.deliveryDate ? (createdOrder.deliveryDate | date:'fullDate') : '3-5 Business Days' }}
+            </h4>
+          </div>
+
+          <div class="mt-5">
+            <p class="mb-2">Track your order:</p>
+            <!-- Link to the specific order page -->
+            <a [routerLink]="['/order', createdOrder.orderId]">
+              Order #{{ createdOrder.orderId }}
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- FORM -->
+      <div class="card bg-transparent" *ngIf="!createdOrder">
+        <div class="card-body p-4">
+          <h2 class="text-center mb-4 fw-bold">Checkout</h2>
+
+          <form [formGroup]="checkoutForm" (ngSubmit)="onSubmit()">
+
+            <!-- Full Name -->
+            <div class="mb-3">
+              <label for="fullName" class="form-label">Full Name</label>
+              <input type="text"
+                     id="fullName"
+                     class="form-control"
+                     formControlName="fullName"
+                     placeholder="John Doe"
+                     [class.is-invalid]="checkoutForm.get('fullName')?.invalid && checkoutForm.get('fullName')?.touched">
+              <div class="invalid-feedback" *ngIf="checkoutForm.get('fullName')?.errors?.['required']">
+                Full name is required.
+              </div>
+              <div class="invalid-feedback" *ngIf="checkoutForm.get('fullName')?.errors?.['minlength']">
+                Name must be at least 3 characters.
+              </div>
+              <div class="invalid-feedback" *ngIf="checkoutForm.get('fullName')?.errors?.['maxlength']">
+                Name cannot exceed 25 characters.
+              </div>
+            </div>
+
+            <!-- Street Address -->
+            <div class="mb-3">
+              <label for="street" class="form-label">Street Address</label>
+              <input type="text"
+                     id="street"
+                     class="form-control"
+                     formControlName="street"
+                     placeholder="123 Main St"
+                     [class.is-invalid]="checkoutForm.get('street')?.invalid && checkoutForm.get('street')?.touched">
+              <div class="invalid-feedback" *ngIf="checkoutForm.get('street')?.errors?.['required']">
+                Street address is required.
+              </div>
+              <div class="invalid-feedback" *ngIf="checkoutForm.get('street')?.errors?.['minlength']">
+                Address must be at least 5 characters.
+              </div>
+              <div class="invalid-feedback" *ngIf="checkoutForm.get('street')?.errors?.['maxlength']">
+                Address cannot exceed 100 characters.
+              </div>
+            </div>
+
+            <div class="row">
+              <!-- City -->
+              <div class="col-md-6 mb-3">
+                <label for="city" class="form-label">City</label>
+                <input type="text"
+                       id="city"
+                       class="form-control"
+                       formControlName="city"
+                       placeholder="New York"
+                       [class.is-invalid]="checkoutForm.get('city')?.invalid && checkoutForm.get('city')?.touched">
+                <div class="invalid-feedback" *ngIf="checkoutForm.get('city')?.errors?.['required']">
+                  City is required.
+                </div>
+              </div>
+
+              <!-- Postal Code -->
+              <div class="col-md-6 mb-3">
+                <label for="postalCode" class="form-label">Postal Code</label>
+                <input type="text"
+                       id="postalCode"
+                       class="form-control"
+                       formControlName="postalCode"
+                       placeholder="10001"
+                       [class.is-invalid]="checkoutForm.get('postalCode')?.invalid && checkoutForm.get('postalCode')?.touched">
+                <div class="invalid-feedback" *ngIf="checkoutForm.get('postalCode')?.errors?.['required']">
+                  Postal code is required.
+                </div>
+              </div>
+            </div>
+
+            <!-- Country -->
+            <div class="mb-4">
+              <label for="country" class="form-label">Country</label>
+              <input type="text"
+                     id="country"
+                     class="form-control"
+                     formControlName="country"
+                     placeholder="United States"
+                     [class.is-invalid]="checkoutForm.get('country')?.invalid && checkoutForm.get('country')?.touched">
+              <div class="invalid-feedback" *ngIf="checkoutForm.get('country')?.errors?.['required']">
+                Country is required.
+              </div>
+              <div class="invalid-feedback" *ngIf="checkoutForm.get('country')?.errors?.['minlength']">
+                Country must be at least 2 characters.
+              </div>
+              <div class="invalid-feedback" *ngIf="checkoutForm.get('country')?.errors?.['maxlength']">
+                Country cannot exceed 50 characters.
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary w-100 py-2" [disabled]="checkoutForm.invalid || isSubmitting">
+              <span *ngIf="!isSubmitting">Place Order</span>
+              <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            </button>
+
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

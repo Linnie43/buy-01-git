@@ -1,9 +1,6 @@
 package com.buy01.order.controller;
 
-import com.buy01.order.dto.CartItemRequestDTO;
-import com.buy01.order.dto.CartItemUpdateDTO;
-import com.buy01.order.dto.CartResponseDTO;
-import com.buy01.order.dto.ItemDTO;
+import com.buy01.order.dto.*;
 import com.buy01.order.model.Cart;
 import com.buy01.order.model.Role;
 import com.buy01.order.security.AuthDetails;
@@ -75,6 +72,16 @@ public class CartController {
         AuthDetails currentUser = securityUtils.getAuthDetails(authHeader);
 
         return ResponseEntity.ok(cartService.updateCart(currentUser, productId, itemUpdate));
+    }
+
+    @PutMapping("/status")
+    public ResponseEntity<CartResponseDTO> updateCartStatus(
+            @RequestHeader("Authorization") String authHeader,
+            @Valid @RequestBody CartUpdateRequest updateRequest
+    ) throws IOException {
+        AuthDetails currentUser = securityUtils.getAuthDetails(authHeader);
+
+        return ResponseEntity.ok(cartService.updateCartStatus(currentUser, updateRequest.getCartStatus()));
     }
 
 

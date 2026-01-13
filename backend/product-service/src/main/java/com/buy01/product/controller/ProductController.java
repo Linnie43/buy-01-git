@@ -170,6 +170,16 @@ public class ProductController {
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping("internal/cancel/{productId}")
+    public ResponseEntity<Void> returnCancelledItemToStock(
+            @PathVariable String productId,
+            @RequestBody int quantityToReturn
+    ) {
+        log.info("Return cancelled order quantity to stock: {} {}", productId, quantityToReturn);
+        productService.returnCancelledItemToStock(productId, quantityToReturn);
+        return ResponseEntity.ok().build();
+    }
+
 
     // update a specific product by ID
     @PutMapping("/{productId}")

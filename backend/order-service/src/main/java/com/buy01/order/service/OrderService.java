@@ -246,7 +246,7 @@ public class OrderService {
 
     public void restoreProductStock(List<OrderItem> orderItems) {
         for (OrderItem orderItem : orderItems) {
-            productClient.updateQuantity(orderItem.getProductId(), orderItem.getQuantity());
+            productClient.cancelOrder(orderItem.getProductId(), orderItem.getQuantity());
         }
     }
 

@@ -69,7 +69,7 @@ public class ProductService {
         validateUserId(request.getUserId());
 
         Product product = new Product(request.getName().trim(), request.getDescription().trim(),
-                request.getPrice(), request.getQuantity(), request.getUserId());
+                request.getPrice(), request.getQuantity(), request.getCategory(), request.getUserId());
 
         if (request.getImagesList() != null && request.getImagesList().size() > 5) {
             throw new BadRequestException("You can upload up to 5 images.");
@@ -98,6 +98,7 @@ public class ProductService {
                 savedProduct.getDescription(),
                 savedProduct.getPrice(),
                 savedProduct.getQuantity(),
+                savedProduct.getCategory(),
                 savedProduct.getUserId(),
                 mediaIds,
                 savedProduct.getUserId().equals(currentUser.getCurrentUserId())
@@ -143,6 +144,7 @@ public class ProductService {
                             product.getDescription(),
                             product.getPrice(),
                             product.getQuantity(),
+                            product.getCategory(),
                             product.getUserId(),
                             images, // now includes images
                             product.getUserId().equals(currentUser.getCurrentUserId())
@@ -195,7 +197,8 @@ public class ProductService {
                 updatedProduct.getProductId(),
                 updatedProduct.getName(),
                 updatedProduct.getPrice(),
-                updatedProduct.getQuantity()
+                updatedProduct.getQuantity(),
+                updatedProduct.getCategory()
         ));
 
         // return the full, current list of images for the product (existing minus deleted + newly uploaded)
@@ -205,6 +208,7 @@ public class ProductService {
                 updatedProduct.getDescription(),
                 updatedProduct.getPrice(),
                 updatedProduct.getQuantity(),
+                updatedProduct.getCategory(),
                 updatedProduct.getUserId(),
                 newMediaIds,
                 updatedProduct.getUserId().equals(currentUser.getCurrentUserId())

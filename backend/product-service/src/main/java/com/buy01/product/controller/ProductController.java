@@ -67,6 +67,7 @@ public class ProductController {
                             p.getDescription(),
                             p.getPrice(),
                             p.getQuantity(),
+                            p.getCategory(),
                             p.getUserId(),
                             images,
                             currentUser != null && currentUser.getCurrentUserId().equals(p.getUserId())
@@ -98,6 +99,7 @@ public class ProductController {
                 p.getDescription(),
                 p.getPrice(),
                 p.getQuantity(),
+                p.getCategory(),
                 p.getUserId(),
                 images,
                 currentUser != null && currentUser.getCurrentUserId().equals(p.getUserId())
@@ -145,6 +147,7 @@ public class ProductController {
                 product.getDescription(),
                 product.getPrice(),
                 product.getQuantity(),
+                product.getCategory(),
                 product.getUserId(),
                 null,
                 false);

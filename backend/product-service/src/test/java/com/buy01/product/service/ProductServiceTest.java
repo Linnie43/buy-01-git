@@ -9,6 +9,7 @@ import com.buy01.product.dto.ProductUpdateRequest;
 import com.buy01.product.exception.ForbiddenException;
 import com.buy01.product.exception.NotFoundException;
 import com.buy01.product.model.Product;
+import com.buy01.product.model.ProductCategory;
 import com.buy01.product.model.Role;
 import com.buy01.product.repository.ProductRepository;
 import com.buy01.product.security.AuthDetails;
@@ -46,8 +47,8 @@ public class ProductServiceTest {
     private ProductService productService;
 
     static class TestProduct extends Product {
-        TestProduct(String productId, String name, String description, double price, int quantity, String userId) {
-            super(productId, name, description, price, quantity, userId);
+        TestProduct(String productId, String name, String description, double price, int quantity, ProductCategory category, String userId) {
+            super(productId, name, description, price, quantity, category, userId);
         }
     }
 
@@ -64,6 +65,7 @@ public class ProductServiceTest {
         when(request.getDescription()).thenReturn("A valid description");
         when(request.getPrice()).thenReturn(9.99);
         when(request.getQuantity()).thenReturn(5);
+        when(request.getCategory()).thenReturn(ProductCategory.ELECTRONICS);
         when(request.getUserId()).thenReturn("current-user-1"); // Use the actual user ID
         when(request.getImagesList()).thenReturn(null);
 
@@ -71,7 +73,7 @@ public class ProductServiceTest {
 
         when(productRepository.save(any(Product.class))).thenAnswer(invocation -> {
             Product p = invocation.getArgument(0);
-            return new TestProduct("prod-1", p.getName(), p.getDescription(), p.getPrice(), p.getQuantity(), p.getUserId());
+            return new TestProduct("prod-1", p.getName(), p.getDescription(), p.getPrice(), p.getQuantity(), p.getCategory(), p.getUserId());
         });
 
         ProductResponseDTO resp = productService.createProduct(request, new AuthDetails("current-user-1", Role.SELLER));
@@ -100,7 +102,7 @@ public class ProductServiceTest {
     void updateProduct_ownerUpdates_success() throws IOException {
 
         String productId = "prod-1";
-        Product existing = new TestProduct(productId, "Old", "old desc", 5.0, 2, "owner-1");
+        Product existing = new TestProduct(productId, "Old", "old desc", 5.0, 2, ProductCategory.HOME_APPLIANCES, "owner-1");
         when(productRepository.findById(productId)).thenReturn(Optional.of(existing));
 
         ProductUpdateRequest request = mock(ProductUpdateRequest.class);
@@ -108,13 +110,14 @@ public class ProductServiceTest {
         when(request.getDescription()).thenReturn("New desc");
         when(request.getPrice()).thenReturn(10.0);
         when(request.getQuantity()).thenReturn(3);
+        when(request.getCat)
         when(request.getDeletedImageIds()).thenReturn(List.of());
         when(request.getImages()).thenReturn(List.of());
 
         when(mediaClient.updateProductImages(eq(productId), anyList(), anyList())).thenReturn(List.of());
         when(productRepository.save(any(Product.class))).thenAnswer(invocation -> {
             Product p = invocation.getArgument(0);
-            return new TestProduct(productId, p.getName(), p.getDescription(), p.getPrice(), p.getQuantity(), p.getUserId());
+            return new TestProduct(productId, p.getName(), p.getDescription(), p.getPrice(), p.getQuantity(), p. p.getUserId());
         });
 
         ProductResponseDTO resp = productService.updateProduct(productId, request, new AuthDetails("owner-1", Role.SELLER));

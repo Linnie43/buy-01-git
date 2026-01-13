@@ -163,7 +163,7 @@ public class CartService {
             throw new NotFoundException("Cart not found");
         }
 
-        if (cart.getCartStatus() == CartStatus.ABANDONED) {
+        if (cart.getCartStatus() == CartStatus.ABANDONED && newStatus != CartStatus.ABANDONED) {
             reactivateCart(cart.getId());
         }
 

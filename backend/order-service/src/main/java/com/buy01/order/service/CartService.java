@@ -54,7 +54,7 @@ public class CartService {
         }
 
         if (cart.getCartStatus() == CartStatus.ABANDONED) {
-            cart = reactivateCart(cart.getId());
+            reactivateCart(cart.getId());
         }
 
         return cart;
@@ -114,7 +114,7 @@ public class CartService {
         }
 
         if (cart.getCartStatus() == CartStatus.ABANDONED) {
-            cart = reactivateCart(cart.getId());
+            reactivateCart(cart.getId());
         }
         validStatusForChanges(cart);
 
@@ -161,6 +161,10 @@ public class CartService {
         Cart cart = getCurrentCart(currentUser);
         if (cart == null) {
             throw new NotFoundException("Cart not found");
+        }
+
+        if (cart.getCartStatus() == CartStatus.ABANDONED) {
+            reactivateCart(cart.getId());
         }
 
         cart.setCartStatus(newStatus);
@@ -219,7 +223,7 @@ public class CartService {
 
     // Helper methods
 
-    public Cart reactivateCart(String cartId) {
+    public void reactivateCart(String cartId) {
         Cart cart = cartRepository.findById(cartId).orElseThrow();
 
         if (cart.getCartStatus() == CartStatus.ABANDONED) {
@@ -234,13 +238,11 @@ public class CartService {
                }
                 cart.setCartStatus(CartStatus.ACTIVE);
                 cart.setUpdateTime(new Date());
-                return cartRepository.save(cart);
            } catch (Exception e) {
                throw new OutOfStockException("Some items are no longer available.", e);
            }
 
         }
-        return cart;
 
     }
 

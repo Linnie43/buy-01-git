@@ -8,6 +8,7 @@ import com.buy01.product.exception.ConflictException;
 import com.buy01.product.exception.ForbiddenException;
 import com.buy01.product.exception.NotFoundException;
 import com.buy01.product.model.Product;
+import com.buy01.product.model.ProductCategory;
 import com.buy01.product.model.Role;
 import com.buy01.product.repository.ProductRepository;
 import com.buy01.product.security.AuthDetails;
@@ -15,6 +16,8 @@ import jakarta.ws.rs.BadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -22,6 +25,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.buy01.product.dto.ProductUpdateRequest;
 import com.buy01.product.dto.ProductCreateDTO;
@@ -69,7 +73,7 @@ public class ProductService {
         validateUserId(request.getUserId());
 
         Product product = new Product(request.getName().trim(), request.getDescription().trim(),
-                request.getPrice(), request.getQuantity(), request.getUserId());
+                request.getPrice(), request.getQuantity(), request.getCategory(), request.getUserId());
 
         if (request.getImagesList() != null && request.getImagesList().size() > 5) {
             throw new BadRequestException("You can upload up to 5 images.");
@@ -98,6 +102,7 @@ public class ProductService {
                 savedProduct.getDescription(),
                 savedProduct.getPrice(),
                 savedProduct.getQuantity(),
+                savedProduct.getCategory(),
                 savedProduct.getUserId(),
                 mediaIds,
                 savedProduct.getUserId().equals(currentUser.getCurrentUserId())
@@ -105,13 +110,20 @@ public class ProductService {
     }
 
     // Get all products, accessible by anyone (including unauthenticated users)
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
+    public Page<ProductResponseDTO> getAllProducts(String keyword, Double minPrice, Double maxPrice, ProductCategory category, Pageable pageable) {
+        if (keyword == null) {
+            keyword = "";
+        } else {
+            keyword = keyword.trim();
+        }
+        Page<Product> productPage = productRepository.findAllByFilters(keyword, minPrice, maxPrice, category, pageable);
+        return productPage.map(product -> mapToProductResponseDTO(product, null));
     }
 
     // Get product by id, public endpoint
-    public Product getProductById(String productId) {
+    public ProductResponseDTO getProductById(String productId, AuthDetails currentUser) {
         return productRepository.findById(productId)
+                .map(product -> mapToProductResponseDTO(product, currentUser))
                 .orElseThrow(() -> new NotFoundException(productId));
     }
 
@@ -132,22 +144,7 @@ public class ProductService {
         }
 
         return products.stream()
-                .map(product -> {
-                    // fetch images for each product
-                    List<String> images = getProductImageIds(product.getProductId());
-                    if (images == null) images = Collections.emptyList();
-
-                    return new ProductResponseDTO(
-                            product.getProductId(),
-                            product.getName(),
-                            product.getDescription(),
-                            product.getPrice(),
-                            product.getQuantity(),
-                            product.getUserId(),
-                            images, // now includes images
-                            product.getUserId().equals(currentUser.getCurrentUserId())
-                    );
-                })
+                .map(product -> mapToProductResponseDTO(product, currentUser))
                 .toList();
     }
 
@@ -185,6 +182,7 @@ public class ProductService {
         product.setDescription(request.getDescription().trim());
         product.setPrice(request.getPrice());
         product.setQuantity(request.getQuantity());
+        product.setCategory(request.getCategory());
         product.setUpdateTime(new Date());
 
 
@@ -195,7 +193,8 @@ public class ProductService {
                 updatedProduct.getProductId(),
                 updatedProduct.getName(),
                 updatedProduct.getPrice(),
-                updatedProduct.getQuantity()
+                updatedProduct.getQuantity(),
+                updatedProduct.getCategory()
         ));
 
         // return the full, current list of images for the product (existing minus deleted + newly uploaded)
@@ -205,6 +204,7 @@ public class ProductService {
                 updatedProduct.getDescription(),
                 updatedProduct.getPrice(),
                 updatedProduct.getQuantity(),
+                updatedProduct.getCategory(),
                 updatedProduct.getUserId(),
                 newMediaIds,
                 updatedProduct.getUserId().equals(currentUser.getCurrentUserId())
@@ -273,6 +273,23 @@ public class ProductService {
     }
 
     // Helper methods
+
+    public ProductResponseDTO mapToProductResponseDTO(Product product, AuthDetails currentUser) {
+        List<String> images = getProductImageIds(product.getProductId());
+        if (images == null) images = Collections.emptyList();
+
+        return new ProductResponseDTO(
+                product.getProductId(),
+                product.getName(),
+                product.getDescription(),
+                product.getPrice(),
+                product.getQuantity(),
+                product.getCategory(),
+                product.getUserId(),
+                images,
+                currentUser != null && product.getUserId().equals(currentUser.getCurrentUserId())
+        );
+    }
 
     private void validateProductName(String productName) {
         if (productName == null || productName.isBlank()) {

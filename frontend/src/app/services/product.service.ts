@@ -1,9 +1,12 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of, map } from 'rxjs';
 import { Product } from '../models/product.model';
 import { PRODUCT_BASE_URL } from '../constants/constants';
 import { tap } from 'rxjs/operators';
+import { ProductCategory } from '../models/product.model';
+
+
 @Injectable({
   providedIn: 'root'
 })
@@ -27,6 +30,7 @@ export class ProductService {
         description: item.description,
         price: item.price,
         quantity: item.quantity,
+        category: item.category,
         ownerId: item.ownerId,
         images: imagePaths.length > 0 ? imagePaths : ['assets/product_image_placeholder.png'],
         isProductOwner: item.isProductOwner
@@ -34,9 +38,22 @@ export class ProductService {
     }
 
     // getting all products with the http call
-    getAllProducts(): Observable<Product[]> {
-      return this.http.get<any[]>(this.apiUrl).pipe(
-        map(products => products.map(p => this.mapProduct(p)))
+    getAllProducts(name?: string, min?: number, max?: number, category?: ProductCategory, page: number = 0, size: number = 10): Observable<{ products: Product[]; total: number }> {
+      let params: any = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('sort', 'createdAt,desc');
+
+      if (name?.trim()) params = params.set('name', name);
+      if (min !== undefined) params = params.set('min', min.toString());
+      if (max !== undefined) params = params.set('max', max.toString());
+      if (category) params = params.set('category', category);
+
+      return this.http.get<any>(this.apiUrl, { params }).pipe(
+        map(res => ({
+          products: res.content.map((p: any) => this.mapProduct(p)),
+          total: res.totalElements
+        }))
       );
     }
 

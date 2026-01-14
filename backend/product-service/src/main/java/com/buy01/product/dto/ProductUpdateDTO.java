@@ -1,5 +1,6 @@
 package com.buy01.product.dto;
 
+import com.buy01.product.model.ProductCategory;
 import jakarta.validation.constraints.*;
 
 public class ProductUpdateDTO {
@@ -16,14 +17,16 @@ public class ProductUpdateDTO {
     @Min(value = 0, message = "Quantity cannot be negative")
     @Max(value = 1000, message = "Quantity cannot exceed 1000")
     private int quantity;
+    private ProductCategory category;
 
     public ProductUpdateDTO() {}
 
-    public ProductUpdateDTO(String productId, String name, double price, int quantity) {
+    public ProductUpdateDTO(String productId, String name, double price, int quantity, ProductCategory category) {
         this.productId = productId;
         this.name = name;
         this.price = price;
         this.quantity = quantity;
+        this.category = category;
     }
 
     public String getProductId() { return productId; }
@@ -37,5 +40,8 @@ public class ProductUpdateDTO {
 
     public int getQuantity() { return quantity; }
     public void setQuantity(int quantity) { this.quantity = quantity; }
+
+    public ProductCategory getCategory() { return category; }
+    public void setCategory(ProductCategory category) { this.category = category; }
 
 }

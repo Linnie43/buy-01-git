@@ -7,6 +7,7 @@ End‑to‑end e‑commerce system built with Spring Boot microservices and an A
 * **User Service** – registration, login (JWT), roles (CLIENT, SELLER), profile.
 * **Product Service** – CRUD for products, ownership checks, image refs.
 * **Media Service** – image upload/download, storing images on server, 2MB limit, MIME validation.
+* **Order Service** – add items to cart, order placement, order history.
 * **Gateway** – routing, CORS, JWT validation.
 * **Discovery** – service discovery.
 * **Frontend** – Angular SPA with routing, guards, interceptors.
@@ -19,8 +20,8 @@ End‑to‑end e‑commerce system built with Spring Boot microservices and an A
 
 * Separate microservices.
 * JWT Authentication.
-* Sellers: create/edit/delete products and upload/delete images as well as profile avatar.
-* Clients: browse products.
+* Sellers: upload/delete profile avatar, sales and product dashboards.
+* Clients: add products to cart, place orders, view order history.
 * Image validation (image/*, max 2MB).
 
 ### Frontend

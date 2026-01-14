@@ -83,7 +83,7 @@ public class ProductServiceTest {
         assertNotNull(resp);
         assertEquals("prod-1", resp.getProductId());
         assertEquals("Valid Name", resp.getName());
-        assertEquals("current-user-1", resp.getOwnerId());
+        assertEquals("current-user-1", resp.getUserId());
     }
 
     @Test

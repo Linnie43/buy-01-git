@@ -148,19 +148,27 @@ public class ProductController {
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping("internal/cancel/{productId}")
+    public ResponseEntity<Void> returnCancelledItemToStock(
+            @PathVariable String productId,
+            @RequestBody int quantityToReturn
+    ) {
+        log.info("Return cancelled order quantity to stock: {} {}", productId, quantityToReturn);
+        productService.returnCancelledItemToStock(productId, quantityToReturn);
+        return ResponseEntity.ok().build();
+    }
+
 
     // update a specific product by ID
     @PutMapping("/{productId}")
-    public ResponseEntity<?> updateProduct(
+    public ResponseEntity<ProductResponseDTO> updateProduct(
             @RequestHeader("Authorization") String authHeader,
             @PathVariable String productId,
             @Valid @ModelAttribute ProductUpdateRequest request) throws IOException {
 
         AuthDetails currentUser = securityUtils.getAuthDetails(authHeader);
 
-        ProductResponseDTO updated = productService.updateProduct(productId, request, currentUser);
-
-        return ResponseEntity.ok(updated);
+        return ResponseEntity.ok(productService.updateProduct(productId, request, currentUser));
     }
 
 

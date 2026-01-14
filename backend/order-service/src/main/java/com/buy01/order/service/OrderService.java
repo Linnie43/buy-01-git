@@ -43,6 +43,7 @@ public class OrderService {
                 .toList();
         List<ItemDTO> topItems = orderRepository.findTopItemsByUserId(currentUser.getCurrentUserId(), 3);
         double totalSum = orders.stream()
+                .filter(order -> order.getStatus() != OrderStatus.CANCELLED)
                 .mapToDouble(Order::getTotalPrice)
                 .sum();
 
@@ -51,33 +52,39 @@ public class OrderService {
     }
 
     public OrderDashboardDTO getSellerOrders(AuthDetails currentUser) {
-        List<Order> orders = orderRepository.findByItemsSellerId(currentUser.getCurrentUserId());
+        List<Order> allOrders = orderRepository.findByItemsSellerId(currentUser.getCurrentUserId());
 
-        List<OrderResponseDTO> sellerOrders = orders.stream()
-                .map(order -> filterOrderForSeller(order, currentUser)) // filter items for the current seller
-                .map(this::mapToDTO)
+        List<OrderResponseDTO> sellerOrders = allOrders.stream()
+                .map(order -> mapToSellerDTO(order, currentUser))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .toList();
 
         List<ItemDTO> topItems = orderRepository.findTopItemsBySellerId(currentUser.getCurrentUserId(), 3);
+
         double totalSum = sellerOrders.stream()
+                .filter(order -> order.getStatus() != OrderStatus.CANCELLED)
                 .mapToDouble(OrderResponseDTO::getTotalPrice)
                 .sum();
 
         return new OrderDashboardDTO(sellerOrders, topItems, totalSum);
-
-}
+    }
 
     public OrderResponseDTO getOrderById(String orderId, AuthDetails currentUser) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new NotFoundException("Order not found with orderId: " + orderId));
 
         log.info("getOrderById: {}", orderId);
-       OrderResponseDTO response = (order.getUserId().equals(currentUser.getCurrentUserId())
-                    || currentUser.getRole().equals(Role.ADMIN))
-                    ? mapToDTO(order) // normal mapping for client and admin
-                    : mapToDTO(filterOrderForSeller(order, currentUser)); // seller gets only filtered items
-        log.info("OrderResponseDTO prepared for orderId: {}", response.getTotalPrice());
-        return response;
+        if (currentUser.getRole().equals(Role.SELLER)) {
+            return mapToSellerDTO(order, currentUser)
+                    .orElseThrow(() -> new ForbiddenException("Access denied to order with orderId: " + orderId + " for userId: " + currentUser.getCurrentUserId()));
+        }
+
+        if (!order.getUserId().equals(currentUser.getCurrentUserId()) && !currentUser.getRole().equals(Role.ADMIN)) {
+            throw new ForbiddenException("Access denied to order with orderId: " + orderId + " for userId: " + currentUser.getCurrentUserId());
+        }
+
+        return mapToDTO(order);
     }
 
     public OrderResponseDTO createOrder(OrderCreateDTO orderCreateDTO, AuthDetails currentUser) throws IOException {
@@ -110,8 +117,10 @@ public class OrderService {
         Order existingOrder = orderRepository.findById(orderId)
                 .orElseThrow(() -> new NotFoundException("Order not found with orderId: " + orderId));
 
+        boolean isSeller = isSellerOfItemsInOrder(existingOrder, currentUser.getCurrentUserId());
+
         if (!existingOrder.getUserId().equals(currentUser.getCurrentUserId())
-                && !currentUser.getRole().equals(Role.ADMIN)) {
+                && !currentUser.getRole().equals(Role.ADMIN) && !isSeller) {
             throw new ForbiddenException("Access denied to update order with orderId: " + orderId + " for userId: " + currentUser.getCurrentUserId());
         }
 
@@ -128,7 +137,7 @@ public class OrderService {
         if (!existingOrder.getStatus().canTransitionTo(orderUpdate.getStatus())) {
             throw new BadRequestException(
                     "Order has status " + existingOrder.getStatus() +
-                    " and cannot be updated to " + orderUpdate.getStatus()
+                            " and cannot be updated to " + orderUpdate.getStatus()
             );
         }
 
@@ -153,7 +162,7 @@ public class OrderService {
         if (!isAdmin && !isOwnerAndCreated) {
             throw new ForbiddenException(
                     "Only ADMIN can delete orders that have been confirmed. Order status is " + existingOrder.getStatus()
-                    + ". Access denied for userId: " + currentUser.getCurrentUserId()
+                            + ". Access denied for userId: " + currentUser.getCurrentUserId()
             );
         }
         restoreProductStock(existingOrder.getItems());
@@ -161,6 +170,9 @@ public class OrderService {
     }
 
     // Helper methods
+    private boolean isSellerOfItemsInOrder(Order order, String sellerId) {
+        return order.getItems().stream().anyMatch(item -> item.getSellerId().equals(sellerId));
+    }
 
     // convert OrderItem to ItemDTO
     public ItemDTO toItemDTO(OrderItem item) {
@@ -176,13 +188,6 @@ public class OrderService {
 
     // map Order to OrderResponseDTO
     private OrderResponseDTO mapToDTO(Order order) {
-        log.info("mapToDTO: fullName {}, street {}, postalCode {}, city {}, country {}",
-                order.getShippingAddress().getFullName(),
-                order.getShippingAddress().getStreet(),
-                order.getShippingAddress().getPostalCode(),
-                order.getShippingAddress().getCity(),
-                order.getShippingAddress().getCountry()
-        );
         return new OrderResponseDTO(
                 order.getId(),
                 order.getItems().stream()
@@ -199,23 +204,37 @@ public class OrderService {
         );
     }
 
-    // filter order items for a specific seller
-    private Order filterOrderForSeller(Order order, AuthDetails currentUser) {
-        if (!currentUser.getRole().equals(Role.SELLER)) {
-            throw new ForbiddenException("Access denied to order with orderId: " + order.getId() + " for userId: " + currentUser.getCurrentUserId());
-        }
-        List<OrderItem> filteredItems = order.getItems().stream()
+    private Optional<OrderResponseDTO> mapToSellerDTO(Order order, AuthDetails currentUser) {
+        List<OrderItem> sellerItems = order.getItems().stream()
                 .filter(item -> item.getSellerId().equals(currentUser.getCurrentUserId()))
                 .toList();
-        if (filteredItems.isEmpty()) {
-            throw new ForbiddenException("Access denied to order with orderId: " + order.getId() + " for userId: " + currentUser.getCurrentUserId());
+
+        if (sellerItems.isEmpty()) {
+            return Optional.empty();
         }
-        order.setItems(filteredItems);
-        double sellerTotal = filteredItems.stream()
+
+        List<ItemDTO> sellerItemDTOs = sellerItems.stream()
+                .map(this::toItemDTO)
+                .toList();
+
+        double sellerTotal = sellerItems.stream()
                 .mapToDouble(item -> item.getPrice() * item.getQuantity())
                 .sum();
-        order.setTotalPrice(sellerTotal);
-        return order;
+
+        OrderResponseDTO sellerOrderDTO = new OrderResponseDTO(
+                order.getId(),
+                sellerItemDTOs,
+                sellerTotal,
+                order.getStatus(),
+                new ShippingAddressMaskedDTO(order.getShippingAddress()),
+                order.isPaid(),
+                order.getDeliveryDate(),
+                order.getTrackingNumber(),
+                order.getCreatedAt(),
+                order.getUpdatedAt()
+        );
+
+        return Optional.of(sellerOrderDTO);
     }
 
     // update reserved quantity for each ordered product in product service
@@ -227,7 +246,7 @@ public class OrderService {
 
     public void restoreProductStock(List<OrderItem> orderItems) {
         for (OrderItem orderItem : orderItems) {
-            productClient.updateQuantity(orderItem.getProductId(), orderItem.getQuantity());
+            productClient.cancelOrder(orderItem.getProductId(), orderItem.getQuantity());
         }
     }
 

@@ -15,7 +15,7 @@ describe('ProductService', () => {
     description: 'A great product',
     price: 99.99,
     quantity: 10,
-    ownerId: 'user-1',
+    userId: 'user-1',
     images: ['image1.jpg'],
     isProductOwner: true
   };
@@ -26,7 +26,7 @@ describe('ProductService', () => {
     description: 'A great product',
     price: 99.99,
     quantity: 10,
-    ownerId: 'user-1',
+    userId: 'user-1',
     images: ['image1.jpg'],
     isProductOwner: true
   };

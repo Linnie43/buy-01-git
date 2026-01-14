@@ -144,7 +144,11 @@ button:hover, .btn:hover, .btn:active, button:active, .btn:focus-visible, button
   margin-bottom: 30px;
 }
 
-.snack-bar-success .mat-mdc-snack-bar-action:hover,
+.snack-bar-success .mat-mdc-snack-bar-action:hover {
+  color: #c8e6c9;
+  background-color: var(--border-color);
+}
+
 .snack-bar-error .mat-mdc-snack-bar-action:hover {
   color: #ffcdd2;
   background-color: var(--border-color);

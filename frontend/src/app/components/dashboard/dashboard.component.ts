@@ -87,7 +87,7 @@ export class DashboardComponent implements OnInit {
       case 'price_desc': sortParam = 'price,desc'; break;
       case 'alpha_asc': sortParam = 'name,asc'; break;
       case 'alpha_desc': sortParam = 'name,desc'; break;
-      case 'latest': default: sortParam = 'createdAt,desc'; break;
+      case 'latest': default: sortParam = 'createTime,desc'; break;
     }
 
     this.productService.getAllProducts(

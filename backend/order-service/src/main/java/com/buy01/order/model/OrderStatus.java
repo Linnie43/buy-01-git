@@ -1,5 +1,6 @@
 package com.buy01.order.model;
 
+import java.util.Collections;
 import java.util.Set;
 
 public enum OrderStatus {
@@ -19,8 +20,20 @@ public enum OrderStatus {
         CANCELLED.allowedNext = Set.of();
     }
 
+    public Set<OrderStatus> getAllowedNext() {
+        return allowedNext == null ? Collections.emptySet() : allowedNext;
+    }
+
     public boolean canTransitionTo(OrderStatus next) {
         return allowedNext.contains(next);
+
+    }
+
+    public OrderStatus getNextActiveStatus() {
+        return getAllowedNext().stream()
+                .filter(status -> status != CANCELLED)
+                .findFirst()
+                .orElse(null); // Return null if no next active status exists (e.g., DELIVERED)
     }
 }
 

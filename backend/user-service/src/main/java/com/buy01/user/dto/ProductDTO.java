@@ -13,8 +13,7 @@ public class ProductDTO {
     private List<String> images;
     private Boolean isProductOwner;
 
-    public ProductDTO() {
-    }
+    public ProductDTO() {}
 
     public ProductDTO(String productId, String name, String description, double price, int quantity, String userId,
             List<String> images, Boolean isProductOwner) {

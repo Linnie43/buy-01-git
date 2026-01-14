@@ -160,6 +160,7 @@ public class ProductService {
         validateProductDescription(request.getDescription());
         validateProductPrice(request.getPrice());
         validateProductQuantity(request.getQuantity());
+        if (request.getCategory() == null) request.setCategory(ProductCategory.OTHER);
 
         // VALIDATE AND HANDLE IMAGES
 
@@ -169,6 +170,7 @@ public class ProductService {
         if (request.getImages() == null) {
             request.setImages(List.of());
         }
+
 
         List<String> newMediaIds = mediaClient.updateProductImages(
                 productId,

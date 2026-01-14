@@ -1,6 +1,7 @@
 package com.buy01.product.dto;
 
 import com.buy01.product.model.ProductCategory;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 
 public class ProductUpdateDTO {
@@ -17,6 +18,8 @@ public class ProductUpdateDTO {
     @Min(value = 0, message = "Quantity cannot be negative")
     @Max(value = 1000, message = "Quantity cannot exceed 1000")
     private int quantity;
+    @NotNull
+    @Valid
     private ProductCategory category;
 
     public ProductUpdateDTO() {}

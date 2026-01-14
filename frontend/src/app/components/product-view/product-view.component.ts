@@ -22,6 +22,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class ProductViewComponent implements OnInit {
   product: Product | null = null;
+  isSeller = false;
   isLoggedIn = false;
   selectedQuantity = 1;
   cart: CartResponseDTO | null = null;
@@ -39,6 +40,7 @@ export class ProductViewComponent implements OnInit {
 
   ngOnInit(): void {
       this.isLoggedIn = this.authService.isLoggedIn();
+      this.isSeller = this.authService.getUserRole() === 'SELLER';
       const productId = this.route.snapshot.paramMap.get('id');
         if (productId) {
           this.productService.getProductById(productId).subscribe({

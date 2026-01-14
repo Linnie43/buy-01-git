@@ -1,5 +1,6 @@
 package com.buy01.product.dto;
 
+import com.buy01.product.model.ProductCategory;
 import jakarta.validation.constraints.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,6 +27,8 @@ public class ProductCreateDTO {
     @Max(value = 1000, message = "Quantity cannot exceed 1000")
     private Integer quantity;
 
+    private ProductCategory category;
+
     @Size(max = 5, message = "You can upload up to 5 images")
     private List<MultipartFile> imagesList;
 
@@ -42,6 +45,9 @@ public class ProductCreateDTO {
 
     public Integer getQuantity() { return quantity; }
     public void setQuantity(Integer quantity) { this.quantity = quantity; }
+
+    public ProductCategory getCategory() { return category; }
+    public void setCategory(ProductCategory category) { this.category = category; }
 
     public List<MultipartFile> getImagesList() { return imagesList; }
     public void setImagesList(List<MultipartFile> imagesList) { this.imagesList = imagesList; }

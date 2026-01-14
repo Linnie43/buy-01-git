@@ -10,17 +10,19 @@ public class ProductResponseDTO {
     private double price;
     private int quantity;
     private String userId;
+    private ProductCategory category;
     private List<String> images;
     private Boolean isProductOwner;
 
     public ProductResponseDTO() {}
 
-    public ProductResponseDTO(String productId, String name, String description, double price, int quantity, String userId, List<String> images, Boolean isProductOwner) {
+    public ProductResponseDTO(String productId, String name, String description, double price, int quantity, ProductCategory category, String userId, List<String> images, Boolean isProductOwner) {
         this.productId = productId;
         this.name = name;
         this.description = description;
         this.price = price;
         this.quantity = quantity;
+        this.category = category;
         this.userId = userId;
         this.images = images;
         this.isProductOwner = isProductOwner;
@@ -40,6 +42,9 @@ public class ProductResponseDTO {
 
     public int getQuantity() { return quantity; }
     public void setQuantity(int quantity) { this.quantity = quantity; }
+
+    public ProductCategory getCategory() { return category; }
+    public void setCategory(ProductCategory category) { this.category = category; }
 
     public String getUserId() { return userId; }
     public void setUserId(String userId) { this.userId = userId; }

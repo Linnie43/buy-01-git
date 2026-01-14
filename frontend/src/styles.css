@@ -139,3 +139,13 @@ button:hover, .btn:hover, .btn:active, button:active, .btn:focus-visible, button
 .dashboard-bg {
   background-color: var(--primary-color);
 }
+
+.cdk-global-overlay-wrapper .mdc-snackbar {
+  margin-bottom: 30px;
+}
+
+.snack-bar-success .mat-mdc-snack-bar-action:hover,
+.snack-bar-error .mat-mdc-snack-bar-action:hover {
+  color: #ffcdd2;
+  background-color: var(--border-color);
+}

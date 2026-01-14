@@ -1,17 +1,22 @@
 package com.buy01.product.controller;
 
+import com.buy01.product.exception.NotFoundException;
 import com.buy01.product.model.Product;
+import com.buy01.product.model.ProductCategory;
 import com.buy01.product.model.Role;
+import com.buy01.product.repository.ProductRepository;
 import com.buy01.product.security.AuthDetails;
 import com.buy01.product.service.ProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Pageable;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import com.buy01.product.dto.ProductResponseDTO;
 import com.buy01.product.security.SecurityUtils;
@@ -24,12 +29,14 @@ import jakarta.validation.Valid;
 public class ProductController {
 
     private final ProductService productService;
+    private final ProductRepository productRepository;
     private final SecurityUtils securityUtils;
     private static final Logger log = LoggerFactory.getLogger(ProductController.class);
 
 
-    public ProductController(ProductService productService, SecurityUtils securityUtils) {
+    public ProductController(ProductService productService, ProductRepository productRepository, SecurityUtils securityUtils) {
         this.productService = productService;
+        this.productRepository = productRepository;
         this.securityUtils = securityUtils;
     }
 
@@ -53,26 +60,15 @@ public class ProductController {
 
     // get all products
     @GetMapping
-    public List<ProductResponseDTO> getAllProducts(
-            @RequestHeader(value = "Authorization", required = false) String authHeader
+    public ResponseEntity<Page<ProductResponseDTO>> getAllProducts(
+            @RequestParam(value = "search", required = false) String keyword,
+            @RequestParam(value = "minPrice", required = false) Double minPrice,
+            @RequestParam(value = "maxPrice", required = false) Double maxPrice,
+            @RequestParam(value = "category", required = false) ProductCategory category,
+            @PageableDefault(size = 10, sort = "createdAt") Pageable pageable
             ) {
-        final AuthDetails currentUser = (authHeader != null) ? securityUtils.getAuthDetails(authHeader) : null;
 
-        return productService.getAllProducts().stream()
-                .map(p -> {
-                    List<String> images = productService.getProductImageIds(p.getProductId());
-                    return new ProductResponseDTO(
-                            p.getProductId(),
-                            p.getName(),
-                            p.getDescription(),
-                            p.getPrice(),
-                            p.getQuantity(),
-                            p.getUserId(),
-                            images,
-                            currentUser != null && currentUser.getCurrentUserId().equals(p.getUserId())
-                    );
-                })
-                .toList();
+        return ResponseEntity.ok(productService.getAllProducts(keyword, minPrice, maxPrice, category, pageable));
     }
 
 
@@ -82,28 +78,9 @@ public class ProductController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable String productId) {
 
-        AuthDetails currentUser = null;
+        final AuthDetails currentUser = (authHeader != null) ? securityUtils.getAuthDetails(authHeader) : null;
 
-        if (authHeader != null) {
-            currentUser = securityUtils.getAuthDetails(authHeader);
-        }
-
-        Product p = productService.getProductById(productId);
-        List<String> images = productService.getProductImageIds(p.getProductId());
-        if (images == null) images = Collections.emptyList();
-
-        ProductResponseDTO product = new ProductResponseDTO(
-                p.getProductId(),
-                p.getName(),
-                p.getDescription(),
-                p.getPrice(),
-                p.getQuantity(),
-                p.getUserId(),
-                images,
-                currentUser != null && currentUser.getCurrentUserId().equals(p.getUserId())
-        );
-
-        return ResponseEntity.ok(product);
+        return ResponseEntity.ok(productService.getProductById(productId, currentUser));
     }
 
     // get all products of the current logged-in user
@@ -136,8 +113,8 @@ public class ProductController {
             @PathVariable String productId
     ) {
 
-        Product product = productService.getProductById(productId);
-        log.info("Get product and price: {} {} {} {} {}", product.getProductId(), product.getPrice(), product.getName(), product.getQuantity(), product.getUserId() );
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new NotFoundException("Product not found with ID: " + productId));
 
         return new ProductResponseDTO(
                 product.getProductId(),
@@ -145,6 +122,7 @@ public class ProductController {
                 product.getDescription(),
                 product.getPrice(),
                 product.getQuantity(),
+                product.getCategory(),
                 product.getUserId(),
                 null,
                 false);

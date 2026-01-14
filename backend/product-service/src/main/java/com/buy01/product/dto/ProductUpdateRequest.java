@@ -1,5 +1,7 @@
 package com.buy01.product.dto;
 
+import com.buy01.product.model.ProductCategory;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,6 +29,10 @@ public class ProductUpdateRequest {
     @Max(value = 1000, message = "Quantity cannot exceed 1000")
     private Integer quantity;
 
+    @Valid
+    @NotNull
+    private ProductCategory category;
+
     private List<String> deletedImageIds = new ArrayList<>();
 
     @Size(max = 5, message = "You can upload up to 5 images")
@@ -35,11 +41,12 @@ public class ProductUpdateRequest {
     private String userId;
 
     public ProductUpdateRequest() {}
-    public ProductUpdateRequest(String name, String description, Double price, Integer quantity, List<String> deletedImageIds, List<MultipartFile> images, String userId) {
+    public ProductUpdateRequest(String name, String description, Double price, Integer quantity, ProductCategory category, List<String> deletedImageIds, List<MultipartFile> images, String userId) {
         this.name = name;
         this.description = description;
         this.price = price;
         this.quantity = quantity;
+        this.category = category;
         this.deletedImageIds = deletedImageIds;
         this.images = images;
         this.userId = userId;
@@ -56,6 +63,9 @@ public class ProductUpdateRequest {
 
     public Integer getQuantity() { return quantity; }
     public void setQuantity(Integer quantity) { this.quantity = quantity; }
+
+    public ProductCategory getCategory() { return category; }
+    public void setCategory(ProductCategory category) { this.category = category; }
 
     public List<String> getDeletedImageIds() { return deletedImageIds; }
     public void setDeletedImageIds(List<String> deletedImageIds) { this.deletedImageIds = deletedImageIds; }

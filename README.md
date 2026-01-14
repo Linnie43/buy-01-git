@@ -111,6 +111,12 @@ The following components start:
 * kafka
 * angular-frontend
 
+To start only one microservice, use:
+
+```
+docker compose up -d --no-deps --build <service-name from docker-compose.yml>
+```
+
 ### 4. Access Points
 
 * **Frontend:** [https://localhost:4200](https://localhost:4200)

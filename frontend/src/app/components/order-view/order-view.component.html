@@ -7,7 +7,7 @@
         <p class="text-muted mb-0">Placed on {{ order.createdAt | date:'mediumDate' }}</p>
       </div>
       <div class="text-end">
-        <h3 class="text-primary">{{ order.totalPrice | currency:'EUR':'symbol' }}</h3>
+        <h3>{{ order.totalPrice | currency:'EUR':'symbol' }}</h3>
         <span class="badge rounded-pill"
               [ngClass]="{
                 'bg-warning text-dark': order.status === 'CREATED',
@@ -69,7 +69,7 @@
           </div>
 
           <div class="text-end">
-            <div class="fw-bold fs-5 text-primary">
+            <div class="fw-bold fs-5">
               {{ (item.price * item.quantity) | currency:'EUR':'symbol' }}
             </div>
             <div class="text-muted small">
@@ -87,7 +87,7 @@
       </button>
       <button *ngIf="!isSeller && (order.status === 'CREATED' || order.status === 'CONFIRMED')"
               (click)="cancelOrder()"
-              class="btn btn-outline-danger">
+              class="btn btn-outline-danger ms-2">
         <i class="bi bi-x-circle me-2"></i>Cancel Order
       </button>
 
@@ -96,12 +96,12 @@
       </div>
     </div>
 
-    <div *ngIf="showReorderModal" class="reorder-modal-overlay">
+    <div *ngIf="showReorderModal" class="reorder-modal-overlay mt-3">
       <div class="card shadow reorder-modal-content">
         <div class="card-body">
           <h5 class="card-title fw-bold">Confirm Re-Order</h5>
           <p class="card-text text-muted">
-            All items from this order will be added to your cart with their <strong>current prices</strong>. 
+            All items from this order will be added to your cart with their <strong>current prices</strong>.
             We will add the same quantity or the maximum available stock.
           </p>
           <div class="alert alert-warning py-2 small">

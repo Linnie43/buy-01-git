@@ -33,7 +33,7 @@ export class DashboardComponent implements OnInit {
 
         // getting the products from the backend
         this.productService.getAllProducts(
-          undefined, undefined, undefined, 0, 10
+          undefined, undefined, undefined, undefined, 0, 10
         ).subscribe({
           next: (data: { products: Product[]; total: number }) => {
             this.products = data.products.reverse();

@@ -144,23 +144,7 @@ public class ProductService {
         }
 
         return products.stream()
-                .map(product -> {
-                    // fetch images for each product
-                    List<String> images = getProductImageIds(product.getProductId());
-                    if (images == null) images = Collections.emptyList();
-
-                    return new ProductResponseDTO(
-                            product.getProductId(),
-                            product.getName(),
-                            product.getDescription(),
-                            product.getPrice(),
-                            product.getQuantity(),
-                            product.getCategory(),
-                            product.getUserId(),
-                            images, // now includes images
-                            product.getUserId().equals(currentUser.getCurrentUserId())
-                    );
-                })
+                .map(product -> mapToProductResponseDTO(product, currentUser))
                 .toList();
     }
 
@@ -198,6 +182,7 @@ public class ProductService {
         product.setDescription(request.getDescription().trim());
         product.setPrice(request.getPrice());
         product.setQuantity(request.getQuantity());
+        product.setCategory(request.getCategory());
         product.setUpdateTime(new Date());
 
 

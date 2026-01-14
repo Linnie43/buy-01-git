@@ -74,8 +74,6 @@ export class ProductViewComponent implements OnInit {
           this.cart = res;
            this.snackBar.open('Product added to cart!', 'Close', {
                   duration: 3000,
-                  verticalPosition: 'top',
-                  horizontalPosition: 'right',
                   panelClass: ['snack-bar-success']
                 });
         },
@@ -83,8 +81,6 @@ export class ProductViewComponent implements OnInit {
           console.error('Cannot add to cart', err);
           this.snackBar.open('Cannot add more than available quantity!', 'Close', {
                   duration: 3000,
-                  verticalPosition: 'top',
-                  horizontalPosition: 'right',
                   panelClass: ['snack-bar-error']
                 });
         }

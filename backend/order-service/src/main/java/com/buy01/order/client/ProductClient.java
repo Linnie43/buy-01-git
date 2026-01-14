@@ -71,4 +71,18 @@ public class ProductClient {
             throw e;
         }
     }
+
+    public void cancelOrder(String productId, int quantity) {
+        try {
+            String url = productServiceBaseUrl + "/internal/cancel/" + productId;
+            restTemplate.put(url, -quantity);
+        } catch (HttpClientErrorException e) {
+
+            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
+                throw new NotFoundException("Product not found with ID: " + productId);
+            }
+
+            throw e;
+        }
+    }
 }

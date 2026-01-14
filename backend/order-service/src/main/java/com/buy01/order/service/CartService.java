@@ -86,7 +86,7 @@ public class CartService {
         if (product == null) throw new NotFoundException("Product not found");
         if (product.getQuantity() <= 0) throw new OutOfStockException("Product is out of stock");
 
-        log.info("newItem ID {}, name {}, quantity {}, price {}", newItem.getProductId(), product.getProductName(), newItem.getQuantity(), product.getProductPrice());
+        log.info("newItem ID {}, sellerId {}", newItem.getProductId(), product.getSellerId());
         OrderItem itemAdded = new OrderItem(product.getProductId(), product.getProductName(), newItem.getQuantity(), product.getProductPrice(), product.getSellerId()); // create new order item
 
         addOrUpdateItemInCart(cart, itemAdded); // add or update item in cart

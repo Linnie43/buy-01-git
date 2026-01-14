@@ -13,7 +13,7 @@ const mockProduct: Product = {
   price: 100,
   description: 'A great product',
   quantity: 10,
-  ownerId: 'owner1'
+  userId: 'owner1'
 };
 
 describe('ProductViewComponent', () => {

@@ -7,8 +7,8 @@ import { AuthService } from '../../services/auth.service';
 import { Product } from '../../models/product.model';
 
 const mockProducts: Product[] = [
-  { productId: '1', name: 'Product A', price: 10, description: 'A', quantity: 5, ownerId: 'owner1', images: [] },
-  { productId: '2', name: 'Product B', price: 20, description: 'B', quantity: 10, ownerId: 'owner2', images: [] },
+  { productId: '1', name: 'Product A', price: 10, description: 'A', quantity: 5, userId: 'owner1', images: [] },
+  { productId: '2', name: 'Product B', price: 20, description: 'B', quantity: 10, userId: 'owner2', images: [] },
 ];
 
 describe('DashboardComponent', () => {

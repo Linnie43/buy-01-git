@@ -4,7 +4,7 @@ export interface Product {
   description: string;
   price: number;
   quantity: number;
-  ownerId: string;
+  userId: string;
   category?: ProductCategory;
   images?: string[];
   isProductOwner?: boolean;

@@ -30,7 +30,7 @@ describe('SellerProfileComponent', () => {
         description: 'Description 1',
         price: 100,
         quantity: 5,
-        ownerId: 'u1',
+        userId: 'u1',
         images: ['img1.jpg'],
         isProductOwner: true
       },
@@ -40,7 +40,7 @@ describe('SellerProfileComponent', () => {
         description: 'Description 2',
         price: 200,
         quantity: 2,
-        ownerId: 'u1'
+        userId: 'u1'
       }
     ]
   };

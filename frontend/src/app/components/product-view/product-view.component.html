@@ -10,6 +10,13 @@
 
       <!-- details column with description -->
       <div class="col-md-6 d-flex flex-column product-details">
+
+        <div class="mb-2">
+            <span class="badge bg-secondary">
+                {{ product.category }} 
+                </span>
+        </div>
+
         <h1>{{ product.name }}</h1>
 
         <p class="description">{{ product.description }}</p>

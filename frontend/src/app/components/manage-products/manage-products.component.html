@@ -92,6 +92,14 @@
               <button type="submit" class="btn" [disabled]="productForm.invalid">
                 {{ mode === 'create' ? 'Create Product' : 'Update Product' }}
               </button>
+
+              <a *ngIf="mode === 'update'" 
+                 [routerLink]="['/products', productId]" 
+                 class="btn btn-outline-dark ms-2" 
+                 title="View product as a buyer">
+                 <i class="bi bi-eye-fill"></i> Preview
+              </a>
+
               <button *ngIf="mode === 'update'" type="button" class="btn btn-danger ms-2" (click)="onDelete()">
                 Delete Product
               </button>

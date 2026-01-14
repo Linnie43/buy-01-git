@@ -1,5 +1,6 @@
 package com.buy01.order.dto;
 
+import com.buy01.order.model.ProductCategory;
 import jakarta.validation.constraints.*;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -16,15 +17,17 @@ public class ProductUpdateDTO {
     @Min(value = 1, message = "Quantity must be at least 1")
     @NotNull(message = "Quantity is required")
     private int quantity;
+    private ProductCategory category;
     @JsonProperty("userId")
     private String sellerId;
 
     public ProductUpdateDTO() {}
-    public ProductUpdateDTO(String productId, String productName, double productPrice, int quantity, String sellerId) {
+    public ProductUpdateDTO(String productId, String productName, double productPrice, int quantity, ProductCategory category, String sellerId) {
         this.productId = productId;
         this.productName = productName;
         this.productPrice = productPrice;
         this.quantity = quantity;
+        this.category = category;
         this.sellerId = sellerId;
     }
 
@@ -39,6 +42,9 @@ public class ProductUpdateDTO {
 
     public int getQuantity() {return quantity;}
     public void setQuantity(int quantity) {this.quantity = quantity;}
+
+    public ProductCategory getCategory() {return category;}
+    public void setCategory(ProductCategory category) {this.category = category;}
 
     public String getSellerId() {return sellerId;}
     public void setSellerId(String sellerId) {this.sellerId = sellerId;}

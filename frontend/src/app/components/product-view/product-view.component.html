@@ -10,6 +10,13 @@
 
       <!-- details column with description -->
       <div class="col-md-6 d-flex flex-column product-details">
+
+        <div class="mb-2">
+            <span class="badge bg-secondary">
+                {{ product.category }}
+                </span>
+        </div>
+
         <h1>{{ product.name }}</h1>
 
         <p class="description">{{ product.description }}</p>
@@ -59,7 +66,7 @@
             </button>
           </div>
 
-          <button *ngIf="!product.isProductOwner && isLoggedIn"
+          <button *ngIf="!isSeller && isLoggedIn"
                   class="btn btn-success w-100 mt-3"
                   [disabled]="product.quantity === 0"
                   (click)="addToCart()"

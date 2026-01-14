@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../../services/product.service';
-import { Product } from '../../models/product.model';
+import { Category, Product } from '../../models/product.model';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -41,7 +41,7 @@ export class ManageProductsComponent implements OnInit {
     rejectedFiles: string[] = [];
     imagePreviews: ImagePreview[] = [];
     deletedImageIds: string[] = [];
-
+    categories = Object.values(Category);
 
     constructor(
       private fb: FormBuilder,
@@ -55,7 +55,8 @@ export class ManageProductsComponent implements OnInit {
             name: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(255)]],
             description: ['', [Validators.required, Validators.maxLength(2000)]],
             price: [null, [Validators.required, Validators.min(0.01)]],
-            quantity: [0, [Validators.required, Validators.min(0), Validators.max(1000), Validators.pattern("^[0-9]*$")]]
+            quantity: [0, [Validators.required, Validators.min(0), Validators.max(1000), Validators.pattern("^[0-9]*$")]],
+            category: [null, [Validators.required]]
           });
       }
 
@@ -67,6 +68,7 @@ export class ManageProductsComponent implements OnInit {
             this.mode = 'update';
             this.productService.getProductById(this.productId).subscribe({
               next: (data: Product) => {
+                console.log('Product loaded:', data);
                 this.productForm.patchValue(data);
                 const images = data.images || [];
                 this.resetStagedChanges(images);

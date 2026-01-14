@@ -2,6 +2,7 @@
 
   <!-- Search and Sort Section -->
   <div class="card bg-transparent mb-5 p-4">
+    <!-- Search and Sort -->
     <div class="row g-4 align-items-center">
       <!-- Search Input -->
       <div class="col-md-8">
@@ -24,7 +25,7 @@
       <div class="col-md-4">
         <div class="d-flex align-items-center">
           <label for="sortBySelect" class="me-2 text-nowrap">Sort by:</label>
-          <select class="form-select" id="sortBySelect" [(ngModel)]="sortBy" (change)="onSortChange()">
+          <select class="form-select" id="sortBySelect" [(ngModel)]="sortBy" (ngModelChange)="onSortChange()">
             <option value="latest">Latest</option>
             <option value="price_asc">Price: Ascending</option>
             <option value="price_desc">Price: Descending</option>
@@ -34,12 +35,57 @@
         </div>
       </div>
     </div>
+
+    <!-- Filtering (Category and Price Inputs) -->
+    <div class="row g-4 align-items-center mt-1">
+      <!-- Category Select -->
+      <div class="col-md-4">
+        <select class="form-select" id="categorySelect" [(ngModel)]="selectedCategory" (ngModelChange)="onFilterChange()" aria-label="Filter by Category">
+          <option value="">All Categories</option>
+          <option *ngFor="let cat of categories" [value]="cat">
+            {{ cat | titlecase }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Price Inputs -->
+      <div class="col-md-8">
+        <div class="row g-2">
+          <!-- Min Price -->
+          <div class="col-6">
+            <div class="input-group">
+              <span class="input-group-text bg-white">Min €</span>
+              <input
+                type="number"
+                class="form-control"
+                placeholder="0"
+                [(ngModel)]="minPrice"
+                (change)="onFilterChange()"
+                aria-label="Minimum Price">
+            </div>
+          </div>
+          <!-- Max Price -->
+          <div class="col-6">
+            <div class="input-group">
+              <span class="input-group-text bg-white">Max €</span>
+              <input
+                type="number"
+                class="form-control"
+                placeholder="Any"
+                [(ngModel)]="maxPrice"
+                (change)="onFilterChange()"
+                aria-label="Maximum Price">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <h2 class="mb-4">For sale</h2>
 
-  <div *ngIf="products.length === 0">
-    <p>No products available</p>
+  <div *ngIf="products.length === 0" class="text-center">
+    <p class="mb-0">No products match your search criteria.</p>
   </div>
 
   <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">

@@ -11,12 +11,13 @@ public class ProductResponseDTO {
     private String description;
     private double price;
     private int quantity;
-    private String userId;
     private ProductCategory category;
+    private String userId;
     private List<String> images;
     private Boolean isProductOwner;
 
-    public ProductResponseDTO() {}
+    public ProductResponseDTO() {
+    }
 
     public ProductResponseDTO(String productId, String name, String description, double price, int quantity, ProductCategory category, String userId, List<String> images, Boolean isProductOwner) {
         this.productId = productId;

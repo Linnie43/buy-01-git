@@ -65,7 +65,7 @@ public class CartServiceTest {
                 "cart1", "user1", new ArrayList<>(), 0, CartStatus.ACTIVE);
 
         ProductUpdateDTO product = new ProductUpdateDTO(
-                "p1", "Phone", 100.0, 10, "seller1");
+                "p1", "Phone", 100.0, 10, ProductCategory.OTHER, "seller1");
 
         when(cartRepository.findByUserId("user1")).thenReturn(cart);
         when(cartRepository.save(any())).thenAnswer(i -> i.getArgument(0));
@@ -86,7 +86,7 @@ public class CartServiceTest {
                 "cart1", "user1", new ArrayList<>(), 0, CartStatus.ACTIVE);
 
         ProductUpdateDTO product = new ProductUpdateDTO(
-                "p1", "Phone", 100.0, 1, "seller1");
+                "p1", "Phone", 100.0, 1, ProductCategory.OTHER, "seller1");
 
         when(cartRepository.findByUserId("user1")).thenReturn(cart);
         when(productClient.getProductById("p1")).thenReturn(product);
@@ -167,9 +167,9 @@ public class CartServiceTest {
         when(cartRepository.findByUserId("user1")).thenReturn(cart);
         when(cartRepository.save(any())).thenAnswer(i -> i.getArgument(0));
         when(productClient.getProductById("p1")).thenReturn(
-                new ProductUpdateDTO("p1", "Phone", 100.0, 1, "seller1"));
+                new ProductUpdateDTO("p1", "Phone", 100.0, 1, ProductCategory.OTHER, "seller1"));
         when(productClient.getProductById("p2")).thenReturn(
-                new ProductUpdateDTO("p2", "Laptop", 500.0, 5, "seller2"));
+                new ProductUpdateDTO("p2", "Laptop", 500.0, 5, ProductCategory.OTHER, "seller2"));
         when(orderService.toItemDTO(any())).thenReturn(mock(ItemDTO.class));
         doNothing().when(productClient).updateQuantity(anyString(), anyInt());
 

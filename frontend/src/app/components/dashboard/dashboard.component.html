@@ -59,6 +59,9 @@
                 type="number"
                 class="form-control"
                 placeholder="0"
+                min="0"
+                oninput="validity.valid||(value='');"
+                (keydown.minus)="$event.preventDefault()"
                 [(ngModel)]="minPrice"
                 (change)="onFilterChange()"
                 aria-label="Minimum Price">
@@ -72,6 +75,9 @@
                 type="number"
                 class="form-control"
                 placeholder="Any"
+                min="0"
+                oninput="validity.valid||(value='');"
+                (keydown.minus)="$event.preventDefault()"
                 [(ngModel)]="maxPrice"
                 (change)="onFilterChange()"
                 aria-label="Maximum Price">
@@ -108,5 +114,42 @@
         </div>
       </div>
     </div>
+  </div>
+  <!-- Pagination Controls -->
+  <div *ngIf="products.length > 0 && totalPages > 1" class="d-flex justify-content-center align-items-center mt-5 mb-5 pb-5 gap-3">
+
+    <!-- Previous Arrow -->
+    <button
+      class="btn p-0 border-0 bg-transparent text-dark"
+      [disabled]="currentPage === 0"
+      (click)="onPageChange(currentPage - 1)"
+      [style.opacity]="currentPage === 0 ? '0' : '1'"
+      style="font-size: 1.2rem; line-height: 1;">
+      &larr;
+    </button>
+
+    <!-- Page Numbers -->
+    <div class="d-flex gap-3">
+      <span
+        *ngFor="let page of pagesArray"
+        (click)="onPageChange(page)"
+        [style.cursor]="'pointer'"
+        [class.fw-bold]="page === currentPage"
+        [class.text-decoration-underline]="page === currentPage"
+        [class.text-muted]="page !== currentPage">
+        {{ page + 1 }}
+      </span>
+    </div>
+
+    <!-- Next Arrow -->
+    <button
+      class="btn p-0 border-0 bg-transparent text-dark"
+      [disabled]="currentPage >= totalPages - 1"
+      (click)="onPageChange(currentPage + 1)"
+      [style.opacity]="currentPage >= totalPages - 1 ? '0' : '1'"
+      style="font-size: 1.2rem; line-height: 1;">
+      &rarr;
+    </button>
+
   </div>
 </div>

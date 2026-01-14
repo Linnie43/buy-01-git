@@ -24,11 +24,17 @@ export class DashboardComponent implements OnInit {
   sortBy: string = 'latest';
   selectedCategory: string = '';
 
-  // Price State (Reverted to standard inputs)
+  // Price State
   minPrice: number | null = null;
   maxPrice: number | null = null;
 
   categories: string[] = Object.values(Category);
+
+  // Pagination State
+  currentPage: number = 0;
+  pageSize: number = 12;
+  totalElements: number = 0;
+  totalPages: number = 0;
 
   constructor(
     private productService: ProductService,
@@ -45,17 +51,32 @@ export class DashboardComponent implements OnInit {
     this.router.navigate(['/products', productId]);
   }
 
-  // Unified trigger for all filter changes
+  // Filter changes should reset to the first page
   onFilterChange() {
+    this.currentPage = 0;
     this.loadProducts();
   }
 
   onSearch() {
+    this.currentPage = 0;
     this.loadProducts();
   }
 
   onSortChange() {
+    this.currentPage = 0;
     this.loadProducts();
+  }
+
+  onPageChange(page: number) {
+    if (page >= 0 && page < this.totalPages) {
+      this.currentPage = page;
+      this.loadProducts();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  get pagesArray(): number[] {
+    return Array(this.totalPages).fill(0).map((x, i) => i);
   }
 
   private loadProducts() {
@@ -66,19 +87,23 @@ export class DashboardComponent implements OnInit {
       case 'price_desc': sortParam = 'price,desc'; break;
       case 'alpha_asc': sortParam = 'name,asc'; break;
       case 'alpha_desc': sortParam = 'name,desc'; break;
-      case 'latest': default: sortParam = 'createdAt,desc'; break;
+      case 'latest': default: sortParam = 'createTime,desc'; break;
     }
 
     this.productService.getAllProducts(
       this.searchTerm,
-      this.minPrice ?? undefined, // Pass undefined if null
+      this.minPrice ?? undefined,
       this.maxPrice ?? undefined,
       (this.selectedCategory as Category) || undefined,
       sortParam,
-      0,
-      10
+      this.currentPage,
+      this.pageSize
     ).subscribe({
-      next: (data) => this.products = data.products,
+      next: (data) => {
+        this.products = data.products;
+        this.totalElements = data.total;
+        this.totalPages = Math.ceil(this.totalElements / this.pageSize);
+      },
       error: (err) => console.error(err)
     });
   }

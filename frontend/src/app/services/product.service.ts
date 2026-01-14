@@ -46,7 +46,7 @@ export class ProductService {
     min?: number,
     max?: number,
     category?: Category,
-    sort: string = 'createdAt, desc',
+    sort: string = 'createTime,desc',
     page: number = 0,
     size: number = 10
   ): Observable<{ products: Product[]; total: number }> {

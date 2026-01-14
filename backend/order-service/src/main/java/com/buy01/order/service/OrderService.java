@@ -117,10 +117,8 @@ public class OrderService {
         Order existingOrder = orderRepository.findById(orderId)
                 .orElseThrow(() -> new NotFoundException("Order not found with orderId: " + orderId));
 
-        boolean isSeller = isSellerOfItemsInOrder(existingOrder, currentUser.getCurrentUserId());
-
         if (!existingOrder.getUserId().equals(currentUser.getCurrentUserId())
-                && !currentUser.getRole().equals(Role.ADMIN) && !isSeller) {
+                && !currentUser.getRole().equals(Role.ADMIN)) {
             throw new ForbiddenException("Access denied to update order with orderId: " + orderId + " for userId: " + currentUser.getCurrentUserId());
         }
 
@@ -147,6 +145,11 @@ public class OrderService {
 
         existingOrder.setStatus(orderUpdate.getStatus());
         existingOrder.setUpdatedAt(new Date());
+        if (orderUpdate.getStatus() == OrderStatus.SHIPPED) {
+            addDeliveryDetails(existingOrder);
+        } else if (orderUpdate.getStatus() == OrderStatus.DELIVERED) {
+            existingOrder.setDeliveryDate(new Date());
+        }
 
         return mapToDTO(orderRepository.save(existingOrder));
     }
@@ -248,6 +251,17 @@ public class OrderService {
         for (OrderItem orderItem : orderItems) {
             productClient.cancelOrder(orderItem.getProductId(), orderItem.getQuantity());
         }
+    }
+
+    public void addDeliveryDetails(Order order) {
+        String trackingNumber;
+        Date deliveryDate;
+            trackingNumber = "FKML" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.DATE, 7); // add 7 days for delivery
+            deliveryDate = cal.getTime();
+            order.setTrackingNumber(trackingNumber);
+            order.setDeliveryDate(deliveryDate);
     }
 
 }

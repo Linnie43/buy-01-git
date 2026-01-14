@@ -2,10 +2,12 @@ package com.buy01.order.repository;
 
 import com.buy01.order.dto.ItemDTO;
 import com.buy01.order.model.Order;
+import com.buy01.order.model.OrderStatus;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -83,4 +85,5 @@ public interface OrderRepository extends MongoRepository<Order, String> {
     })
     List<ItemDTO> findTopItemsByUserId(String userId, int limit);
 
+    List<Order> findAllByStatusNotIn(Collection<OrderStatus> statuses);
 }

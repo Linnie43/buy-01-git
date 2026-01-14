@@ -1,5 +1,8 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
 import { ProductService } from './product.service';
 import { Product } from '../models/product.model';
 import { PRODUCT_BASE_URL } from '../constants/constants';
@@ -15,9 +18,9 @@ describe('ProductService', () => {
     description: 'A great product',
     price: 99.99,
     quantity: 10,
-    ownerId: 'user-1',
+    userId: 'user-1',
     images: ['image1.jpg'],
-    isProductOwner: true
+    isProductOwner: true,
   };
 
   const mockMappedProduct: Product = {
@@ -26,15 +29,15 @@ describe('ProductService', () => {
     description: 'A great product',
     price: 99.99,
     quantity: 10,
-    ownerId: 'user-1',
+    userId: 'user-1',
     images: ['image1.jpg'],
-    isProductOwner: true
+    isProductOwner: true,
   };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [ProductService]
+      providers: [ProductService],
     });
     service = TestBed.inject(ProductService);
     httpTestingController = TestBed.inject(HttpTestingController);
@@ -50,7 +53,7 @@ describe('ProductService', () => {
 
   describe('getAllProducts', () => {
     it('should return an array of mapped products', () => {
-      service.getAllProducts().subscribe(products => {
+      service.getAllProducts().subscribe((products) => {
         expect(products.length).toBe(1);
         expect(products[0]).toEqual(mockMappedProduct);
       });
@@ -64,7 +67,7 @@ describe('ProductService', () => {
   describe('getProductById', () => {
     it('should return a single mapped product', () => {
       const productId = 'prod-1';
-      service.getProductById(productId).subscribe(product => {
+      service.getProductById(productId).subscribe((product) => {
         expect(product).toEqual(mockMappedProduct);
       });
 
@@ -74,15 +77,21 @@ describe('ProductService', () => {
     });
 
     it('should map product with no images to use a placeholder', () => {
-        const productId = 'prod-2';
-        const productDataNoImages = { ...mockApiProduct, productId: 'prod-2', images: [] };
+      const productId = 'prod-2';
+      const productDataNoImages = {
+        ...mockApiProduct,
+        productId: 'prod-2',
+        images: [],
+      };
 
-        service.getProductById(productId).subscribe(product => {
-            expect(product.images).toEqual(['assets/product_image_placeholder.png']);
-        });
+      service.getProductById(productId).subscribe((product) => {
+        expect(product.images).toEqual([
+          'assets/product_image_placeholder.png',
+        ]);
+      });
 
-        const req = httpTestingController.expectOne(`${apiUrl}/${productId}`);
-        req.flush(productDataNoImages);
+      const req = httpTestingController.expectOne(`${apiUrl}/${productId}`);
+      req.flush(productDataNoImages);
     });
   });
 
@@ -91,7 +100,7 @@ describe('ProductService', () => {
       const formData = new FormData();
       formData.append('name', 'New Product');
 
-      service.createProduct(formData).subscribe(product => {
+      service.createProduct(formData).subscribe((product) => {
         expect(product).toEqual(mockMappedProduct);
       });
 
@@ -108,7 +117,7 @@ describe('ProductService', () => {
       const formData = new FormData();
       formData.append('name', 'Updated Product');
 
-      service.updateProduct(productId, formData).subscribe(product => {
+      service.updateProduct(productId, formData).subscribe((product) => {
         expect(product).toEqual(mockMappedProduct);
       });
 
@@ -122,8 +131,7 @@ describe('ProductService', () => {
   describe('deleteProduct', () => {
     it('should send a DELETE request to the correct URL', () => {
       const productId = 'prod-1';
-      service.deleteProduct(productId).subscribe(() => {
-      });
+      service.deleteProduct(productId).subscribe(() => {});
 
       const req = httpTestingController.expectOne(`${apiUrl}/${productId}`);
       expect(req.request.method).toBe('DELETE');

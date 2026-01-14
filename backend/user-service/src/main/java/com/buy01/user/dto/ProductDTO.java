@@ -9,45 +9,87 @@ public class ProductDTO {
     private String description;
     private double price;
     private int quantity;
-    private String ownerId;
+    private String userId;
     private List<String> images;
     private Boolean isProductOwner;
 
-    public ProductDTO() {}
+    public ProductDTO() {
+    }
 
-    public ProductDTO(String productId, String name, String description, double price, int quantity, String ownerId, List<String> images, Boolean isProductOwner) {
+    public ProductDTO(String productId, String name, String description, double price, int quantity, String userId,
+            List<String> images, Boolean isProductOwner) {
         this.productId = productId;
         this.name = name;
         this.description = description;
         this.price = price;
         this.quantity = quantity;
-        this.ownerId = ownerId;
+        this.userId = userId;
         this.images = images;
         this.isProductOwner = isProductOwner;
     }
 
-    public String getProductId() { return productId; }
-    public void setProductId(String productId) { this.productId = productId; }
+    public String getProductId() {
+        return productId;
+    }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public void setProductId(String productId) {
+        this.productId = productId;
+    }
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    public String getName() {
+        return name;
+    }
 
-    public Double getPrice() { return price; }
-    public void setPrice(Double price) { this.price = price; }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    public int getQuantity() { return quantity; }
-    public void setQuantity(int quantity) { this.quantity = quantity; }
+    public String getDescription() {
+        return description;
+    }
 
-    public String getOwnerId() { return ownerId; }
-    public void setOwnerId(String ownerId) { this.ownerId = ownerId; }
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-    public List<String> getImages() { return images; }
-    public void setImages(List<String> images) { this.images = images; }
+    public Double getPrice() {
+        return price;
+    }
 
-    public Boolean getIsProductOwner() { return isProductOwner; }
-    public void setIsProductOwner(Boolean isProductOwner) { this.isProductOwner = isProductOwner; }
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public String getuserId() {
+        return userId;
+    }
+
+    public void setuserId(String userId) {
+        this.userId = userId;
+    }
+
+    public List<String> getImages() {
+        return images;
+    }
+
+    public void setImages(List<String> images) {
+        this.images = images;
+    }
+
+    public Boolean getIsProductOwner() {
+        return isProductOwner;
+    }
+
+    public void setIsProductOwner(Boolean isProductOwner) {
+        this.isProductOwner = isProductOwner;
+    }
 
 }

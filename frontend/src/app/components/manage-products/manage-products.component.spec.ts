@@ -1,4 +1,9 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import {
+  ComponentFixture,
+  TestBed,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { ManageProductsComponent } from './manage-products.component';
@@ -17,8 +22,8 @@ const mockProduct: Product = {
   description: 'A test description',
   price: 10,
   quantity: 5,
-  ownerId: 'user-1',
-  images: ['image1.jpg']
+  userId: 'user-1',
+  images: ['image1.jpg'],
 };
 
 const mockUser: User = {
@@ -27,13 +32,13 @@ const mockUser: User = {
   role: 'user',
   ownProfile: true,
   products: [mockProduct],
-  avatar: 'avatar.jpg'
+  avatar: 'avatar.jpg',
 };
 
 class MatDialogMock {
   open() {
     return {
-      afterClosed: () => of(true) // Simulate user confirming the dialog
+      afterClosed: () => of(true), // Simulate user confirming the dialog
     };
   }
 }
@@ -47,7 +52,12 @@ describe('ManageProductsComponent', () => {
   let dialog: MatDialog;
 
   const configureTestBed = (productId: string | null) => {
-    productServiceSpy = jasmine.createSpyObj('ProductService', ['getProductById', 'createProduct', 'updateProduct', 'deleteProduct']);
+    productServiceSpy = jasmine.createSpyObj('ProductService', [
+      'getProductById',
+      'createProduct',
+      'updateProduct',
+      'deleteProduct',
+    ]);
     userServiceSpy = jasmine.createSpyObj('UserService', ['getMe']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
@@ -57,7 +67,7 @@ describe('ManageProductsComponent', () => {
         ReactiveFormsModule,
         HttpClientTestingModule,
         NoopAnimationsModule,
-        MatDialogModule
+        MatDialogModule,
       ],
       providers: [
         { provide: ProductService, useValue: productServiceSpy },
@@ -67,10 +77,10 @@ describe('ManageProductsComponent', () => {
         {
           provide: ActivatedRoute,
           useValue: {
-            paramMap: of({ get: (key: string) => productId })
-          }
-        }
-      ]
+            paramMap: of({ get: (key: string) => productId }),
+          },
+        },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ManageProductsComponent);
@@ -95,7 +105,12 @@ describe('ManageProductsComponent', () => {
 
     it('should call createProduct on valid form submission', () => {
       productServiceSpy.createProduct.and.returnValue(of(mockProduct));
-      component.productForm.setValue({ name: 'New Product', description: 'Desc', price: 1, quantity: 1 });
+      component.productForm.setValue({
+        name: 'New Product',
+        description: 'Desc',
+        price: 1,
+        quantity: 1,
+      });
       component.submit();
       expect(productServiceSpy.createProduct).toHaveBeenCalled();
     });
@@ -118,9 +133,17 @@ describe('ManageProductsComponent', () => {
 
     it('should call updateProduct on valid form submission', () => {
       productServiceSpy.updateProduct.and.returnValue(of(mockProduct));
-      component.productForm.setValue({ name: 'Updated Product Name', description: 'Desc', price: 1, quantity: 1 });
+      component.productForm.setValue({
+        name: 'Updated Product Name',
+        description: 'Desc',
+        price: 1,
+        quantity: 1,
+      });
       component.submit();
-      expect(productServiceSpy.updateProduct).toHaveBeenCalledWith('prod-123', jasmine.any(FormData));
+      expect(productServiceSpy.updateProduct).toHaveBeenCalledWith(
+        'prod-123',
+        jasmine.any(FormData)
+      );
     });
 
     it('should call deleteProduct when onDelete is confirmed', () => {
@@ -147,7 +170,10 @@ describe('ManageProductsComponent', () => {
 
     it('should navigate when edit is called', () => {
       component.edit(mockProduct);
-      expect(routerSpy.navigate).toHaveBeenCalledWith(['/products/update', mockProduct.productId]);
+      expect(routerSpy.navigate).toHaveBeenCalledWith([
+        '/products/update',
+        mockProduct.productId,
+      ]);
     });
   });
 });

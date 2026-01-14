@@ -49,7 +49,8 @@ public class ProductServiceTest {
     private ProductService productService;
 
     static class TestProduct extends Product {
-        TestProduct(String productId, String name, String description, double price, int quantity, ProductCategory category, String userId) {
+        TestProduct(String productId, String name, String description, double price, int quantity,
+                ProductCategory category, String userId) {
             super(productId, name, description, price, quantity, category, userId);
         }
     }
@@ -75,7 +76,8 @@ public class ProductServiceTest {
 
         when(productRepository.save(any(Product.class))).thenAnswer(invocation -> {
             Product p = invocation.getArgument(0);
-            return new TestProduct("prod-1", p.getName(), p.getDescription(), p.getPrice(), p.getQuantity(), p.getCategory(), p.getUserId());
+            return new TestProduct("prod-1", p.getName(), p.getDescription(), p.getPrice(), p.getQuantity(),
+                    p.getCategory(), p.getUserId());
         });
 
         ProductResponseDTO resp = productService.createProduct(request, new AuthDetails("current-user-1", Role.SELLER));
@@ -83,15 +85,14 @@ public class ProductServiceTest {
         assertNotNull(resp);
         assertEquals("prod-1", resp.getProductId());
         assertEquals("Valid Name", resp.getName());
-        assertEquals("current-user-1", resp.getOwnerId());
+        assertEquals("current-user-1", resp.getuserId());
     }
 
     @Test
     void createProduct_forbiddenRole_throwsForbiddenException() {
         ProductCreateDTO request = mock(ProductCreateDTO.class);
-        assertThrows(ForbiddenException.class, () ->
-                productService.createProduct(request, new AuthDetails( "some-user", Role.CLIENT))
-        );
+        assertThrows(ForbiddenException.class,
+                () -> productService.createProduct(request, new AuthDetails("some-user", Role.CLIENT)));
     }
 
     @Test
@@ -119,18 +120,19 @@ public class ProductServiceTest {
         when(mediaClient.updateProductImages(eq(productId), anyList(), anyList())).thenReturn(List.of());
         when(productRepository.save(any(Product.class))).thenAnswer(invocation -> {
             Product p = invocation.getArgument(0);
-            return new TestProduct(productId, p.getName(), p.getDescription(), p.getPrice(), p.getQuantity(), p.getCategory(), p.getUserId());
+            return new TestProduct(productId, p.getName(), p.getDescription(), p.getPrice(), p.getQuantity(),
+                    p.getCategory(), p.getUserId());
         });
 
-        ProductResponseDTO resp = productService.updateProduct(productId, request, new AuthDetails("owner-1", Role.SELLER));
+        ProductResponseDTO resp = productService.updateProduct(productId, request,
+                new AuthDetails("owner-1", Role.SELLER));
 
         assertNotNull(resp);
         assertEquals("New Name", resp.getName());
         assertEquals(10.0, resp.getPrice());
         assertTrue(Boolean.TRUE.equals(resp.getIsProductOwner()));
 
-        ArgumentCaptor<ProductUpdateDTO> captor =
-                ArgumentCaptor.forClass(ProductUpdateDTO.class);
+        ArgumentCaptor<ProductUpdateDTO> captor = ArgumentCaptor.forClass(ProductUpdateDTO.class);
 
         verify(productEventService).publishProductUpdatedEvent(captor.capture());
 
@@ -157,9 +159,8 @@ public class ProductServiceTest {
     @Test
     void createProduct_forbiddenRole_doesNotCallDownstreamClients() throws IOException {
         ProductCreateDTO request = mock(ProductCreateDTO.class);
-        assertThrows(ForbiddenException.class, () ->
-                productService.createProduct(request, new AuthDetails( "some-user", Role.CLIENT))
-        );
+        assertThrows(ForbiddenException.class,
+                () -> productService.createProduct(request, new AuthDetails("some-user", Role.CLIENT)));
         verify(productRepository, never()).save(any());
         verify(mediaClient, never()).postProductImages(anyString(), anyList());
         verify(userClient, never()).getRoleIfUserExists(anyString());
@@ -175,20 +176,20 @@ public class ProductServiceTest {
         when(request.getUserId()).thenReturn("current-user"); // Use the actual user ID
 
         var mockFile = new org.springframework.mock.web.MockMultipartFile(
-                "file", "orig.jpg", "image/jpeg", new byte[] {1}
-        );
+                "file", "orig.jpg", "image/jpeg", new byte[] { 1 });
         when(request.getImagesList()).thenReturn(List.of(mockFile));
 
         when(userClient.getRoleIfUserExists("current-user")).thenReturn(Role.SELLER);
 
         when(productRepository.save(any(Product.class))).thenAnswer(invocation -> {
             Product p = invocation.getArgument(0);
-            return new TestProduct("prod-x", p.getName(), p.getDescription(), p.getPrice(), p.getQuantity(), ProductCategory.OTHER, p.getUserId());
+            return new TestProduct("prod-x", p.getName(), p.getDescription(), p.getPrice(), p.getQuantity(),
+                    ProductCategory.OTHER, p.getUserId());
         });
 
         when(mediaClient.postProductImages(anyString(), anyList())).thenThrow(new RuntimeException("upstream fail"));
 
-        ProductResponseDTO resp = productService.createProduct(request, new AuthDetails( "current-user", Role.SELLER));
+        ProductResponseDTO resp = productService.createProduct(request, new AuthDetails("current-user", Role.SELLER));
         assertNotNull(resp);
         assertEquals("prod-x", resp.getProductId());
         assertTrue(resp.getImages().isEmpty());
@@ -224,9 +225,8 @@ public class ProductServiceTest {
     void createProduct_nameTooShort_throwsIllegalArgumentException() {
         ProductCreateDTO request = mock(ProductCreateDTO.class);
         when(request.getName()).thenReturn("abc"); // only stub used by validation
-        assertThrows(IllegalArgumentException.class, () ->
-                productService.createProduct(request, new AuthDetails( "current-user", Role.SELLER))
-        );
+        assertThrows(IllegalArgumentException.class,
+                () -> productService.createProduct(request, new AuthDetails("current-user", Role.SELLER)));
     }
 
     @Test

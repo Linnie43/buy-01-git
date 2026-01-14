@@ -1,4 +1,9 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import {
+  ComponentFixture,
+  TestBed,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { ProductViewComponent } from './product-view.component';
@@ -13,7 +18,7 @@ const mockProduct: Product = {
   price: 100,
   description: 'A great product',
   quantity: 10,
-  ownerId: 'owner1'
+  userId: 'owner1',
 };
 
 describe('ProductViewComponent', () => {
@@ -25,7 +30,9 @@ describe('ProductViewComponent', () => {
   let activatedRoute: ActivatedRoute;
 
   const setupComponent = (productId: string | null) => {
-    productServiceSpy = jasmine.createSpyObj('ProductService', ['getProductById']);
+    productServiceSpy = jasmine.createSpyObj('ProductService', [
+      'getProductById',
+    ]);
     authServiceSpy = jasmine.createSpyObj('AuthService', ['isLoggedIn']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
@@ -84,7 +91,9 @@ describe('ProductViewComponent', () => {
     it('should log an error if fetching product fails', () => {
       setupComponent('1');
       const consoleErrorSpy = spyOn(console, 'error');
-      productServiceSpy.getProductById.and.returnValue(throwError(() => new Error('Fetch failed')));
+      productServiceSpy.getProductById.and.returnValue(
+        throwError(() => new Error('Fetch failed'))
+      );
 
       fixture.detectChanges();
 
@@ -98,6 +107,9 @@ describe('ProductViewComponent', () => {
     setupComponent('1');
     const productId = 'test-product-id';
     component.goToUpdateProduct(productId);
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['/products/update', productId]);
+    expect(routerSpy.navigate).toHaveBeenCalledWith([
+      '/products/update',
+      productId,
+    ]);
   });
 });

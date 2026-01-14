@@ -1,4 +1,9 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import {
+  ComponentFixture,
+  TestBed,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { DashboardComponent } from './dashboard.component';
@@ -7,8 +12,24 @@ import { AuthService } from '../../services/auth.service';
 import { Product } from '../../models/product.model';
 
 const mockProducts: Product[] = [
-  { productId: '1', name: 'Product A', price: 10, description: 'A', quantity: 5, ownerId: 'owner1', images: [] },
-  { productId: '2', name: 'Product B', price: 20, description: 'B', quantity: 10, ownerId: 'owner2', images: [] },
+  {
+    productId: '1',
+    name: 'Product A',
+    price: 10,
+    description: 'A',
+    quantity: 5,
+    userId: 'owner1',
+    images: [],
+  },
+  {
+    productId: '2',
+    name: 'Product B',
+    price: 20,
+    description: 'B',
+    quantity: 10,
+    userId: 'owner2',
+    images: [],
+  },
 ];
 
 describe('DashboardComponent', () => {
@@ -19,7 +40,9 @@ describe('DashboardComponent', () => {
   let routerSpy: jasmine.SpyObj<Router>;
 
   beforeEach(async () => {
-    productServiceSpy = jasmine.createSpyObj('ProductService', ['getAllProducts']);
+    productServiceSpy = jasmine.createSpyObj('ProductService', [
+      'getAllProducts',
+    ]);
     authServiceSpy = jasmine.createSpyObj('AuthService', ['isLoggedIn']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
@@ -73,7 +96,9 @@ describe('DashboardComponent', () => {
 
     it('should log an error if fetching products fails', () => {
       const consoleErrorSpy = spyOn(console, 'error');
-      productServiceSpy.getAllProducts.and.returnValue(throwError(() => new Error('Fetch failed')));
+      productServiceSpy.getAllProducts.and.returnValue(
+        throwError(() => new Error('Fetch failed'))
+      );
 
       fixture.detectChanges();
 

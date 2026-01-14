@@ -67,7 +67,7 @@ public class ProductServiceTest {
         when(request.getDescription()).thenReturn("A valid description");
         when(request.getPrice()).thenReturn(9.99);
         when(request.getQuantity()).thenReturn(5);
-        when(request.getCategory()).thenReturn(ProductCategory.ELECTRONICS);
+        when(request.getCategory()).thenReturn(ProductCategory.OTHER);
         when(request.getUserId()).thenReturn("current-user-1"); // Use the actual user ID
         when(request.getImagesList()).thenReturn(null);
 
@@ -104,7 +104,7 @@ public class ProductServiceTest {
     void updateProduct_ownerUpdates_success() throws IOException {
 
         String productId = "prod-1";
-        Product existing = new TestProduct(productId, "Old", "old desc", 5.0, 2, ProductCategory.HOME_APPLIANCES, "owner-1");
+        Product existing = new TestProduct(productId, "Old", "old desc", 5.0, 2, ProductCategory.OTHER, "owner-1");
         when(productRepository.findById(productId)).thenReturn(Optional.of(existing));
 
         ProductUpdateRequest request = mock(ProductUpdateRequest.class);
@@ -112,14 +112,14 @@ public class ProductServiceTest {
         when(request.getDescription()).thenReturn("New desc");
         when(request.getPrice()).thenReturn(10.0);
         when(request.getQuantity()).thenReturn(3);
-        when(request.getCat)
+        when(request.getCategory()).thenReturn(ProductCategory.OTHER);
         when(request.getDeletedImageIds()).thenReturn(List.of());
         when(request.getImages()).thenReturn(List.of());
 
         when(mediaClient.updateProductImages(eq(productId), anyList(), anyList())).thenReturn(List.of());
         when(productRepository.save(any(Product.class))).thenAnswer(invocation -> {
             Product p = invocation.getArgument(0);
-            return new TestProduct(productId, p.getName(), p.getDescription(), p.getPrice(), p.getQuantity(), p. p.getUserId());
+            return new TestProduct(productId, p.getName(), p.getDescription(), p.getPrice(), p.getQuantity(), p.getCategory(), p.getUserId());
         });
 
         ProductResponseDTO resp = productService.updateProduct(productId, request, new AuthDetails("owner-1", Role.SELLER));
@@ -145,7 +145,7 @@ public class ProductServiceTest {
     @Test
     void deleteProduct_ownerDeletes_callsRepositoryAndPublishesEvent() {
         String productId = "prod-1";
-        Product existing = new TestProduct(productId, "Name", "desc", 1.0, 1, "owner-1");
+        Product existing = new TestProduct(productId, "Name", "desc", 1.0, 1, ProductCategory.OTHER, "owner-1");
         when(productRepository.findById(productId)).thenReturn(Optional.of(existing));
 
         productService.deleteProduct(productId, new AuthDetails("owner-1", Role.SELLER));
@@ -183,7 +183,7 @@ public class ProductServiceTest {
 
         when(productRepository.save(any(Product.class))).thenAnswer(invocation -> {
             Product p = invocation.getArgument(0);
-            return new TestProduct("prod-x", p.getName(), p.getDescription(), p.getPrice(), p.getQuantity(), p.getUserId());
+            return new TestProduct("prod-x", p.getName(), p.getDescription(), p.getPrice(), p.getQuantity(), ProductCategory.OTHER, p.getUserId());
         });
 
         when(mediaClient.postProductImages(anyString(), anyList())).thenThrow(new RuntimeException("upstream fail"));
@@ -202,8 +202,8 @@ public class ProductServiceTest {
 
     @Test
     void deleteProductsByUserId_deletesEachAndPublishesEvent() {
-        TestProduct p1 = new TestProduct("p1", "n", "d", 1.0, 1, "u1");
-        TestProduct p2 = new TestProduct("p2", "n2", "d2", 2.0, 2, "u1");
+        TestProduct p1 = new TestProduct("p1", "n", "d", 1.0, 1, ProductCategory.OTHER, "u1");
+        TestProduct p2 = new TestProduct("p2", "n2", "d2", 2.0, 2, ProductCategory.OTHER, "u1");
         when(productRepository.findAllProductsByUserId("u1")).thenReturn(List.of(p1, p2));
 
         productService.deleteProductsByUserId("u1");
@@ -216,7 +216,7 @@ public class ProductServiceTest {
 
     @Test
     void authProductOwner_nonOwnerNonAdmin_throwsForbiddenException() {
-        TestProduct p = new TestProduct("p1", "n", "d", 1.0, 1, "owner-1");
+        TestProduct p = new TestProduct("p1", "n", "d", 1.0, 1, ProductCategory.OTHER, "owner-1");
         assertThrows(ForbiddenException.class, () -> productService.authProductOwner(p, "someone-else", Role.SELLER));
     }
 
@@ -232,11 +232,11 @@ public class ProductServiceTest {
     @Test
     void getAllProducts_returnsSortedPage() {
         Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
-        TestProduct p = new TestProduct("p1", "n", "d", 1.0, 1, "u1");
+        TestProduct p = new TestProduct("p1", "n", "d", 1.0, 1, ProductCategory.OTHER, "u1");
         Page<Product> productPage = new PageImpl<>(List.of(p), pageable, 1);
-        when(productRepository.findAllByFilters("", null, null, pageable))
+        when(productRepository.findAllByFilters("", null, null, null, pageable))
                 .thenReturn(productPage);
-        Page<ProductResponseDTO> all = productService.getAllProducts(null, null, null, pageable);
+        Page<ProductResponseDTO> all = productService.getAllProducts(null, null, null, null, pageable);
         assertEquals(1, all.getTotalPages());
         assertEquals("p1", all.getContent().get(0).getProductId());
     }

@@ -8,6 +8,7 @@ import com.buy01.product.exception.ConflictException;
 import com.buy01.product.exception.ForbiddenException;
 import com.buy01.product.exception.NotFoundException;
 import com.buy01.product.model.Product;
+import com.buy01.product.model.ProductCategory;
 import com.buy01.product.model.Role;
 import com.buy01.product.repository.ProductRepository;
 import com.buy01.product.security.AuthDetails;
@@ -109,13 +110,13 @@ public class ProductService {
     }
 
     // Get all products, accessible by anyone (including unauthenticated users)
-    public Page<ProductResponseDTO> getAllProducts(String keyword, Double minPrice, Double maxPrice, Pageable pageable) {
+    public Page<ProductResponseDTO> getAllProducts(String keyword, Double minPrice, Double maxPrice, ProductCategory category, Pageable pageable) {
         if (keyword == null) {
             keyword = "";
         } else {
             keyword = keyword.trim();
         }
-        Page<Product> productPage = productRepository.findAllByFilters(keyword, minPrice, maxPrice, pageable);
+        Page<Product> productPage = productRepository.findAllByFilters(keyword, minPrice, maxPrice, category, pageable);
         return productPage.map(product -> mapToProductResponseDTO(product, null));
     }
 
@@ -298,6 +299,7 @@ public class ProductService {
                 product.getDescription(),
                 product.getPrice(),
                 product.getQuantity(),
+                product.getCategory(),
                 product.getUserId(),
                 images,
                 currentUser != null && product.getUserId().equals(currentUser.getCurrentUserId())

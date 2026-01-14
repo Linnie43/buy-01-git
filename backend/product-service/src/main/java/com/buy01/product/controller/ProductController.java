@@ -2,6 +2,7 @@ package com.buy01.product.controller;
 
 import com.buy01.product.exception.NotFoundException;
 import com.buy01.product.model.Product;
+import com.buy01.product.model.ProductCategory;
 import com.buy01.product.model.Role;
 import com.buy01.product.repository.ProductRepository;
 import com.buy01.product.security.AuthDetails;
@@ -63,10 +64,11 @@ public class ProductController {
             @RequestParam(value = "search", required = false) String keyword,
             @RequestParam(value = "minPrice", required = false) Double minPrice,
             @RequestParam(value = "maxPrice", required = false) Double maxPrice,
+            @RequestParam(value = "category", required = false) ProductCategory category,
             @PageableDefault(size = 10, sort = "createdAt") Pageable pageable
             ) {
 
-        return ResponseEntity.ok(productService.getAllProducts(keyword, minPrice, maxPrice, pageable));
+        return ResponseEntity.ok(productService.getAllProducts(keyword, minPrice, maxPrice, category, pageable));
     }
 
 
@@ -120,6 +122,7 @@ public class ProductController {
                 product.getDescription(),
                 product.getPrice(),
                 product.getQuantity(),
+                product.getCategory(),
                 product.getUserId(),
                 null,
                 false);

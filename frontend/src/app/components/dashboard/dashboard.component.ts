@@ -28,19 +28,7 @@ export class DashboardComponent implements OnInit {
   minPrice: number | null = null;
   maxPrice: number | null = null;
 
-  categories: string[] = [
-    'ELECTRONICS',
-    'FASHION',
-    'HOME_APPLIANCES',
-    'BOOKS',
-    'TOYS',
-    'SPORTS',
-    'BEAUTY',
-    'AUTOMOTIVE',
-    'GROCERY',
-    'HEALTH',
-    'OTHER'
-  ];
+  categories: string[] = Object.values(ProductCategory);
 
   constructor(
     private productService: ProductService,
@@ -88,7 +76,7 @@ export class DashboardComponent implements OnInit {
       (this.selectedCategory as ProductCategory) || undefined,
       sortParam,
       0,
-      12
+      10
     ).subscribe({
       next: (data) => this.products = data.products,
       error: (err) => console.error(err)

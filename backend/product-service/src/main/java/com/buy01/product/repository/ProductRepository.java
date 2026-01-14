@@ -17,8 +17,8 @@ public interface ProductRepository extends MongoRepository<Product, String> {
     @Query("{ $and: [ " +
             "{ 'name': { $regex: ?0, $options: 'i' } }, " +
             "{ $or: [ { $expr: { $eq: [?1, null] } } , { 'price': { $gte: ?1 } } ] }, " +
-            "{ $or: [ { $expr: { $eq: [?2, null] } } , { 'price': { $lte: ?2 } } ] } " +
-            "{ $or: [ { $expr: { $eq: [?3, null] } } , { 'category': ?3 } } ] } " +
+            "{ $or: [ { $expr: { $eq: [?2, null] } } , { 'price': { $lte: ?2 } } ] }, " +
+            "{ $or: [ { $expr: { $eq: [?3, null] } } , { 'category': ?3 } ] } " +
             "] }")
     Page<Product> findAllByFilters(String name, Double minPrice, Double maxPrice, ProductCategory category, Pageable pageable);
 }

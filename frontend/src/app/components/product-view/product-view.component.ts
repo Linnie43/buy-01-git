@@ -7,7 +7,6 @@ import { AuthService } from '../../services/auth.service';
 import { ImageUrlPipe } from '../../pipes/image-url.pipe';
 import { ImageCarouselComponent } from '../shared/image-carousel/image-carousel.component';
 import { HttpErrorResponse } from '@angular/common/http';
-import { HttpClientModule } from '@angular/common/http';
 import { CartService } from '../../services/cart.service';
 import { FormsModule } from '@angular/forms';
 import { CartResponseDTO } from '../../models/cart.model';
@@ -23,6 +22,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 export class ProductViewComponent implements OnInit {
   product: Product | null = null;
   isLoggedIn = false;
+  isClient = false;
   selectedQuantity = 1;
   cart: CartResponseDTO | null = null;
   updating = false;
@@ -39,6 +39,7 @@ export class ProductViewComponent implements OnInit {
 
   ngOnInit(): void {
       this.isLoggedIn = this.authService.isLoggedIn();
+      this.isClient = this.authService.getUserRole() === 'CLIENT';
       const productId = this.route.snapshot.paramMap.get('id');
         if (productId) {
           this.productService.getProductById(productId).subscribe({

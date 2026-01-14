@@ -1,5 +1,7 @@
 package com.buy01.product.dto;
 
+import com.buy01.product.model.ProductCategory;
+
 import java.util.List;
 
 // Product response class to send product details in responses - what the user sees after adding a product

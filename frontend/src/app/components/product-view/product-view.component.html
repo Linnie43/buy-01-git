@@ -31,7 +31,7 @@
             Manage Product
           </button>
 
-          <div class="quantity-selector mt-2 d-flex align-items-center gap-2">
+          <div *ngIf="isClient" class="quantity-selector mt-2 d-flex align-items-center gap-2">
             <label class="me-1">Qty</label>
 
             <button
@@ -60,7 +60,7 @@
           </div>
 
           <button *ngIf="!product.isProductOwner && isLoggedIn"
-                  class="btn btn-success w-100"
+                  class="btn btn-success w-100 mt-3"
                   [disabled]="product.quantity === 0"
                   (click)="addToCart()"
           >

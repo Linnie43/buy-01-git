@@ -32,7 +32,7 @@ describe('SellerProfileComponent', () => {
         quantity: 5,
         userId: 'u1',
         images: ['img1.jpg'],
-        isProductOwner: true,
+        isProductOwner: true
       },
       {
         productId: 'p2',
@@ -40,33 +40,23 @@ describe('SellerProfileComponent', () => {
         description: 'Description 2',
         price: 200,
         quantity: 2,
-        userId: 'u1',
-      },
-    ],
+        userId: 'u1'
+      }
+    ]
   };
 
   beforeEach(async () => {
-    authServiceSpy = jasmine.createSpyObj('AuthService', [
-      'isLoggedIn',
-      'getCurrentUser',
-    ]);
+    authServiceSpy = jasmine.createSpyObj('AuthService', ['isLoggedIn', 'getCurrentUser']);
     userServiceSpy = jasmine.createSpyObj('UserService', ['getMe']);
-    avatarServiceSpy = jasmine.createSpyObj('AvatarService', [
-      'updateMyAvatar',
-      'buildAvatarUrl',
-    ]);
+    avatarServiceSpy = jasmine.createSpyObj('AvatarService', ['updateMyAvatar', 'buildAvatarUrl']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     mockWindow = { location: { reload: jasmine.createSpy('reload') } };
 
     authServiceSpy.isLoggedIn.and.returnValue(true);
     authServiceSpy.getCurrentUser.and.returnValue(of(mockUser));
     userServiceSpy.getMe.and.returnValue(of(mockUser));
-    avatarServiceSpy.buildAvatarUrl.and.callFake(
-      (filename: string) => `url/${filename}`
-    );
-    avatarServiceSpy.updateMyAvatar.and.returnValue(
-      of({ ...mockUser, avatar: 'new-avatar.png' })
-    );
+    avatarServiceSpy.buildAvatarUrl.and.callFake((filename: string) => `url/${filename}`);
+    avatarServiceSpy.updateMyAvatar.and.returnValue(of({ ...mockUser, avatar: 'new-avatar.png' }));
 
     await TestBed.configureTestingModule({
       imports: [SellerProfileComponent],
@@ -76,11 +66,8 @@ describe('SellerProfileComponent', () => {
         { provide: AvatarService, useValue: avatarServiceSpy },
         { provide: Router, useValue: routerSpy },
         { provide: WINDOW, useValue: mockWindow },
-        {
-          provide: ActivatedRoute,
-          useValue: { snapshot: {}, paramMap: { get: () => null } },
-        },
-      ],
+        { provide: ActivatedRoute, useValue: { snapshot: {}, paramMap: { get: () => null } } }
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(SellerProfileComponent);
@@ -92,12 +79,11 @@ describe('SellerProfileComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should load user data on init', () => {
-    expect(component.user).toEqual(mockUser);
-    expect(component.profileImageUrl).toBe(
-      `https://localhost:8443/api/media/avatar/${mockUser.avatar}`
-    );
-  });
+   it('should load user data on init', () => {
+     expect(component.user).toEqual(mockUser);
+     expect(component.profileImageUrl)
+       .toBe(`https://localhost:8443/api/media/avatar/${mockUser.avatar}`);
+   });
 
   it('should navigate to product', () => {
     component.goToProduct('prod123');

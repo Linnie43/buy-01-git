@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms'; // Import FormsModule
+import { FormsModule } from '@angular/forms';
 import { ProductService } from '../../services/product.service';
 import { AuthService } from '../../services/auth.service';
-import { Product } from '../../models/product.model';
+import { Product, Category } from '../../models/product.model';
 import { Router } from '@angular/router';
 import { ImageUrlPipe } from '../../pipes/image-url.pipe';
 import { ImageCarouselComponent } from '../shared/image-carousel/image-carousel.component';
@@ -11,48 +11,75 @@ import { ImageCarouselComponent } from '../shared/image-carousel/image-carousel.
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, ImageUrlPipe, ImageCarouselComponent, FormsModule], // Add FormsModule
+  imports: [CommonModule, ImageUrlPipe, ImageCarouselComponent, FormsModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
-    products: Product[] = [];
-    isLoggedIn = false;
+  products: Product[] = [];
+  isLoggedIn = false;
 
-    searchTerm: string = '';
-    sortBy: string = 'latest';
+  // Filter Query Params
+  searchTerm: string = '';
+  sortBy: string = 'latest';
+  selectedCategory: string = '';
 
-    constructor(
-        private productService: ProductService,
-        private authService: AuthService,
-        private router: Router
-      ) {}
+  // Price State (Reverted to standard inputs)
+  minPrice: number | null = null;
+  maxPrice: number | null = null;
 
-     ngOnInit() {
-        this.isLoggedIn = this.authService.isLoggedIn?.() ?? false;
+  categories: string[] = Object.values(Category);
 
-        // getting the products from the backend
-        this.productService.getAllProducts(
-          undefined, undefined, undefined, undefined, 0, 10
-        ).subscribe({
-          next: (data: { products: Product[]; total: number }) => {
-            this.products = data.products.reverse();
-            console.log(this.products);
-          },
-          error: (err: unknown) => console.error(err)
-        });
-      }
+  constructor(
+    private productService: ProductService,
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
-    goToProduct(productId: string) {
-      this.router.navigate(['/products', productId]);
+  ngOnInit() {
+    this.isLoggedIn = this.authService.isLoggedIn?.() ?? false;
+    this.loadProducts();
+  }
+
+  goToProduct(productId: string) {
+    this.router.navigate(['/products', productId]);
+  }
+
+  // Unified trigger for all filter changes
+  onFilterChange() {
+    this.loadProducts();
+  }
+
+  onSearch() {
+    this.loadProducts();
+  }
+
+  onSortChange() {
+    this.loadProducts();
+  }
+
+  private loadProducts() {
+    let sortParam = 'createdAt,desc';
+
+    switch (this.sortBy) {
+      case 'price_asc': sortParam = 'price,asc'; break;
+      case 'price_desc': sortParam = 'price,desc'; break;
+      case 'alpha_asc': sortParam = 'name,asc'; break;
+      case 'alpha_desc': sortParam = 'name,desc'; break;
+      case 'latest': default: sortParam = 'createdAt,desc'; break;
     }
 
-    // Placeholder methods, change for backend!
-    onSearch() {
-      console.log('Searching for:', this.searchTerm);
-    }
-
-    onSortChange() {
-      console.log('Sorting by:', this.sortBy);
-    }
+    this.productService.getAllProducts(
+      this.searchTerm,
+      this.minPrice ?? undefined, // Pass undefined if null
+      this.maxPrice ?? undefined,
+      (this.selectedCategory as Category) || undefined,
+      sortParam,
+      0,
+      10
+    ).subscribe({
+      next: (data) => this.products = data.products,
+      error: (err) => console.error(err)
+    });
+  }
 }

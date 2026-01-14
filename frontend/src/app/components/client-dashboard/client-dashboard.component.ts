@@ -2,9 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OrderService } from '../../services/order.service';
-import { OrderDashboardDTO } from '../../models/order.model';
+import { OrderDashboardDTO, OrderStatusList } from '../../models/order.model';
 import { Router } from '@angular/router';
-import { OrderStatusList } from '../../models/order.model';
 
 @Component({
   selector: 'app-client-dashboard',
@@ -73,5 +72,9 @@ export class ClientDashboardComponent implements OnInit {
 
   goToProduct(productId: string): void {
     this.router.navigate(['/products', productId]);
+  }
+
+  viewOrder(orderId: string): void {
+    this.router.navigate(['/order', orderId]);
   }
 }

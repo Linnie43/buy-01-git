@@ -19,6 +19,7 @@ export class OrderViewComponent implements OnInit {
   isLoggedIn = false;
   statusSteps: string[] = OrderStatusList as unknown as string[];
   showReorderModal = false;
+  isSeller: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -30,6 +31,7 @@ export class OrderViewComponent implements OnInit {
 
   ngOnInit(): void {
       this.isLoggedIn = this.authService.isLoggedIn();
+      this.isSeller = this.authService.getUserRole() === 'SELLER';
       const orderId = this.route.snapshot.paramMap.get('id');
         if (orderId) {
           this.orderService.getOrderById(orderId).subscribe({

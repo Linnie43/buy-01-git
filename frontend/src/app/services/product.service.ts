@@ -46,18 +46,19 @@ export class ProductService {
     min?: number,
     max?: number,
     category?: Category,
+    sort: string = 'createdAt, desc',
     page: number = 0,
     size: number = 10
   ): Observable<{ products: Product[]; total: number }> {
     let params: any = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString())
-      .set('sort', 'createdAt,desc');
+      .set('sort', sort);
 
-    if (name?.trim()) params = params.set('name', name);
-    if (min !== undefined) params = params.set('min', min.toString());
-    if (max !== undefined) params = params.set('max', max.toString());
-    if (category) params = params.set('category', category);
+      if (name?.trim()) params = params.set('search', name);
+      if (min !== undefined) params = params.set('minPrice', min.toString());
+      if (max !== undefined) params = params.set('maxPrice', max.toString());
+      if (category) params = params.set('category', category);
 
     return this.http.get<any>(this.apiUrl, { params }).pipe(
       map((res) => ({

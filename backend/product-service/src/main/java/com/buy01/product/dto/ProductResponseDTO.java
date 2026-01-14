@@ -19,8 +19,7 @@ public class ProductResponseDTO {
     public ProductResponseDTO() {
     }
 
-    public ProductResponseDTO(String productId, String name, String description, double price, int quantity,
-            ProductCategory category, String userId, List<String> images, Boolean isProductOwner) {
+    public ProductResponseDTO(String productId, String name, String description, double price, int quantity, ProductCategory category, String userId, List<String> images, Boolean isProductOwner) {
         this.productId = productId;
         this.name = name;
         this.description = description;
@@ -32,76 +31,31 @@ public class ProductResponseDTO {
         this.isProductOwner = isProductOwner;
     }
 
-    public String getProductId() {
-        return productId;
-    }
+    public String getProductId() { return productId; }
+    public void setProductId(String productId) { this.productId = productId; }
 
-    public void setProductId(String productId) {
-        this.productId = productId;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public String getName() {
-        return name;
-    }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public Double getPrice() { return price; }
+    public void setPrice(Double price) { this.price = price; }
 
-    public String getDescription() {
-        return description;
-    }
+    public int getQuantity() { return quantity; }
+    public void setQuantity(int quantity) { this.quantity = quantity; }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+    public ProductCategory getCategory() { return category; }
+    public void setCategory(ProductCategory category) { this.category = category; }
 
-    public Double getPrice() {
-        return price;
-    }
+    public String getUserId() { return userId; }
+    public void setUserId(String userId) { this.userId = userId; }
 
-    public void setPrice(Double price) {
-        this.price = price;
-    }
+    public List<String> getImages() { return images; }
+    public void setImages(List<String> images) { this.images = images; }
 
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
-    public ProductCategory getCategory() {
-        return category;
-    }
-
-    public void setCategory(ProductCategory category) {
-        this.category = category;
-    }
-
-    public String getuserId() {
-        return userId;
-    }
-
-    public void setuserId(String userId) {
-        this.userId = userId;
-    }
-
-    public List<String> getImages() {
-        return images;
-    }
-
-    public void setImages(List<String> images) {
-        this.images = images;
-    }
-
-    public Boolean getIsProductOwner() {
-        return isProductOwner;
-    }
-
-    public void setIsProductOwner(Boolean isProductOwner) {
-        this.isProductOwner = isProductOwner;
-    }
+    public Boolean getIsProductOwner() { return isProductOwner; }
+    public void setIsProductOwner(Boolean isProductOwner) { this.isProductOwner = isProductOwner; }
 
 }

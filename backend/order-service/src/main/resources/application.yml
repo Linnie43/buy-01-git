@@ -6,14 +6,14 @@ spring:
       database: buy01
   cloud:
     inetutils:
-      preferredNetworks:g
+      preferredNetworks:
         -"172."
   kafka:
     bootstrap-servers: kafka:9092
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-    consumer:
+  consumer:
       group-id: order-service-group
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
@@ -26,6 +26,7 @@ kafka:
   topic:
     user-deleted: USER_DELETED
     product-deleted: PRODUCT_DELETED
+    product-updated: PRODUCT_UPDATED
 
 server:
   port: 8083

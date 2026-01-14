@@ -123,6 +123,20 @@ docker compose up -d --no-deps --build <service-name from docker-compose.yml>
 * **Gateway:** [https://localhost:8443](https://localhost:8443)
 * **Discovery UI (dev only):** [http://localhost:8761](http://localhost:8761)
 
+Open database through terminal:
+
+```
+docker exec -it <database-container> mongosh -u admin -p password --authenticationDatabase admin
+```
+
+You can find database container name with `docker ps`.
+
+You can view logs with:
+
+```
+docker logs -f <container-name>
+```
+
 ### 5. Stopping
 
 ```

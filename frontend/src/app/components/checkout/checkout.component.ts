@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -15,7 +15,7 @@ import { OrderResponseDTO } from '../../models/order.model';
   templateUrl: './checkout.component.html',
   styleUrls: ['./checkout.component.css']
 })
-export class CheckoutComponent implements OnInit {
+export class CheckoutComponent implements OnInit, OnDestroy {
   checkoutForm: FormGroup;
   isSubmitting = false;
   createdOrder: OrderResponseDTO | null = null;
@@ -45,6 +45,17 @@ export class CheckoutComponent implements OnInit {
     });
   }
 
+  // Triggers when user navigates away (Back button, Home link, etc.)
+  ngOnDestroy(): void {
+    // Only call the backend to revert to ACTIVE if an order wasn't placed
+    if (!this.createdOrder) {
+      this.cartService.updateCartStatus({ cartStatus: CartStatus.ACTIVE }).subscribe({
+        next: () => console.log('Cart status reverted to ACTIVE (User left checkout)'),
+        error: (err) => console.error('Failed to revert cart status', err)
+      });
+    }
+  }
+
   onSubmit(): void {
     if (this.checkoutForm.invalid) {
       return;
@@ -63,10 +74,9 @@ export class CheckoutComponent implements OnInit {
           panelClass: ['snack-bar-success']
         });
 
-        // Store the response to trigger the UI change
+        // Store the response
         this.createdOrder = res;
         this.isSubmitting = false;
-
       },
       error: (err: any) => {
         console.error('Order creation failed', err);
@@ -78,16 +88,8 @@ export class CheckoutComponent implements OnInit {
       }
     });
   }
-  onContinueShopping() {
 
-    this.cartService.updateCartStatus({ cartStatus: CartStatus.ACTIVE }).subscribe({
-      next: (response) => {
-        console.log('Cart status updated to ACTIVE');
-        this.router.navigate(['']); 
-      },
-      error: (error) => {
-        console.error('Failed to update cart status', error);
-      }
-    });
+  onContinueShopping() {
+    this.router.navigate(['']);
   }
 }

@@ -124,6 +124,7 @@
               </div>
             </div>
 
+<<<<<<< Updated upstream
             <!-- Submit & Continue Shopping Buttons -->
              <div class="d-flex gap-2">
                 
@@ -134,10 +135,30 @@
                 </button>
 
                 <button type="submit" class="btn btn-primary w-100 py-2" [disabled]="checkoutForm.invalid || isSubmitting">
+=======
+            <!-- Pay on delivery checkbox (mandatory to proceed)-->
+            <div class="form-check mb-4">
+              <input type="checkbox"
+                     id="payOnDelivery"
+                     class="form-check-input"
+                     formControlName="payOnDelivery"
+                     [class.is-invalid]="checkoutForm.get('payOnDelivery')?.invalid && checkoutForm.get('payOnDelivery')?.touched">
+              <label for="payOnDelivery" class="form-check-label">
+                I agree to pay on delivery.
+              </label>
+              <div class="invalid-feedback" *ngIf="checkoutForm.get('payOnDelivery')?.errors?.['required']">
+                You must agree to pay on delivery to proceed.
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+                <button type="submit"
+                        class="btn btn-primary w-100 py-2"
+                        [disabled]="checkoutForm.invalid || isSubmitting">
+>>>>>>> Stashed changes
                   <span *ngIf="!isSubmitting">Place Order</span>
                   <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                 </button>
-            </div>
 
           </form>
         </div>

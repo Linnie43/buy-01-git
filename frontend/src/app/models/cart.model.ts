@@ -13,6 +13,7 @@ export interface CartResponseDTO {
   id: string;
   items: ItemDTO[];
   totalPrice: number;
+  expiryTime: string;
 }
 
 // POST request to add item to cart

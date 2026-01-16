@@ -13,6 +13,7 @@
       title="My cart"
     >
       <img src="assets/cart.png" alt="Cart" class="cart-icon" />
+      <span *ngIf="cartItemCount > 0" class="cart-badge">{{ cartItemCount }}</span>
     </a>
 
     <button *ngIf="showProfile" (click)="logout()" class="login-btn">

@@ -57,6 +57,7 @@ header {
 }
 
 .cart-link {
+  position: relative; /* Added for badge positioning */
   display: flex;
   align-items: center;
   padding: 6px;
@@ -67,3 +68,17 @@ header {
   background-color: rgba(0, 0, 0, 0.05);
 }
 
+.cart-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: var(--dark-color);
+  color: white;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
+  width: 20px;
+  height: 20px;
+  line-height: 20px; /* Vertically center the number */
+}

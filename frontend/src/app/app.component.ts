@@ -1,13 +1,11 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { provideRouter } from '@angular/router';
-import { routes } from './app.routes';
-import { AuthService } from './services/auth.service';
-import { Router, NavigationEnd } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { RouterOutlet, RouterLink, Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 import { AVATAR_BASE_URL } from './constants/constants';
+import { CartService } from './services/cart.service';
+import { AuthService } from './services/auth.service';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -16,16 +14,17 @@ import { AVATAR_BASE_URL } from './constants/constants';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   profileRoute = '/auth';
   profileImageUrl: string | null = null;
   isLoggedIn = false;
   showProfile = false;
   isSeller = false;
   isOnAuthPage = false;
+  cartItemCount = 0;
 
 
-  constructor(private auth: AuthService, private router: Router) {
+  constructor(private auth: AuthService, private router: Router, private cartService: CartService) {
     this.updateProfileState();
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
@@ -33,6 +32,24 @@ export class AppComponent {
       }
     });
   }
+
+  ngOnInit(): void {
+    this.cartService.cart$.subscribe(cart => {
+      this.cartItemCount = cart?.items.reduce((sum, item) => sum + item.quantity, 0) ?? 0;
+    });
+
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      const isLoggedIn = this.auth.isLoggedIn();
+      if (isLoggedIn && this.auth.getUserRole() === 'CLIENT') {
+        this.cartService.loadCart();
+      } else {
+        this.cartService.clearCart();
+      }
+    });
+  }
+
 
   private updateProfileState() {
     this.isLoggedIn = this.auth.isLoggedIn();
@@ -62,5 +79,6 @@ export class AppComponent {
     this.auth.logout();
     this.isSeller = false;
     this.showProfile = false;
+    this.cartService.clearCart();
   }
 }

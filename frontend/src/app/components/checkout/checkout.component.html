@@ -12,7 +12,6 @@
           <div class="mb-4">
             <p class="fs-5 text-muted">Estimated time of arrival:</p>
             <h4 class="fw-bold">
-              <!-- do we have a deliveryDate? -->
               {{ createdOrder.deliveryDate ? (createdOrder.deliveryDate | date:'fullDate') : '3-5 Business Days' }}
             </h4>
           </div>
@@ -124,11 +123,37 @@
               </div>
             </div>
 
-            <!-- Submit Button -->
-            <button type="submit" class="btn btn-primary w-100 py-2" [disabled]="checkoutForm.invalid || isSubmitting">
-              <span *ngIf="!isSubmitting">Place Order</span>
-              <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-            </button>
+            <!-- Pay on delivery checkbox (mandatory to proceed)-->
+            <div class="form-check mb-4">
+              <input type="checkbox"
+                     id="payOnDelivery"
+                     class="form-check-input"
+                     formControlName="payOnDelivery"
+                     [class.is-invalid]="checkoutForm.get('payOnDelivery')?.invalid && checkoutForm.get('payOnDelivery')?.touched">
+              <label for="payOnDelivery" class="form-check-label">
+                I agree to pay on delivery.
+              </label>
+              <div class="invalid-feedback" *ngIf="checkoutForm.get('payOnDelivery')?.errors?.['required']">
+                You must agree to pay on delivery to proceed.
+              </div>
+            </div>
+
+            <!-- Submit & Continue Shopping Buttons -->
+             <div class="d-flex gap-2">
+
+                <button type="button"
+                        class="btn btn-success w-50 py-2"
+                        (click)="onContinueShopping()">
+                  Continue Shopping
+                </button>
+
+                <button type="submit"
+                        class="btn btn-primary w-100 py-2"
+                        [disabled]="checkoutForm.invalid || isSubmitting">
+                  <span *ngIf="!isSubmitting">Place Order</span>
+                  <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                </button>
+            </div>
 
           </form>
         </div>

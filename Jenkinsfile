@@ -9,10 +9,6 @@ pipeline {
             JWT_SECRET = credentials('JWT_SECRET')
     }
 
-    parameters {
-        string(name: 'BRANCH', defaultValue: 'main', description: 'Branch to build')
-    }
-
     tools {
         maven 'maven'
         nodejs 'NodeJS-20'

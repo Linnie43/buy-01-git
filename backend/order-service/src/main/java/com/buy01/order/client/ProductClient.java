@@ -15,18 +15,17 @@ import org.springframework.web.client.RestTemplate;
 public class ProductClient {
 
     private final RestTemplate restTemplate;
-    private final String productServiceBaseUrl;
+    private static final String PRODUCT_SERVICE_BASE_URL = "http://product-service:8081/api/products";
     private static final Logger log = LoggerFactory.getLogger(ProductClient.class);
 
 
     public ProductClient(RestTemplateBuilder builder) {
         this.restTemplate = builder.build();
-        this.productServiceBaseUrl = "http://product-service:8081/api/products";
     }
 
     public ProductUpdateDTO getProductById(String productId) {
         try {
-            String url = productServiceBaseUrl + "/internal/" + productId;
+            String url = PRODUCT_SERVICE_BASE_URL + "/internal/" + productId;
             log.info("Get product by id {}", url);
            return restTemplate.getForObject(url, ProductUpdateDTO.class);
         } catch (HttpClientErrorException e) {
@@ -36,7 +35,7 @@ public class ProductClient {
 
     public void updateQuantity(String productId, int quantity) {
         try {
-            String url = productServiceBaseUrl + "/internal/quantity/" + productId;
+            String url = PRODUCT_SERVICE_BASE_URL + "/internal/quantity/" + productId;
             restTemplate.put(url, quantity);
         } catch (HttpClientErrorException e) {
 
@@ -55,7 +54,7 @@ public class ProductClient {
 
     public void placeOrder(String productId, int quantity) {
         try {
-            String url = productServiceBaseUrl + "/internal/order/" + productId;
+            String url = PRODUCT_SERVICE_BASE_URL + "/internal/order/" + productId;
             restTemplate.put(url, quantity);
         } catch (HttpClientErrorException e) {
 
@@ -74,7 +73,7 @@ public class ProductClient {
 
     public void cancelOrder(String productId, int quantity) {
         try {
-            String url = productServiceBaseUrl + "/internal/cancel/" + productId;
+            String url = PRODUCT_SERVICE_BASE_URL + "/internal/cancel/" + productId;
             restTemplate.put(url, -quantity);
         } catch (HttpClientErrorException e) {
 

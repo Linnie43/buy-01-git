@@ -23,18 +23,16 @@ import java.io.IOException;
 public class MediaClient {
 
     private final RestTemplate restTemplate;
-    private final String mediaServiceBaseUrl;
+    private static final String MEDIA_SERVICE_BASE_URL = "http://media-service:8082/api/media";
     private static final Logger log = LoggerFactory.getLogger(MediaClient.class);
 
-    public MediaClient(RestTemplate restTemplate, RestTemplateBuilder builder) {
+    public MediaClient(RestTemplateBuilder builder) {
         this.restTemplate = builder.build();
-        // Local dev URL; will switch to container name in Docker
-        this.mediaServiceBaseUrl = "http://media-service:8082/api/media";
     }
 
     // send avatar to media service and get back the URL path
     public AvatarResponseDTO saveAvatar(AvatarCreateDTO avatarCreateDTO) throws IOException {
-        String url = mediaServiceBaseUrl + "/internal/avatar";
+        String url = MEDIA_SERVICE_BASE_URL + "/internal/avatar";
 
         MultipartFile avatar = avatarCreateDTO.getAvatar();
 
@@ -67,7 +65,7 @@ public class MediaClient {
     }
 
     public AvatarResponseDTO updateAvatar(AvatarUpdateRequest avatarUpdateRequest) throws IOException, FileUploadException {
-        String url = mediaServiceBaseUrl + "/internal/avatar";
+        String url = MEDIA_SERVICE_BASE_URL + "/internal/avatar";
 
         MultipartFile avatar = avatarUpdateRequest.getNewAvatar();
 

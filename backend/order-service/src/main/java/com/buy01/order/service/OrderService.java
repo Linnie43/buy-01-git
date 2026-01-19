@@ -97,6 +97,9 @@ public class OrderService {
         if (cart == null || cart.getItems().isEmpty()) {
             throw new BadRequestException("Cart is empty. Cannot create order.");
         }
+        if (cart.getCartStatus() != CartStatus.CHECKOUT) {
+            throw new BadRequestException("Checkout mode does not exists or has expired. Cannot create order.");
+        }
         updateProductStock(cart.getItems());
 
         Order order = orderRepository.save(
@@ -173,9 +176,6 @@ public class OrderService {
     }
 
     // Helper methods
-    private boolean isSellerOfItemsInOrder(Order order, String sellerId) {
-        return order.getItems().stream().anyMatch(item -> item.getSellerId().equals(sellerId));
-    }
 
     // convert OrderItem to ItemDTO
     public ItemDTO toItemDTO(OrderItem item) {

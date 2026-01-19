@@ -1,6 +1,7 @@
 package com.buy01.order.repository;
 
 import com.buy01.order.model.Cart;
+import com.buy01.order.model.CartStatus;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
@@ -9,6 +10,7 @@ import java.util.List;
 
 public interface CartRepository extends MongoRepository<Cart, String> {
     Cart findByUserId(String userId);
+    List<Cart> findByCartStatus(CartStatus status);
     List<Cart> findByItemsProductId(String productId);
     // Find ACTIVE carts updated before the specific date (fifteenMinsAgo)
     @Query("{ 'cartStatus': 'ACTIVE', 'expiryTime': { $lt: ?0 } }")

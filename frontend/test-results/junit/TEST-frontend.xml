@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<testsuite name="Chrome Headless 143.0.0.0 (Mac OS 10.15.7)" package="" timestamp="2026-01-19T08:51:40" id="0" hostname="fanni.vesanen" tests="7" errors="0" failures="0" time="0.084">
+  <properties>
+    <property name="browser.fullName" value="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/143.0.0.0 Safari/537.36"/>
+  </properties>
+  <testcase name="ManageProductsComponent in Update Mode should call deleteProduct when onDelete is confirmed" time="0.062" classname="ManageProductsComponent in Update Mode"/>
+  <testcase name="ManageProductsComponent in Update Mode should submit valid form data to updateProduct" time="0.005" classname="ManageProductsComponent in Update Mode"/>
+  <testcase name="ManageProductsComponent in Update Mode should NOT call deleteProduct when onDelete is cancelled" time="0.004" classname="ManageProductsComponent in Update Mode"/>
+  <testcase name="ManageProductsComponent in Update Mode should initialize in update mode and load product data" time="0.004" classname="ManageProductsComponent in Update Mode"/>
+  <testcase name="ManageProductsComponent in Create Mode should not submit if form is invalid" time="0.003" classname="ManageProductsComponent in Create Mode"/>
+  <testcase name="ManageProductsComponent in Create Mode should initialize successfully in create mode" time="0.003" classname="ManageProductsComponent in Create Mode"/>
+  <testcase name="ManageProductsComponent in Create Mode should submit valid form data to createProduct" time="0.003" classname="ManageProductsComponent in Create Mode"/>
+  <system-out>
+    <![CDATA[Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Product loaded:', Object{productId: 'prod-123', name: 'Test Product', description: 'A test description', price: 10, quantity: 5, category: 'OTHER', userId: 'user-1', images: ['image1.jpg']}
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'getMyProducts: success', [Object{productId: 'prod-123', name: 'Test Product', description: 'A test description', price: 10, quantity: 5, category: 'OTHER', userId: 'user-1', images: [...]}]
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Transforming imageId:', 'image1.jpg'
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Transforming imageId:', 'image1.jpg'
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'getMyProducts: success', [Object{productId: 'prod-123', name: 'Test Product', description: 'A test description', price: 10, quantity: 5, category: 'OTHER', userId: 'user-1', images: [...]}]
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Product loaded:', Object{productId: 'prod-123', name: 'Test Product', description: 'A test description', price: 10, quantity: 5, category: 'OTHER', userId: 'user-1', images: ['image1.jpg']}
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'getMyProducts: success', [Object{productId: 'prod-123', name: 'Test Product', description: 'A test description', price: 10, quantity: 5, category: 'OTHER', userId: 'user-1', images: [...]}]
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Transforming imageId:', 'image1.jpg'
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Transforming imageId:', 'image1.jpg'
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'getMyProducts: success', [Object{productId: 'prod-123', name: 'Test Product', description: 'A test description', price: 10, quantity: 5, category: 'OTHER', userId: 'user-1', images: [...]}]
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Product loaded:', Object{productId: 'prod-123', name: 'Test Product', description: 'A test description', price: 10, quantity: 5, category: 'OTHER', userId: 'user-1', images: ['image1.jpg']}
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'getMyProducts: success', [Object{productId: 'prod-123', name: 'Test Product', description: 'A test description', price: 10, quantity: 5, category: 'OTHER', userId: 'user-1', images: [...]}]
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Transforming imageId:', 'image1.jpg'
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Transforming imageId:', 'image1.jpg'
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Product loaded:', Object{productId: 'prod-123', name: 'Test Product', description: 'A test description', price: 10, quantity: 5, category: 'OTHER', userId: 'user-1', images: ['image1.jpg']}
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'getMyProducts: success', [Object{productId: 'prod-123', name: 'Test Product', description: 'A test description', price: 10, quantity: 5, category: 'OTHER', userId: 'user-1', images: [...]}]
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Transforming imageId:', 'image1.jpg'
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Transforming imageId:', 'image1.jpg'
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'getMyProducts: success', [Object{productId: 'prod-123', name: 'Test Product', description: 'A test description', price: 10, quantity: 5, category: 'OTHER', userId: 'user-1', images: [...]}]
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Transforming imageId:', 'image1.jpg'
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'getMyProducts: success', [Object{productId: 'prod-123', name: 'Test Product', description: 'A test description', price: 10, quantity: 5, category: 'OTHER', userId: 'user-1', images: [...]}]
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Transforming imageId:', 'image1.jpg'
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'getMyProducts: success', [Object{productId: 'prod-123', name: 'Test Product', description: 'A test description', price: 10, quantity: 5, category: 'OTHER', userId: 'user-1', images: [...]}]
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Transforming imageId:', 'image1.jpg'
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'getMyProducts: success', [Object{productId: 'prod-123', name: 'Test Product', description: 'A test description', price: 10, quantity: 5, category: 'OTHER', userId: 'user-1', images: [...]}]
+
+]]>
+  </system-out>
+  <system-err/>
+</testsuite>

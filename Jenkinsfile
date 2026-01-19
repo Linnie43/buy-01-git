@@ -2,15 +2,11 @@ pipeline {
     agent any
 
     environment {
-            SLACK_WEBHOOK = credentials('slack-webhook')
+            //             SLACK_WEBHOOK = credentials('slack-webhook')
             VERSION = "v${env.BUILD_NUMBER}"
             STABLE_TAG = "stable"
             SONAR_SCANNER_HOME = tool 'SonarScanner'
-//             JWT_SECRET = credentials('JWT_SECRET')
-        }
-
-    parameters {
-        string(name: 'BRANCH', defaultValue: 'main', description: 'Branch to build')
+            JWT_SECRET = credentials('JWT_SECRET')
     }
 
     tools {
@@ -19,13 +15,23 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                echo "Checking out branch: ${params.BRANCH}"
-                git branch: "${params.BRANCH}",
-                    url: 'https://github.com/Linnie43/buy-01-git'
-            }
-        }
+        //         stage('Checkout') {
+        //             steps {
+        //                 echo "Checking out branch: ${params.BRANCH}"
+        //                 git branch: "${params.BRANCH}",
+        //                     url: 'https://github.com/Linnie43/buy-01-git'
+        //             }
+        //         }
+
+        stage('Initialize') {
+                    steps {
+                        script {
+                            echo "Building Branch: ${env.BRANCH_NAME}"
+                            // This command ensures the code is pulled for the specific PR or Branch
+                            checkout scm
+                        }
+                    }
+                }
 
         stage('Build Backend') {
             steps {
@@ -47,6 +53,7 @@ pipeline {
                 }
                 dir('backend/order-service') {
                     sh 'mvn clean package -DskipTests -Dspring-boot.repackage.skip=true'
+                }
             }
         }
 
@@ -130,6 +137,9 @@ pipeline {
 
 
        stage('Build Images') {
+                    when {
+                       branch 'main' // This stage runs ONLY on the main branch
+                   }
                    steps {
                        script {
                            echo "Building Docker images with tag: ${VERSION}"
@@ -142,6 +152,9 @@ pipeline {
        }
 
         stage('Deploy & Verify') {
+                    when {
+                        branch 'main' // This stage runs ONLY on the main branch
+                    }
                     steps {
                         dir("$WORKSPACE") {
                             script {
@@ -168,14 +181,11 @@ pipeline {
 
                                     echo "Deployment Verification Passed!"
 
-                                    // TAG the new version as 'stable' since deployment succeeded
-                                    sh "docker tag frontend:${VERSION} frontend:${STABLE_TAG}"
-                                    sh "docker tag user-service:${VERSION} user-service:${STABLE_TAG}"
-                                    sh "docker tag product-service:${VERSION} product-service:${STABLE_TAG}"
-                                    sh "docker tag media-service:${VERSION} media-service:${STABLE_TAG}"
-                                    sh "docker tag order-service:${VERSION} order-service:${STABLE_TAG}"
-                                    sh "docker tag gateway:${VERSION} gateway:${STABLE_TAG}"
-                                    sh "docker tag discovery:${VERSION} discovery:${STABLE_TAG}"
+                                    // Retag as stable
+                                    def services = ['frontend', 'user-service', 'product-service', 'media-service', 'order-service', 'gateway', 'discovery']
+                                    services.each { svc ->
+                                        sh "docker tag ${svc}:${VERSION} ${svc}:${STABLE_TAG}"
+                                    }
 
 
                                 } catch (Exception e) {
@@ -189,19 +199,19 @@ pipeline {
                                         }
                                         echo "Rolled back to previous stable version."
                                         // Slack notification for successful rollback
-                                        sh """
-                                        curl -X POST -H 'Content-type: application/json' --data '{
-                                            "text": ":information_source: Rollback SUCCESSFUL!\n*Job:* ${env.JOB_NAME}\n*Build:* ${env.BUILD_NUMBER}\n*Branch:* ${params.BRANCH}"
-                                        }' ${env.SLACK_WEBHOOK}
-                                        """
+                                        //                                         sh """
+                                        //                                         curl -X POST -H 'Content-type: application/json' --data '{
+                                        //                                             "text": ":information_source: Rollback SUCCESSFUL!\n*Job:* ${env.JOB_NAME}\n*Build:* ${env.BUILD_NUMBER}\n*Branch:* ${params.BRANCH}"
+                                        //                                         }' ${env.SLACK_WEBHOOK}
+                                        //                                         """
                                     } catch (Exception rollbackErr) {
                                         echo "FATAL: Rollback failed!"
                                             echo "Reason: ${rollbackErr.getMessage()}"
-                                            sh """
-                                            curl -X POST -H 'Content-type: application/json' --data '{
-                                                "text": ":rotating_light: Rollback FAILED!\n*Reason:* ${rollbackErr.getMessage()}\n*Job:* ${env.JOB_NAME}\n*Build:* ${env.BUILD_NUMBER}\n*Branch:* ${params.BRANCH}\nManual intervention needed!"
-                                            }' ${env.SLACK_WEBHOOK}
-                                            """
+                                        //                                             sh """
+                                        //                                             curl -X POST -H 'Content-type: application/json' --data '{
+                                        //                                                 "text": ":rotating_light: Rollback FAILED!\n*Reason:* ${rollbackErr.getMessage()}\n*Job:* ${env.JOB_NAME}\n*Build:* ${env.BUILD_NUMBER}\n*Branch:* ${params.BRANCH}\nManual intervention needed!"
+                                        //                                             }' ${env.SLACK_WEBHOOK}
+                                        //                                             """
                                     }
 
                                     // Fail the build
@@ -216,38 +226,41 @@ pipeline {
     post {
         always {
             script {
-                // Backend test reports
-                junit allowEmptyResults: true, testResults: 'backend/*/target/surefire-reports/*.xml'
-                archiveArtifacts artifacts: 'backend/*/target/surefire-reports/*.xml', allowEmptyArchive: true
+                try {
+                    // Backend test reports
+                    junit allowEmptyResults: true, testResults: 'backend/*/target/surefire-reports/*.xml'
+                    archiveArtifacts artifacts: 'backend/*/target/surefire-reports/*.xml', allowEmptyArchive: true
 
-                // Frontend reports
-                junit allowEmptyResults: true, testResults: 'frontend/test-results/junit/*.xml'
-                archiveArtifacts artifacts: 'frontend/test-results/junit/*.xml', allowEmptyArchive: true
+                    // Frontend reports
+                    junit allowEmptyResults: true, testResults: 'frontend/test-results/junit/*.xml'
+                    archiveArtifacts artifacts: 'frontend/test-results/junit/*.xml', allowEmptyArchive: true
 
-                if (env.WORKSPACE) {
-                    cleanWs notFailBuild: true //clean the workspace after build
-                } else {
-                    echo "No workspace available; skipping cleanWs"
+                    if (env.WORKSPACE) {
+                        cleanWs notFailBuild: true
+                    }
+
+                } catch (err) {
+                    echo "Post-build actions failed: ${err.getMessage()}"
                 }
             }
         }
 
         success {
             echo "Build succeeded!"
-            sh """
-            curl -X POST -H 'Content-type: application/json' --data '{
-                "text": ":white_check_mark: Build SUCCESS\n*Job:* ${env.JOB_NAME}\n*Build:* ${env.BUILD_NUMBER}\n*Branch:* ${params.BRANCH}"
-            }' ${env.SLACK_WEBHOOK}
-            """
+            //             sh """
+            //             curl -X POST -H 'Content-type: application/json' --data '{
+            //                 "text": ":white_check_mark: Build SUCCESS\n*Job:* ${env.JOB_NAME}\n*Build:* ${env.BUILD_NUMBER}\n*Branch:* ${params.BRANCH}"
+            //             }' ${env.SLACK_WEBHOOK}
+            //             """
         }
 
         failure {
             echo "Build failed!"
-            sh """
-            curl -X POST -H 'Content-type: application/json' --data '{
-                "text": ":x: Build FAILED\n*Job:* ${env.JOB_NAME}\n*Build:* ${env.BUILD_NUMBER}\n*Branch:* ${params.BRANCH}\n*Error:* ${currentBuild.currentResult}"
-            }' ${env.SLACK_WEBHOOK}
-            """
+            //             sh """
+            //             curl -X POST -H 'Content-type: application/json' --data '{
+            //                 "text": ":x: Build FAILED\n*Job:* ${env.JOB_NAME}\n*Build:* ${env.BUILD_NUMBER}\n*Branch:* ${params.BRANCH}\n*Error:* ${currentBuild.currentResult}"
+            //             }' ${env.SLACK_WEBHOOK}
+            //             """
         }
     }
 }

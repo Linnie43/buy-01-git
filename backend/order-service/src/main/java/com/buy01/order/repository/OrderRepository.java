@@ -13,10 +13,15 @@ import java.util.Optional;
 
 public interface OrderRepository extends MongoRepository<Order, String> {
     Optional<Order> getOrderById(String orderId);
-    List<Order> findOrdersByUserId(String userId);
 
-    @Query("{ 'items.sellerId': ?0 }")
+    List<Order> findOrdersByUserIdOrderByCreatedAtDesc(String userId);
+
+    @Query(
+            value = "{ 'items.sellerId': ?0 }",
+            sort = "{ 'createdAt': -1 }"
+    )
     List<Order> findByItemsSellerId(String sellerId);
+
 
     @Aggregation(pipeline = {
             // 1. Optimization: Only pick orders that have this seller involved at all

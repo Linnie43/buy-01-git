@@ -1,8 +1,11 @@
 package com.buy01.order.scheduler;
 
+import com.buy01.order.client.ProductClient;
 import com.buy01.order.model.Cart;
 import com.buy01.order.model.CartStatus;
+import com.buy01.order.model.OrderItem;
 import com.buy01.order.repository.CartRepository;
+import com.buy01.order.service.CartService;
 import com.buy01.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +21,7 @@ import java.util.List;
 public class CartCleanupScheduler {
 
     private final CartRepository cartRepository;
-    private final OrderService orderService;
+    private final ProductClient productClient;
 
     // Run every 30 seconds to catch the 1-minute and 15-minute windows
     @Scheduled(fixedRate = 30000)
@@ -46,7 +49,8 @@ public class CartCleanupScheduler {
         cart.setUpdateTime(new Date());
         cartRepository.save(cart);
 
-        orderService.restoreProductStock(cart.getItems());
-
+        for(OrderItem item : cart.getItems()) {
+            productClient.updateQuantity(item.getProductId(), item.getQuantity());
+        }
     }
 }

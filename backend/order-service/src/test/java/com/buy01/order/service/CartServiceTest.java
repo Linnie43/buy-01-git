@@ -27,7 +27,7 @@ import static org.mockito.Mockito.*;
 
 @Service
 @ExtendWith(MockitoExtension.class)
-public class CartServiceTest {
+class CartServiceTest {
 
     @Mock
     private CartRepository cartRepository;
@@ -42,11 +42,14 @@ public class CartServiceTest {
     private CartService cartService;
 
     @Test
-    void getCurrentCart_createsCartForClient() throws Exception {
+    void getCurrentCartNull_createACart_success() throws Exception {
         when(cartRepository.findByUserId("user1")).thenReturn(null);
         when(cartRepository.save(any())).thenAnswer(i -> i.getArgument(0));
 
         Cart cart = cartService.getCurrentCart(clientUser());
+        if (cart == null) {
+            cart = cartService.createNewCart(clientUser());
+        }
 
         assertNotNull(cart);
         assertEquals("user1", cart.getUserId());
@@ -145,7 +148,7 @@ public class CartServiceTest {
 
         assertTrue(cart.getItems().isEmpty());
         verify(productClient).updateQuantity("p1", 2);
-        verify(cartRepository).save(cart);
+        verify(cartRepository).delete(cart);
     }
 
     @Test

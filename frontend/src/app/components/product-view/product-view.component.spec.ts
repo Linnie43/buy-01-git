@@ -33,7 +33,7 @@ describe('ProductViewComponent', () => {
     productServiceSpy = jasmine.createSpyObj('ProductService', [
       'getProductById',
     ]);
-    authServiceSpy = jasmine.createSpyObj('AuthService', ['isLoggedIn']);
+    authServiceSpy = jasmine.createSpyObj('AuthService', ['isLoggedIn', 'getUserRole']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     TestBed.configureTestingModule({

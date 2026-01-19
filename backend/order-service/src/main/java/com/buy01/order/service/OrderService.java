@@ -36,7 +36,7 @@ public class OrderService {
     }
 
     public OrderDashboardDTO getClientOrders(AuthDetails currentUser) {
-        List<Order> orders = orderRepository.findOrdersByUserId(currentUser.getCurrentUserId());
+        List<Order> orders = orderRepository.findOrdersByUserIdOrderByCreatedAtDesc(currentUser.getCurrentUserId());
 
         List<OrderResponseDTO> ordersDto = orders.stream()
                 .map(this::mapToDTO)

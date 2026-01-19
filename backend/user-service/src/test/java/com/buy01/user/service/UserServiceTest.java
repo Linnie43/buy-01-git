@@ -86,6 +86,7 @@ class UserServiceTest {
         user.setEmail("seller@test.com");
         user.setPassword("pass123");
         user.setRole(Role.SELLER);
+        user.setAvatar(avatar);
 
         AvatarResponseDTO avatarResponse = new AvatarResponseDTO("http://avatar.com/myimg.png");
 

@@ -173,9 +173,6 @@ public class OrderService {
     }
 
     // Helper methods
-    private boolean isSellerOfItemsInOrder(Order order, String sellerId) {
-        return order.getItems().stream().anyMatch(item -> item.getSellerId().equals(sellerId));
-    }
 
     // convert OrderItem to ItemDTO
     public ItemDTO toItemDTO(OrderItem item) {

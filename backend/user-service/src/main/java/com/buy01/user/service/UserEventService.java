@@ -15,7 +15,7 @@ public class UserEventService {
     private String userDeletedTopic;
 
     public void publishUserDeletedEvent(String userId) {
-        System.out.println("Kafka called with user deleted event");
+
         kafkaTemplate.send(userDeletedTopic, userId);
     }
 }

@@ -7,6 +7,8 @@ import com.buy01.media.model.Media;
 import com.buy01.media.repository.MediaRepository;
 import com.buy01.media.service.MediaService;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.CacheControl;
@@ -28,6 +30,8 @@ public class MediaController {
     private final MediaRepository mediaRepository;
     private final MediaService mediaService;
     private final String avatarDir = "uploads/avatar";
+    private static final Logger log = LoggerFactory.getLogger(MediaController.class);
+
 
     public MediaController(MediaRepository mediaRepository,MediaService mediaService) {
         this.mediaRepository = mediaRepository;
@@ -42,7 +46,6 @@ public class MediaController {
 
         List<MediaResponseDTO> result = mediaService.saveProductImages(dto.getProductId(), dto.getFiles());
 
-        System.out.println("Responding ok from media-service: "+ result);
         return ResponseEntity.ok(result);
     }
 
@@ -51,7 +54,6 @@ public class MediaController {
     public ResponseEntity<Resource> getImage(
             @PathVariable String id
     ) throws IOException {
-        System.out.println("Image requested with id: "+ id);
         Media media = mediaRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Image not found"));
 
@@ -59,11 +61,9 @@ public class MediaController {
         Resource resource = new UrlResource(filePath.toUri());
 
         if (!resource.exists() || !resource.isReadable()) {
-            System.out.println("Resource doesn't exist or is not readable");
+            log.error("Resource doesn't exist or is not readable: {}", filePath);
             throw new NotFoundException("Image file not found");
         }
-
-        System.out.println("Resource found:" + resource);
 
         String contentType = Files.probeContentType(filePath);
         MediaType mediaType = (contentType != null) ? MediaType.parseMediaType(contentType) : MediaType.APPLICATION_OCTET_STREAM;
@@ -79,7 +79,6 @@ public class MediaController {
     public List<MediaResponseDTO> getProductImages(
             @PathVariable String productId
     ) {
-        System.out.println("Get product image requested with id: "+ productId);
         List<Media> mediaList = mediaRepository.getMediaByProductId(productId);
 
         return mediaList.stream()
@@ -122,7 +121,6 @@ public class MediaController {
     public ResponseEntity<AvatarResponseDTO> uploadAvatar(
             @ModelAttribute AvatarCreateDTO dto
     ) throws IOException {
-        System.out.println("Upload avatar requested");
 
         String url = mediaService.saveUserAvatar(dto.getAvatar());
 
@@ -134,13 +132,9 @@ public class MediaController {
     public ResponseEntity<Resource> getAvatar(
             @PathVariable String filename
     ) throws IOException {
-        System.out.println("Avatar requested with path: "+ filename);
-
 
         Path baseDir = Paths.get(avatarDir).toAbsolutePath().normalize();
         Path filePath = baseDir.resolve(filename).normalize();
-
-        System.out.println("Filepath: " + filePath);
 
         // prevent path traversal
         if (!filePath.startsWith(baseDir)) {
@@ -150,11 +144,9 @@ public class MediaController {
         Resource resource = new UrlResource(filePath.toUri());
 
         if (!resource.exists() || !resource.isReadable()) {
-            System.out.println("Resource doesn't exist or is not readable");
+            log.error("Error serving the avatar, resource doesn't exist or is not readable: {}", filePath);
             throw new NotFoundException("Image file not found");
         }
-
-        System.out.println("Resource found:" + resource);
 
         String contentType = Files.probeContentType(filePath);
         MediaType mediaType = (contentType != null) ? MediaType.parseMediaType(contentType) : MediaType.APPLICATION_OCTET_STREAM;
@@ -170,7 +162,6 @@ public class MediaController {
     public ResponseEntity<AvatarResponseDTO> updateAvatar(
             @Valid @ModelAttribute AvatarUpdateRequest dto
     ) throws IOException {
-        System.out.println("PUT method for avatar called");
         AvatarResponseDTO response = mediaService.updateAvatar(dto.getNewAvatar(), dto.getOldAvatar());
 
         return ResponseEntity.ok(response);

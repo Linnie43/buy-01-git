@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface CartRepository extends MongoRepository<Cart, String> {
     Cart findByUserId(String userId);
+    List<Cart> findByCartStatus(CartStatus status);
     List<Cart> findByItemsProductId(String productId);
     // Find ACTIVE carts updated before the specific date (fifteenMinsAgo)
     @Query("{ 'cartStatus': 'ACTIVE', 'expiryTime': { $lt: ?0 } }")

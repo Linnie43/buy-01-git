@@ -97,6 +97,9 @@ public class OrderService {
         if (cart == null || cart.getItems().isEmpty()) {
             throw new BadRequestException("Cart is empty. Cannot create order.");
         }
+        if (cart.getCartStatus() != CartStatus.CHECKOUT) {
+            throw new BadRequestException("Checkout mode does not exists or has expired. Cannot create order.");
+        }
         updateProductStock(cart.getItems());
 
         Order order = orderRepository.save(

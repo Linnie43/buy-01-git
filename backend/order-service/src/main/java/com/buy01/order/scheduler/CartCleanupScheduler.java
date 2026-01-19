@@ -28,12 +28,26 @@ public class CartCleanupScheduler {
     public void processCartExpirations() {
         Date now =  new Date();
         Date oneMinAgo = new Date(now.getTime() - (60 * 1000));
+        Date fiveMinAgo = new Date(now.getTime() - (5 * 60 * 1000));
 
         // Mark ACTIVE Carts started 15min ago to ABANDONED
         List<Cart> toAbandon = cartRepository.findExpiredActiveCarts(now);
         for (Cart cart : toAbandon) {
             if (cart.getCartStatus() == CartStatus.ACTIVE && cart.getUpdateTime().before(oneMinAgo)) { // avoid double processing and give grace
                 abandonCart(cart);
+            }
+        }
+
+        // Mark CHECKOUT Carts to ABANDONED (The 5-minute expiry logic)
+        List<Cart> checkoutCarts = cartRepository.findByCartStatus(CartStatus.CHECKOUT);
+        for (Cart cart : checkoutCarts) {
+            // Logic: if updateTime > 5 min ago AND expiryTime (if exists) is past now
+            if (cart.getUpdateTime().before(fiveMinAgo)) {
+                if (cart.getExpiryTime() != null && cart.getExpiryTime().before(now)) {
+                    abandonCart(cart);
+                } else {
+                    activateCart(cart);
+                }
             }
         }
 
@@ -52,5 +66,11 @@ public class CartCleanupScheduler {
         for(OrderItem item : cart.getItems()) {
             productClient.updateQuantity(item.getProductId(), item.getQuantity());
         }
+    }
+
+    private void activateCart(Cart cart) {
+        cart.setCartStatus(CartStatus.ACTIVE);
+        cart.setUpdateTime(new Date());
+        cartRepository.save(cart);
     }
 }

@@ -2,12 +2,12 @@ pipeline {
     agent any
 
     environment {
-//             SLACK_WEBHOOK = credentials('slack-webhook')
+            //             SLACK_WEBHOOK = credentials('slack-webhook')
             VERSION = "v${env.BUILD_NUMBER}"
             STABLE_TAG = "stable"
             SONAR_SCANNER_HOME = tool 'SonarScanner'
             JWT_SECRET = credentials('JWT_SECRET')
-        }
+    }
 
     parameters {
         string(name: 'BRANCH', defaultValue: 'main', description: 'Branch to build')
@@ -19,13 +19,13 @@ pipeline {
     }
 
     stages {
-//         stage('Checkout') {
-//             steps {
-//                 echo "Checking out branch: ${params.BRANCH}"
-//                 git branch: "${params.BRANCH}",
-//                     url: 'https://github.com/Linnie43/buy-01-git'
-//             }
-//         }
+        //         stage('Checkout') {
+        //             steps {
+        //                 echo "Checking out branch: ${params.BRANCH}"
+        //                 git branch: "${params.BRANCH}",
+        //                     url: 'https://github.com/Linnie43/buy-01-git'
+        //             }
+        //         }
 
         stage('Initialize') {
                     steps {
@@ -57,6 +57,7 @@ pipeline {
                 }
                 dir('backend/order-service') {
                     sh 'mvn clean package -DskipTests -Dspring-boot.repackage.skip=true'
+                }
             }
         }
 
@@ -202,19 +203,19 @@ pipeline {
                                         }
                                         echo "Rolled back to previous stable version."
                                         // Slack notification for successful rollback
-//                                         sh """
-//                                         curl -X POST -H 'Content-type: application/json' --data '{
-//                                             "text": ":information_source: Rollback SUCCESSFUL!\n*Job:* ${env.JOB_NAME}\n*Build:* ${env.BUILD_NUMBER}\n*Branch:* ${params.BRANCH}"
-//                                         }' ${env.SLACK_WEBHOOK}
-//                                         """
+                                        //                                         sh """
+                                        //                                         curl -X POST -H 'Content-type: application/json' --data '{
+                                        //                                             "text": ":information_source: Rollback SUCCESSFUL!\n*Job:* ${env.JOB_NAME}\n*Build:* ${env.BUILD_NUMBER}\n*Branch:* ${params.BRANCH}"
+                                        //                                         }' ${env.SLACK_WEBHOOK}
+                                        //                                         """
                                     } catch (Exception rollbackErr) {
                                         echo "FATAL: Rollback failed!"
                                             echo "Reason: ${rollbackErr.getMessage()}"
-//                                             sh """
-//                                             curl -X POST -H 'Content-type: application/json' --data '{
-//                                                 "text": ":rotating_light: Rollback FAILED!\n*Reason:* ${rollbackErr.getMessage()}\n*Job:* ${env.JOB_NAME}\n*Build:* ${env.BUILD_NUMBER}\n*Branch:* ${params.BRANCH}\nManual intervention needed!"
-//                                             }' ${env.SLACK_WEBHOOK}
-//                                             """
+                                        //                                             sh """
+                                        //                                             curl -X POST -H 'Content-type: application/json' --data '{
+                                        //                                                 "text": ":rotating_light: Rollback FAILED!\n*Reason:* ${rollbackErr.getMessage()}\n*Job:* ${env.JOB_NAME}\n*Build:* ${env.BUILD_NUMBER}\n*Branch:* ${params.BRANCH}\nManual intervention needed!"
+                                        //                                             }' ${env.SLACK_WEBHOOK}
+                                        //                                             """
                                     }
 
                                     // Fail the build
@@ -237,30 +238,30 @@ pipeline {
                 junit allowEmptyResults: true, testResults: 'frontend/test-results/junit/*.xml'
                 archiveArtifacts artifacts: 'frontend/test-results/junit/*.xml', allowEmptyArchive: true
 
-                cleanWs notFailBuild: true //clean the workspace after build
-//                 if (env.WORKSPACE) {
-//                 } else {
-//                     echo "No workspace available; skipping cleanWs"
-//                 }
+                if (env.WORKSPACE) {
+                    cleanWs notFailBuild: true //clean the workspace after build
+                } else {
+                    echo "No workspace available; skipping cleanWs"
+                }
             }
         }
 
         success {
             echo "Build succeeded!"
-//             sh """
-//             curl -X POST -H 'Content-type: application/json' --data '{
-//                 "text": ":white_check_mark: Build SUCCESS\n*Job:* ${env.JOB_NAME}\n*Build:* ${env.BUILD_NUMBER}\n*Branch:* ${params.BRANCH}"
-//             }' ${env.SLACK_WEBHOOK}
-//             """
+            //             sh """
+            //             curl -X POST -H 'Content-type: application/json' --data '{
+            //                 "text": ":white_check_mark: Build SUCCESS\n*Job:* ${env.JOB_NAME}\n*Build:* ${env.BUILD_NUMBER}\n*Branch:* ${params.BRANCH}"
+            //             }' ${env.SLACK_WEBHOOK}
+            //             """
         }
 
         failure {
             echo "Build failed!"
-//             sh """
-//             curl -X POST -H 'Content-type: application/json' --data '{
-//                 "text": ":x: Build FAILED\n*Job:* ${env.JOB_NAME}\n*Build:* ${env.BUILD_NUMBER}\n*Branch:* ${params.BRANCH}\n*Error:* ${currentBuild.currentResult}"
-//             }' ${env.SLACK_WEBHOOK}
-//             """
+            //             sh """
+            //             curl -X POST -H 'Content-type: application/json' --data '{
+            //                 "text": ":x: Build FAILED\n*Job:* ${env.JOB_NAME}\n*Build:* ${env.BUILD_NUMBER}\n*Branch:* ${params.BRANCH}\n*Error:* ${currentBuild.currentResult}"
+            //             }' ${env.SLACK_WEBHOOK}
+            //             """
         }
     }
 }

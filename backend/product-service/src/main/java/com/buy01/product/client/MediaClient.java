@@ -65,7 +65,6 @@ public class MediaClient {
 
     public List<String> postProductImages(String productId, List<MultipartFile> images) throws IOException {
         String url = mediaServiceBaseUrl + "/internal/images";
-        System.out.println("Request url: " + url);
 
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         body.add("productId", productId);
@@ -93,10 +92,13 @@ public class MediaClient {
         );
 
         List<MediaResponseDTO> mediaIds = response.getBody();
-        System.out.println("Uploaded product images: " + mediaIds);
+        if (mediaIds == null) {
+            log.info("No media IDs returned from media service");
+            mediaIds = List.of();
+        }
 
         if (!response.getStatusCode().is2xxSuccessful()) {
-            System.out.println("Failed to save images: " + response.getStatusCode());
+            log.error("Failed to save images: {}", response.getStatusCode());
             throw new FileUploadException("Failed to upload images: " + response.getStatusCode());
         }
 
@@ -112,7 +114,6 @@ public class MediaClient {
             List<MultipartFile> newImages
     ) throws IOException {
         String url = mediaServiceBaseUrl + "/internal/images/productId/" + productId;
-        System.out.println("Request url: " + url);
 
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         for (String id : imagesToDelete) {
@@ -144,11 +145,15 @@ public class MediaClient {
             );
 
             List<MediaResponseDTO> mediaIds = response.getBody();
+            if (mediaIds == null) {
+                log.info("No media IDs returned from media service after update");
+                mediaIds = List.of();
+            }
             return mediaIds.stream()
                     .map(MediaResponseDTO::getId)
                     .collect(Collectors.toList());
         } catch (HttpClientErrorException e) {
-            System.out.println("Error updating product images: " + e.getStatusCode() + " - " + e.getResponseBodyAsString());
+            log.error("Error updating product images: {} - {} - {}", e.getStatusCode(), e.getResponseBodyAsString(), e.getResponseBodyAsString());
             throw new ResponseStatusException(e.getStatusCode(), e.getResponseBodyAsString(), e);
         }
     }

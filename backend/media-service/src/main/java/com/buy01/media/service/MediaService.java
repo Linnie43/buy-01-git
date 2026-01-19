@@ -7,6 +7,8 @@ import com.buy01.media.exception.ForbiddenException;
 import com.buy01.media.exception.NotFoundException;
 import com.buy01.media.repository.MediaRepository;
 import com.buy01.media.exception.FileUploadException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import com.buy01.media.model.Media;
@@ -29,6 +31,8 @@ public class MediaService {
 
     private static final String UPLOAD_DIR = "uploads";
     private static final String AVATAR_DIR = "avatar";
+    private static final Logger log = LoggerFactory.getLogger(MediaService.class);
+
 
     public MediaService(MediaRepository mediaRepository) throws IOException {
         this.mediaRepository = mediaRepository;
@@ -48,16 +52,14 @@ public class MediaService {
             validateFile(file);
         }
 
-        System.out.println("Saving images for productId: " + productId + ", number of files: " + files.size());
+        log.info("Saving images for productId: {}, number of files: {}", productId, files.size());
         // Stream files, save them and create a list of MediaResponseDTO for return
-        List<MediaResponseDTO> result = files.stream()
+        return files.stream()
                 .map(file -> {
                     Media media = saveImage(file, productId);
                     return new MediaResponseDTO(media.getId(), media.getProductId());
                 })
                 .toList();
-        System.out.println("saved images: " + result.size());
-        return result;
     }
 
     // creates path and saves the image to uploads
@@ -86,7 +88,7 @@ public class MediaService {
                     throw new ForbiddenException("Media id: " + id + " does not belong to productId: " + productId);
                 }
             }
-            System.out.println("Deleting images for productId: " + productId + ", number of files: " + deletedIds.size());
+            log.info("Deleting images for productId: {}, number of files: {}", productId, deletedIds.size());
         }
 
         // validate newImages
@@ -122,8 +124,6 @@ public class MediaService {
             updatedMedia.add(new MediaResponseDTO(media.getId(), media.getProductId()));
         }
 
-        //return updated list
-        System.out.println("Updated images for productId: " + productId + ", number of files: " + updatedMedia.size());
         return updatedMedia;
     }
 
@@ -182,7 +182,6 @@ public class MediaService {
 
     // delete user avatar from server
     public void deleteAvatar(String filename) {
-        System.out.println("deleting old avatar");
         Path filePath = avatarPath.resolve(filename).toAbsolutePath();
         deleteFile(filePath.toString());
     }
@@ -209,21 +208,21 @@ public class MediaService {
         }
         String contentType = file.getContentType();
         if (contentType == null || !contentType.startsWith("image/")) {
-            System.out.println("Invalid content type: " + contentType);
+            log.error("Invalid content type: {}", contentType);
             throw new FileUploadException("Invalid file type");
         }
     }
 
     // delete file from server by path
     public void deleteFile(String filePathStr) {
-        System.out.println(filePathStr);
         Path filePath = Paths.get(filePathStr).toAbsolutePath();
         try {
             boolean deleted = Files.deleteIfExists(filePath);
             if (!deleted) {
-                System.out.println("File not found: " + filePath);
+                log.info("File not found: {}", filePath);
             }
         } catch (IOException e) {
+            log.error("Error deleting file: {}", filePath, e);
             throw new ConflictException("Failed to delete file: " + filePath, e);
         }
     }

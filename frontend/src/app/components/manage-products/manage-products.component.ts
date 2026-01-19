@@ -11,6 +11,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../shared/confirmation-dialog.component';
 import { ImageUrlPipe } from '../../pipes/image-url.pipe';
 import { ImageCarouselComponent } from '../shared/image-carousel/image-carousel.component';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 const MAX_SIZE = 2 * 1024 * 1024; // 2 MB
 
@@ -23,7 +24,7 @@ interface ImagePreview {
 @Component({
   selector: 'app-manage-products',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, ImageUrlPipe, ImageCarouselComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, ImageUrlPipe, ImageCarouselComponent, MatSnackBarModule],
   templateUrl: './manage-products.component.html',
   styleUrls: ['./manage-products.component.css']
 })
@@ -47,7 +48,8 @@ export class ManageProductsComponent implements OnInit {
       private productService: ProductService,
       private router: Router,
       private userService: UserService,
-      public dialog: MatDialog
+      public dialog: MatDialog,
+      private snackBar: MatSnackBar
     ) {
       this.productForm = this.fb.group({
             name: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(255)]],
@@ -196,7 +198,10 @@ export class ManageProductsComponent implements OnInit {
               if (this.mode === 'create') {
                     this.selectedFiles.forEach(file => formData.append('imagesList', file));
                     this.productService.createProduct(formData).subscribe({
-                      next: () => this.onSuccess(),
+                      next: () => {
+                        this.snackBar.open('Product created successfully!', 'Close', { duration: 3000, panelClass: ['snack-bar-success'] });
+                        this.onSuccess();
+                      },
                       error: (err) => this.handleError(err, 'Create')
                     });
 
@@ -204,23 +209,24 @@ export class ManageProductsComponent implements OnInit {
                         this.deletedImageIds.forEach(id => formData.append('deletedImageIds', id));
                         this.selectedFiles.forEach(file => formData.append('images', file));
                         this.productService.updateProduct(this.productId, formData).subscribe({
-                          next: () => this.onSuccess(),
+                          next: () => {
+                            this.snackBar.open('Product updated successfully!', 'Close', { duration: 3000, panelClass: ['snack-bar-success'] });
+                            // Refresh product list
+                            this.loadMyProducts();
+                          },
                           error: (err) => this.handleError(err, 'Update')
                         });
                       }
                     }
 
-      // Centralized error handling for create/update operations
       private handleError(err: HttpErrorResponse, action: 'Create' | 'Update') {
           console.error(`${action} failed`, err);
           if (err.status === 400 && err.error && typeof err.error === 'object') {
-            // Handle specific name length error from the server
-            if (err.error.error && typeof err.error.error === 'string' && err.error.error.includes('Product name must be between')) {
+             if (err.error.error && typeof err.error.error === 'string' && err.error.error.includes('Product name must be between')) {
               this.formErrors['name'] = err.error.error;
             } else if (err.error.error === 'Invalid file type') {
               this.error = 'One or more images have an unsupported file type. Please use JPG, PNG, or GIF.';
             } else {
-              // Assign other field-specific errors
               this.formErrors = err.error;
             }
           } else if (err.status !== 401 && err.status !== 403) {
@@ -228,7 +234,7 @@ export class ManageProductsComponent implements OnInit {
           }
         }
 
-      // Handle product deletion with confirmation
+      // Product deletion and confirmation
       onDelete(): void {
         const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
           width: '350px',
@@ -241,7 +247,10 @@ export class ManageProductsComponent implements OnInit {
         dialogRef.afterClosed().subscribe(result => {
               if (result) {
                 this.productService.deleteProduct(this.productId).subscribe({
-                  next: () => this.onSuccess(),
+                  next: () => {
+                    this.snackBar.open('Product deleted', 'Close', { duration: 3000, panelClass: ['snack-bar-success'] });
+                    this.onSuccess();
+                  },
                   error: (err) => { this.error = 'Failed to delete the product.'; }
                 });
               }
@@ -259,15 +268,16 @@ export class ManageProductsComponent implements OnInit {
           this.updateImagePreviews(currentImages.filter(id => id !== previewToRemove.identifier));
         }
 
-      // Common success handler for create/update/delete
+      // Reset form and reload products
       private onSuccess() {
         this.loadMyProducts();
-        this.switchToCreateMode(); // Reset form after success
+        this.switchToCreateMode();
       }
 
      // Navigate to edit mode for a specific product
      edit(p: Product) {
        this.router.navigate(['/products/update', p.productId]);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
 
      // Switch to create mode and reset form
@@ -310,5 +320,3 @@ export class ManageProductsComponent implements OnInit {
            this.imagePreviews = [...existing, ...newFiles];
         }
       }
-
-

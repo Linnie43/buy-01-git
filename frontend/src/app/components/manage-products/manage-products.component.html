@@ -76,8 +76,7 @@
 
             <div class="mb-3">
               <label for="category" class="form-label">Category</label>
-              <select id="category" class="form-select" formControlName="category" 
-                [class.is-invalid]="(productForm.get('category')?.invalid && (productForm.get('category')?.dirty || productForm.get('category')?.touched)) || formErrors['category']">
+              <select id="category" class="form-select" formControlName="category" [class.is-invalid]="(productForm.get('category')?.invalid && (productForm.get('category')?.dirty || productForm.get('category')?.touched)) || formErrors['category']">
                 <option [ngValue]="null" disabled>Select a category</option>
                 <option *ngFor="let cat of categories" [ngValue]="cat">{{ cat }}</option>
               </select>
@@ -88,23 +87,24 @@
             </div>
 
             <input id="images" type="file" class="d-none" multiple accept="image/*" (change)="onFileSelected($event)" #fileInput>
-            <div class="d-flex mt-4">
-              <button type="submit" class="btn" [disabled]="productForm.invalid">
-                {{ mode === 'create' ? 'Create Product' : 'Update Product' }}
-              </button>
-
-              <a *ngIf="mode === 'update'" 
-                 [routerLink]="['/products', productId]" 
-                 class="btn btn-outline-dark ms-2" 
-                 title="View product as a buyer">
-                 <i class="bi bi-eye-fill"></i> Preview
-              </a>
-
-              <button *ngIf="mode === 'update'" type="button" class="btn btn-danger ms-2" (click)="onDelete()">
-                Delete Product
-              </button>
-            </div>
           </form>
+        </div>
+
+        <div class="col-12 d-flex justify-content-end mt-4">
+          <button type="button" [disabled]="productForm.invalid" (click)="submit()">
+            {{ mode === 'create' ? 'Create Product' : 'Update Product' }}
+          </button>
+
+          <a *ngIf="mode === 'update'"
+             [routerLink]="['/products', productId]"
+             class="btn ms-2"
+             title="View product as a buyer">
+             Preview
+          </a>
+
+          <button *ngIf="mode === 'update'" type="button" class="btn btn-danger ms-2" (click)="onDelete()">
+            Delete Product
+          </button>
         </div>
       </div>
     </div>

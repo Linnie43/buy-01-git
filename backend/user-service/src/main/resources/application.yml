@@ -50,8 +50,8 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
 
-jwt:
-  secret: very-long-secret-key-string-with-at-least-32-chars
-
 #jwt:
-#  secret: ${JWT_SECRET}
+#  secret: very-long-secret-key-string-with-at-least-32-chars
+#
+jwt:
+  secret: ${JWT_SECRET}

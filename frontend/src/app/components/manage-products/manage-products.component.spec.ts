@@ -9,7 +9,7 @@ import { of, throwError } from 'rxjs';
 import { ManageProductsComponent } from './manage-products.component';
 import { ProductService } from '../../services/product.service';
 import { UserService } from '../../services/user.service';
-import { Product } from '../../models/product.model';
+import { Product, Category } from '../../models/product.model';
 import { User } from '../../models/user.model';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
@@ -22,6 +22,7 @@ const mockProduct: Product = {
   description: 'A test description',
   price: 10,
   quantity: 5,
+  category: Category.OTHER,
   userId: 'user-1',
   images: ['image1.jpg'],
 };
@@ -78,6 +79,9 @@ describe('ManageProductsComponent', () => {
           provide: ActivatedRoute,
           useValue: {
             paramMap: of({ get: (key: string) => productId }),
+            queryParams: of({}),
+            url: of([]),
+            snapshot: { paramMap: { get: (key: string) => productId }, queryParams: {} }
           },
         },
       ],
@@ -110,6 +114,7 @@ describe('ManageProductsComponent', () => {
         description: 'Desc',
         price: 1,
         quantity: 1,
+        category: Category.OTHER,
       });
       component.submit();
       expect(productServiceSpy.createProduct).toHaveBeenCalled();
@@ -138,6 +143,7 @@ describe('ManageProductsComponent', () => {
         description: 'Desc',
         price: 1,
         quantity: 1,
+        category: Category.OTHER,
       });
       component.submit();
       expect(productServiceSpy.updateProduct).toHaveBeenCalledWith(

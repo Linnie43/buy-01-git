@@ -179,7 +179,7 @@ public class UserService {
     // sending an API call for users products to be deleted and then deletes the user
     public void deleteUser(String userId, AuthDetails currentUser) {
 
-        if (!currentUser.getCurrentUserId().equals(userId) || !currentUser.getRole().equals(Role.ADMIN)) {
+        if (!currentUser.getCurrentUserId().equals(userId) && !currentUser.getRole().equals(Role.ADMIN)) {
             throw new ForbiddenException("You don't have permission to delete this user");
         }
 

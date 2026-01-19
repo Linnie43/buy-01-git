@@ -4,7 +4,7 @@ import {
   HttpTestingController,
 } from '@angular/common/http/testing';
 import { ProductService } from './product.service';
-import { Product } from '../models/product.model';
+import { Category, Product } from '../models/product.model';
 import { PRODUCT_BASE_URL } from '../constants/constants';
 
 describe('ProductService', () => {
@@ -18,6 +18,7 @@ describe('ProductService', () => {
     description: 'A great product',
     price: 99.99,
     quantity: 10,
+    category: Category.OTHER,
     userId: 'user-1',
     images: ['image1.jpg'],
     isProductOwner: true,
@@ -29,6 +30,7 @@ describe('ProductService', () => {
     description: 'A great product',
     price: 99.99,
     quantity: 10,
+    category: Category.OTHER,
     userId: 'user-1',
     images: ['image1.jpg'],
     isProductOwner: true,
@@ -53,14 +55,15 @@ describe('ProductService', () => {
 
   describe('getAllProducts', () => {
     it('should return an array of mapped products', () => {
-      service.getAllProducts().subscribe((products) => {
-        expect(products.length).toBe(1);
-        expect(products[0]).toEqual(mockMappedProduct);
+      service.getAllProducts().subscribe((response) => {
+        expect(response.products.length).toBe(1);
+        expect(response.products[0]).toEqual(mockMappedProduct);
+        expect(response.total).toBe(1);
       });
 
-      const req = httpTestingController.expectOne(apiUrl);
+      const req = httpTestingController.expectOne(req => req.url === apiUrl && req.params.has('page') && req.params.has('size') && req.params.has('sort'));
       expect(req.request.method).toBe('GET');
-      req.flush([mockApiProduct]);
+      req.flush({ content: [mockApiProduct], totalElements: 1 });
     });
   });
 

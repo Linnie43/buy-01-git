@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class ProductServiceTest {
+class ProductServiceTest {
 
     @Mock
     private ProductRepository productRepository;
@@ -239,6 +239,53 @@ public class ProductServiceTest {
         Page<ProductResponseDTO> all = productService.getAllProducts(null, null, null, null, pageable);
         assertEquals(1, all.getTotalPages());
         assertEquals("p1", all.getContent().get(0).getProductId());
+    }
+
+    @Test
+    void updateProductStock_successfulUpdate() {
+        String productId = "prod-1";
+        Product existing = new TestProduct(productId, "Name", "desc", 5.0, 10, ProductCategory.OTHER, "owner-1");
+        when(productRepository.findById(productId)).thenReturn(Optional.of(existing));
+
+        productService.updateProductQuantity(productId, -4);
+
+        ArgumentCaptor<Product> captor = ArgumentCaptor.forClass(Product.class);
+        verify(productRepository).save(captor.capture());
+        Product saved = captor.getValue();
+        assertEquals(6, saved.getQuantity());
+        assertEquals(4, saved.getReservedQuantity());
+    }
+
+    @Test
+    void removeReserveQuantityForOrderPlaced_successful() {
+        String productId = "prod-1";
+        Product existing = new TestProduct(productId, "Name", "desc", 5.0, 10, ProductCategory.OTHER, "owner-1");
+        existing.setReservedQuantity(5);
+        when(productRepository.findById(productId)).thenReturn(Optional.of(existing));
+
+        productService.removeReserveQuantityForOrderPlaced(productId, -3);
+
+        ArgumentCaptor<Product> captor = ArgumentCaptor.forClass(Product.class);
+        verify(productRepository).save(captor.capture());
+        Product saved = captor.getValue();
+        assertEquals(10, saved.getQuantity());
+        assertEquals(2, saved.getReservedQuantity());
+    }
+
+    @Test
+    void returnCancelledItemsToStock_successful() {
+        String productId = "prod-1";
+        Product existing = new TestProduct(productId, "Name", "desc", 5.0, 8, ProductCategory.OTHER, "owner-1");
+        existing.setReservedQuantity(4);
+        when(productRepository.findById(productId)).thenReturn(Optional.of(existing));
+
+        productService.returnCancelledItemToStock(productId, 3);
+
+        ArgumentCaptor<Product> captor = ArgumentCaptor.forClass(Product.class);
+        verify(productRepository).save(captor.capture());
+        Product saved = captor.getValue();
+        assertEquals(11, saved.getQuantity());
+        assertEquals(4, saved.getReservedQuantity());
     }
 
 }

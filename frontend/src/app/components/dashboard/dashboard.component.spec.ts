@@ -65,7 +65,11 @@ describe('DashboardComponent', () => {
 
   describe('ngOnInit', () => {
     it('should fetch products and reverse them on initialization', fakeAsync(() => {
-      productServiceSpy.getAllProducts.and.returnValue(of([...mockProducts]));
+      // Mock returning products in "latest first" order (B then A)
+      productServiceSpy.getAllProducts.and.returnValue(of({
+        products: [mockProducts[1], mockProducts[0]],
+        total: 2
+      }));
       authServiceSpy.isLoggedIn.and.returnValue(false);
 
       fixture.detectChanges();
@@ -73,11 +77,11 @@ describe('DashboardComponent', () => {
 
       expect(productServiceSpy.getAllProducts).toHaveBeenCalled();
       expect(component.products.length).toBe(2);
-      expect(component.products[0].name).toBe('Product B'); // Check that the array was reversed
+      expect(component.products[0].name).toBe('Product B'); // Check that the array is sorted correctly
     }));
 
     it('should set isLoggedIn to true if the user is authenticated', () => {
-      productServiceSpy.getAllProducts.and.returnValue(of([]));
+      productServiceSpy.getAllProducts.and.returnValue(of({ products: [], total: 0 }));
       authServiceSpy.isLoggedIn.and.returnValue(true);
 
       fixture.detectChanges();
@@ -86,7 +90,7 @@ describe('DashboardComponent', () => {
     });
 
     it('should set isLoggedIn to false if the user is not authenticated', () => {
-      productServiceSpy.getAllProducts.and.returnValue(of([]));
+      productServiceSpy.getAllProducts.and.returnValue(of({ products: [], total: 0 }));
       authServiceSpy.isLoggedIn.and.returnValue(false);
 
       fixture.detectChanges();

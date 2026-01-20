@@ -31,6 +31,13 @@
         <div class="card-body p-4">
           <h2 class="text-center mb-4 fw-bold">Checkout</h2>
 
+          <!-- TIMER DISPLAY -->
+          <div class="alert alert-warning text-center d-flex justify-content-between align-items-center mb-4"
+               *ngIf="timeLeftSeconds > 0 && timeLeftSeconds <= 300">
+            <span>Time remaining to complete purchase:</span>
+            <span class="fw-bold fs-5">{{ timerDisplay }}</span>
+          </div>
+
           <form [formGroup]="checkoutForm" (ngSubmit)="onSubmit()">
 
             <!-- Full Name -->
@@ -139,20 +146,20 @@
             </div>
 
             <!-- Submit & Continue Shopping Buttons -->
-             <div class="d-flex gap-2">
+            <div class="d-flex gap-2">
 
-                <button type="button"
-                        class="btn btn-success w-50 py-2"
-                        (click)="onContinueShopping()">
-                  Continue Shopping
-                </button>
+              <button type="button"
+                      class="btn btn-success w-50 py-2"
+                      (click)="onContinueShopping()">
+                Continue Shopping
+              </button>
 
-                <button type="submit"
-                        class="btn btn-primary w-100 py-2"
-                        [disabled]="checkoutForm.invalid || isSubmitting">
-                  <span *ngIf="!isSubmitting">Place Order</span>
-                  <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                </button>
+              <button type="submit"
+                      class="btn btn-primary w-100 py-2"
+                      [disabled]="checkoutForm.invalid || isSubmitting">
+                <span *ngIf="!isSubmitting">Place Order</span>
+                <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              </button>
             </div>
 
           </form>

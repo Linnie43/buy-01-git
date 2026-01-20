@@ -20,12 +20,19 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   isSubmitting = false;
   createdOrder: OrderResponseDTO | null = null;
 
+  // Timer properties
+  timeLeftSeconds = 60; // 5 minutes
+  timerDisplay = '05:00';
+  private timerInterval: any;
+  private cartExpiry: Date | null = null;
+  private shouldAbandon = false;
+
   constructor(
-    private fb: FormBuilder,
-    private cartService: CartService,
-    private orderService: OrderService,
-    private router: Router,
-    private snackBar: MatSnackBar
+    private readonly fb: FormBuilder,
+    private readonly cartService: CartService,
+    private readonly orderService: OrderService,
+    private readonly router: Router,
+    private readonly snackBar: MatSnackBar
   ) {
 
     this.checkoutForm = this.fb.group({
@@ -39,20 +46,80 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    // 1. Update status to CHECKOUT (Backend sets updateTime to NOW)
     this.cartService.updateCartStatus({ cartStatus: CartStatus.CHECKOUT }).subscribe({
-      next: () => console.log('Cart status updated to CHECKOUT'),
+      next: () => {
+        console.log('Cart status updated to CHECKOUT');
+        this.startTimer();
+      },
       error: (err: any) => console.error('Failed to update cart status', err)
+    });
+
+    // 2. Fetch cart to store Global Expiry time
+    this.cartService.getCart().subscribe({
+      next: (cart) => {
+        if (cart?.expiryTime) {
+          this.cartExpiry = new Date(cart.expiryTime);
+        }
+      }
     });
   }
 
-  // Triggers when user navigates away (Back button, Home link, etc.)
   ngOnDestroy(): void {
-    // Only call the backend to revert to ACTIVE if an order wasn't placed
-    if (!this.createdOrder) {
-      this.cartService.updateCartStatus({ cartStatus: CartStatus.ACTIVE }).subscribe({
-        next: () => console.log('Cart status reverted to ACTIVE (User left checkout)'),
+
+    // Only call the backend to revert status if an order wasn't placed
+    if (!this.createdOrder && this.cartExpiry > now) {
+      // If we flagged as abandoned (timeout + expiry), send ABANDONED. Else ACTIVE.
+      const targetStatus = this.shouldAbandon ? CartStatus.ABANDONED : CartStatus.ACTIVE;
+
+      this.cartService.updateCartStatus({ cartStatus: targetStatus }).subscribe({
+        next: () => console.log(`Cart status reverted to ${targetStatus}`),
         error: (err) => console.error('Failed to revert cart status', err)
       });
+    }
+      this.stopTimer();
+  }
+
+  startTimer(): void {
+    this.stopTimer();
+    this.timerInterval = setInterval(() => {
+      this.timeLeftSeconds--;
+      this.updateTimerDisplay();
+
+      if (this.timeLeftSeconds <= 0) {
+        this.handleTimeout();
+      }
+    }, 1000);
+  }
+
+  stopTimer(): void {
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+      this.timerInterval = null;
+    }
+  }
+
+  updateTimerDisplay(): void {
+    const m = Math.floor(this.timeLeftSeconds / 60);
+    const s = this.timeLeftSeconds % 60;
+    this.timerDisplay = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  }
+
+  handleTimeout(): void {
+    this.stopTimer();
+    const now = new Date();
+
+    // Logic: If updateTime (5 min) passes...
+    // UnLESS expiryTime has run out -> Abandon & Dashboard
+    // Else -> Active & Cart
+    if (this.cartExpiry && this.cartExpiry < now) {
+      this.shouldAbandon = true;
+      this.snackBar.open('Cart hold expired.', 'Close', { duration: 3000 });
+      this.router.navigate(['']); // Dashboard/Home
+    } else {
+      this.shouldAbandon = false;
+      this.snackBar.open('Checkout session timed out.', 'Close', { duration: 3000 });
+      this.router.navigate(['/cart']);
     }
   }
 
@@ -77,6 +144,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         // Store the response
         this.createdOrder = res;
         this.isSubmitting = false;
+        this.stopTimer();
       },
       error: (err: any) => {
         console.error('Order creation failed', err);

@@ -28,7 +28,7 @@ public class CartCleanupScheduler {
     public void processCartExpirations() {
         Date now =  new Date();
         Date oneMinAgo = new Date(now.getTime() - (60 * 1000));
-        Date fiveMinAgo = new Date(now.getTime() - (5 * 60 * 1000));
+        Date fiveMinAgo = new Date(now.getTime() - (60 * 1000));
 
         // Mark ACTIVE Carts started 15min ago to ABANDONED
         List<Cart> toAbandon = cartRepository.findExpiredActiveCarts(now);

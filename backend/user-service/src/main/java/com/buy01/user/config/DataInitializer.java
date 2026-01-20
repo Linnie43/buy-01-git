@@ -31,12 +31,10 @@ public class DataInitializer implements CommandLineRunner {
                     admin.setPassword(new BCryptPasswordEncoder().encode("password"));
                     admin.setRole(Role.ADMIN);
                     userRepository.save(admin);
-                    System.out.println("Default admin created");
                 }
                 break; // success, exit loop
             } catch (Exception e) {
                 retries--;
-                System.out.println("Mongo not ready, retrying in " + wait / 1000 + "s... (" + retries + " retries left)");
                 Thread.sleep(wait);
             }
         }

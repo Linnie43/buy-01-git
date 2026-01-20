@@ -14,6 +14,7 @@ import com.buy01.product.model.Role;
 import com.buy01.product.repository.ProductRepository;
 import com.buy01.product.security.AuthDetails;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -60,7 +61,8 @@ class ProductServiceTest {
     }
 
     @Test
-    void createProduct_validRequest_returnsProductResponseDTO() throws IOException {
+    @DisplayName("createProduct with valid request returns ProductResponseDTO")
+    void createProduct() throws IOException {
 
         ProductCreateDTO request = mock(ProductCreateDTO.class);
         when(request.getName()).thenReturn("Valid Name");
@@ -87,21 +89,27 @@ class ProductServiceTest {
     }
 
     @Test
-    void createProduct_forbiddenRole_throwsForbiddenException() {
+    @DisplayName("createProduct with forbidden role throws ForbiddenException")
+    void createProductForbidden() throws IOException {
         ProductCreateDTO request = mock(ProductCreateDTO.class);
         assertThrows(ForbiddenException.class, () ->
                 productService.createProduct(request, new AuthDetails( "some-user", Role.CLIENT))
         );
+        verify(productRepository, never()).save(any());
+        verify(mediaClient, never()).postProductImages(anyString(), anyList());
+        verify(userClient, never()).getRoleIfUserExists(anyString());
     }
 
     @Test
-    void getProductById_notFound_throwsNotFoundException() {
+    @DisplayName("getProductById with non-existing ID throws NotFoundException")
+    void getProductByIdNotFound() {
         when(productRepository.findById("missing")).thenReturn(Optional.empty());
         assertThrows(NotFoundException.class, () -> productService.getProductById("missing", null));
     }
 
     @Test
-    void updateProduct_ownerUpdates_success() throws IOException {
+    @DisplayName("updateProduct by owner updates successfully and publishes event")
+    void updateProduct() throws IOException {
 
         String productId = "prod-1";
         Product existing = new TestProduct(productId, "Old", "old desc", 5.0, 2, ProductCategory.OTHER, "owner-1");
@@ -143,7 +151,8 @@ class ProductServiceTest {
     }
 
     @Test
-    void deleteProduct_ownerDeletes_callsRepositoryAndPublishesEvent() {
+    @DisplayName("deleteProduct by owner deletes successfully and publishes event")
+    void deleteProduct() {
         String productId = "prod-1";
         Product existing = new TestProduct(productId, "Name", "desc", 1.0, 1, ProductCategory.OTHER, "owner-1");
         when(productRepository.findById(productId)).thenReturn(Optional.of(existing));
@@ -155,18 +164,8 @@ class ProductServiceTest {
     }
 
     @Test
-    void createProduct_forbiddenRole_doesNotCallDownstreamClients() throws IOException {
-        ProductCreateDTO request = mock(ProductCreateDTO.class);
-        assertThrows(ForbiddenException.class, () ->
-                productService.createProduct(request, new AuthDetails( "some-user", Role.CLIENT))
-        );
-        verify(productRepository, never()).save(any());
-        verify(mediaClient, never()).postProductImages(anyString(), anyList());
-        verify(userClient, never()).getRoleIfUserExists(anyString());
-    }
-
-    @Test
-    void createProduct_mediaClientThrows_stillCreatesProductAndReturnsEmptyMediaList() throws IOException {
+    @DisplayName("createProduct when mediaClient throws still creates product and returns empty media list")
+    void createProductMediaError() throws IOException {
         ProductCreateDTO request = mock(ProductCreateDTO.class);
         when(request.getName()).thenReturn("Valid Name");
         when(request.getDescription()).thenReturn("Desc here");
@@ -195,13 +194,15 @@ class ProductServiceTest {
     }
 
     @Test
-    void getProductImageIds_returnsEmptyListWhenClientReturnsNull() {
+    @DisplayName("getProductImageIds returns empty list when mediaClient returns null")
+    void getProductImageIdsNull() {
         when(mediaClient.getProductImageIds("p-1")).thenReturn(null);
         assertTrue(productService.getProductImageIds("p-1").isEmpty());
     }
 
     @Test
-    void deleteProductsByUserId_deletesEachAndPublishesEvent() {
+    @DisplayName("deleteProductsByUserId deletes each product and publishes events")
+    void deleteProductsByUserId() {
         TestProduct p1 = new TestProduct("p1", "n", "d", 1.0, 1, ProductCategory.OTHER, "u1");
         TestProduct p2 = new TestProduct("p2", "n2", "d2", 2.0, 2, ProductCategory.OTHER, "u1");
         when(productRepository.findAllProductsByUserId("u1")).thenReturn(List.of(p1, p2));
@@ -215,13 +216,15 @@ class ProductServiceTest {
     }
 
     @Test
-    void authProductOwner_nonOwnerNonAdmin_throwsForbiddenException() {
+    @DisplayName("authProductOwner allows owner and admin, forbids others")
+    void authProductOwner() {
         TestProduct p = new TestProduct("p1", "n", "d", 1.0, 1, ProductCategory.OTHER, "owner-1");
         assertThrows(ForbiddenException.class, () -> productService.authProductOwner(p, "someone-else", Role.SELLER));
     }
 
     @Test
-    void createProduct_nameTooShort_throwsIllegalArgumentException() {
+    @DisplayName("createProduct with name too short throws IllegalArgumentException")
+    void createProductBadRequest() {
         ProductCreateDTO request = mock(ProductCreateDTO.class);
         when(request.getName()).thenReturn("abc"); // only stub used by validation
         assertThrows(IllegalArgumentException.class, () ->
@@ -230,7 +233,8 @@ class ProductServiceTest {
     }
 
     @Test
-    void getAllProducts_returnsSortedPage() {
+    @DisplayName("getAllProducts returns sorted page of products")
+    void getAllProducts() {
         Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
         TestProduct p = new TestProduct("p1", "n", "d", 1.0, 1, ProductCategory.OTHER, "u1");
         Page<Product> productPage = new PageImpl<>(List.of(p), pageable, 1);
@@ -242,7 +246,8 @@ class ProductServiceTest {
     }
 
     @Test
-    void updateProductStock_successfulUpdate() {
+    @DisplayName("updateProductStock updates stock and reserved quantities correctly")
+    void updateProductStock() {
         String productId = "prod-1";
         Product existing = new TestProduct(productId, "Name", "desc", 5.0, 10, ProductCategory.OTHER, "owner-1");
         when(productRepository.findById(productId)).thenReturn(Optional.of(existing));
@@ -257,7 +262,8 @@ class ProductServiceTest {
     }
 
     @Test
-    void removeReserveQuantityForOrderPlaced_successful() {
+    @DisplayName("removeReserveQuantityForOrderPlaced updates stock and reserved quantities correctly")
+    void removeReserveQuantityForOrderPlaced() {
         String productId = "prod-1";
         Product existing = new TestProduct(productId, "Name", "desc", 5.0, 10, ProductCategory.OTHER, "owner-1");
         existing.setReservedQuantity(5);
@@ -273,7 +279,8 @@ class ProductServiceTest {
     }
 
     @Test
-    void returnCancelledItemsToStock_successful() {
+    @DisplayName("returnCancelledItemsToStock updates stock and reserved quantities correctly")
+    void returnCancelledItemsToStock() {
         String productId = "prod-1";
         Product existing = new TestProduct(productId, "Name", "desc", 5.0, 8, ProductCategory.OTHER, "owner-1");
         existing.setReservedQuantity(4);

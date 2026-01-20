@@ -16,6 +16,10 @@ public class TestAuthFactory {
         return new AuthDetails("seller1", Role.SELLER);
     }
 
+    public static AuthDetails sellerUser2() {
+        return new AuthDetails("seller2", Role.SELLER);
+    }
+
     public static AuthDetails adminUser() {
         return new AuthDetails("admin1", Role.ADMIN);
     }

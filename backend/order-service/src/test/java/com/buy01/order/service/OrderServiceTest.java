@@ -7,6 +7,7 @@ import com.buy01.order.model.*;
 import com.buy01.order.repository.CartRepository;
 import com.buy01.order.repository.OrderRepository;
 import com.buy01.order.security.AuthDetails;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -52,7 +53,8 @@ class OrderServiceTest {
     }
 
     @Test
-    void getClientDashboard_returnsOrderList_topItems_totalSpent() throws IOException {
+    @DisplayName("Get client dashboard returns order list, top items, and total spent")
+    void getClientDashboard() throws IOException {
         // Mock auth check
         AuthDetails currentUser = clientUser();
 
@@ -81,7 +83,8 @@ class OrderServiceTest {
     }
 
     @Test
-    void getSellerDashboard_returnsOrderList_topItems_totalRevenue() throws IOException {
+    @DisplayName("Get seller dashboard returns order list, top items, and total revenue")
+    void getSellerDashboard() throws IOException {
         // Mock auth check
         AuthDetails currentUser = sellerUser();
 
@@ -118,7 +121,8 @@ class OrderServiceTest {
     }
 
     @Test
-    void getOrderById_existingOrderAsClient_returnsOrderResponseDTO() throws IOException {
+    @DisplayName("Get order by ID returns order details")
+    void getOrderById() throws IOException {
         // Mock auth check
         AuthDetails currentUser = clientUser();
 
@@ -135,7 +139,8 @@ class OrderServiceTest {
     }
 
     @Test
-    void createOrder_validCart_createsOrderSuccessfully() {
+    @DisplayName("Create order from valid cart creates order successfully")
+    void createOrder() {
         // Mock auth check
         AuthDetails currentUser = clientUser();
 
@@ -162,7 +167,8 @@ class OrderServiceTest {
     }
 
     @Test
-    void updateOrder_validUpdate_updatesOrderSuccessfully() throws IOException {
+    @DisplayName("Update order with valid data updates order successfully")
+    void updateOrder() throws IOException {
         // Mock auth check
         AuthDetails currentUser = clientUser();
 
@@ -185,7 +191,8 @@ class OrderServiceTest {
     }
 
     @Test
-    void updateOrder_forbiddenUpdate_throwsForbiddenException() throws IOException {
+    @DisplayName("Update order with forbidden status update throws exception")
+    void updateOrderForbidden() throws IOException {
         // Mock auth check
         AuthDetails currentUser = clientUser();
 
@@ -211,7 +218,8 @@ class OrderServiceTest {
     }
 
     @Test
-    void deleteOrder_validDelete_deletesOrderSuccessfully() throws IOException {
+    @DisplayName("Delete order by ID deletes order successfully for admin")
+    void deleteOrder() throws IOException {
         // Mock auth check
         AuthDetails currentUser = adminUser();
 
@@ -225,7 +233,8 @@ class OrderServiceTest {
     }
 
     @Test
-    void deleteOrder_forbiddenDelete_throwsForbiddenException() throws IOException {
+    @DisplayName("Delete order by ID forbidden for non-admin users")
+    void deleteOrderForbidden() throws IOException {
         // Mock auth check
         AuthDetails currentUser = clientUser();
 

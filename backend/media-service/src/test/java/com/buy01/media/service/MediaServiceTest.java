@@ -5,6 +5,7 @@ import com.buy01.media.exception.FileUploadException;
 import com.buy01.media.model.Media;
 import com.buy01.media.repository.MediaRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
@@ -51,7 +52,8 @@ public class MediaServiceTest {
 
     // Testing saving valid product images - expected to return list of MediaResponseDTO
     @Test
-    void saveProductImages_validFiles_returnsMediaResponseDTOList() throws IOException {
+    @DisplayName("saveProductImages with valid files returns MediaResponseDTO list")
+    void saveProductImagesValid() throws IOException {
         MultipartFile file1 = new MockMultipartFile(
                 "file1", "image1.png", "image/png", "dummy content 1".getBytes()
         );
@@ -74,7 +76,8 @@ public class MediaServiceTest {
 
     // Testing saving invalid product images (one file empty) - expected to throw FileUploadException
     @Test
-    void saveProductImages_oneEmptyFile_throwsException() {
+    @DisplayName("saveProductImages with one empty file throws FileUploadException")
+    void saveProductImagesOnEmptyFileFail() {
         MultipartFile file1 = new MockMultipartFile("file1", "image1.png", "image/png", "dummy content 1".getBytes());
         MultipartFile file2 = new MockMultipartFile("file2", "empty.jpg", "image/jpeg", new byte[0]);
 
@@ -85,7 +88,8 @@ public class MediaServiceTest {
 
     // Testing updating product images with one deleted and one new file - expected to return list of MediaResponseDTO
     @Test
-    void updateProductImages_shouldDeleteAndAddImages() throws IOException {
+    @DisplayName("updateProductImages should delete specified images and add new ones")
+    void updateProductImages() throws IOException {
         // given
         String productId = "product-1";
         String deleteId = "media-1";
@@ -132,7 +136,8 @@ public class MediaServiceTest {
 
     // Testing saving valid user avatar - expected to return file name
     @Test
-    void saveUserAvatar_validFile_returnsFileName() throws IOException {
+    @DisplayName("saveUserAvatar with valid file returns file name")
+    void saveUserAvatarSuccess() throws IOException {
         MultipartFile file = new MockMultipartFile(
                 "file", "avatar.png", "image/png", "dummy content".getBytes()
         );
@@ -145,7 +150,8 @@ public class MediaServiceTest {
 
     // Testing saving invalid user avatar (empty file) - expected to throw FileUploadException
     @Test
-    void saveUserAvatar_emptyFile_throwsException() {
+    @DisplayName("saveUserAvatar with empty file throws FileUploadException")
+    void saveUserAvatarFail() {
         MultipartFile file = new MockMultipartFile(
                 "file", "empty.png", "image/png", new byte[0]
         );
@@ -155,7 +161,8 @@ public class MediaServiceTest {
 
     // Testing saving invalid user avatar (wrong content type) - expected to throw FileUploadException
     @Test
-    void saveUserAvatar_invalidContentType_throwsException() {
+    @DisplayName("saveUserAvatar with invalid content type throws FileUploadException")
+    void saveUserAvatarContentFail() {
         MultipartFile file = new MockMultipartFile(
                 "file", "picture.avif", "application/octet-stream", "dummy content".getBytes()
         );
@@ -166,7 +173,8 @@ public class MediaServiceTest {
     // -- KAFKA CONSUMER TESTS --
 
     @Test
-    void deleteMediaByProductId_deletesFilesAndRepositoryEntries() throws IOException {
+    @DisplayName("deleteMediaByProductId deletes files and repository entries")
+    void deleteMediaByProductId() throws IOException {
         String productId = "product-123";
 
         // Temporary files for testing delete

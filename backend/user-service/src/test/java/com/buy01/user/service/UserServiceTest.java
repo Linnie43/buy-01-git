@@ -9,6 +9,7 @@ import com.buy01.user.model.User;
 import com.buy01.user.repository.UserRepository;
 import com.buy01.user.security.AuthDetails;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -43,7 +44,7 @@ class UserServiceTest {
 
     private UserService userService;
 
-    private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     // Before each test, set up with dependencies
     @BeforeEach
@@ -56,7 +57,8 @@ class UserServiceTest {
 
     @Test
     @MockitoSettings(strictness = Strictness.LENIENT)
-    void createUser_success_whenNoAvatar() throws IOException {
+    @DisplayName("Create Client Success without Avatar")
+    void createClient() throws IOException {
         UserCreateDTO user = new UserCreateDTO();
         user.setFirstname("Anna");
         user.setLastname("Test");
@@ -79,7 +81,8 @@ class UserServiceTest {
 
     @Test
     @MockitoSettings(strictness = Strictness.LENIENT)
-    void createUser_success_withAvatar_whenSeller() throws IOException {
+    @DisplayName("Create Seller Success with Avatar")
+    void createSellerWithAvatar() throws IOException {
         UserCreateDTO user = new UserCreateDTO();
         user.setFirstname("Seller");
         user.setLastname("Test");
@@ -106,7 +109,8 @@ class UserServiceTest {
 
     @Test
     @MockitoSettings(strictness = Strictness.LENIENT)
-    void createUser_throwsWhenEmailExists() {
+    @DisplayName("Create User Fails when Email Exists")
+    void createUserEmailExists() {
         User existingUser = mock(User.class);
         when(existingUser.getId()).thenReturn("existing-id"); // mock ID since we cant get it when testing
         when(userRepository.findByEmail("exists@test.com"))
@@ -126,7 +130,8 @@ class UserServiceTest {
     // Get products tests
 
     @Test
-    void getProductsForCurrentUser_validRole_callsProductService()throws IOException {
+    @DisplayName("Get Products for Current User with Valid Role")
+    void getProductsForCurrentUser()throws IOException {
         when(productClient.getUsersProducts("123"))
                 .thenReturn(List.of(new ProductDTO()));
 
@@ -137,7 +142,8 @@ class UserServiceTest {
     }
 
     @Test
-    void getProductsForCurrentUser_invalidRole_throws() {
+    @DisplayName("Get Products for Current User with Invalid Role Throws ForbiddenException")
+    void getProductsForCurrentUserForbidden() {
         assertThrows(ForbiddenException.class,
                 () -> userService.getProductsForCurrentUser(new AuthDetails("123", Role.CLIENT)));
     }
@@ -145,7 +151,8 @@ class UserServiceTest {
     // Update User Tests
 
     @Test
-    void updateUser_updatesFields() {
+    @DisplayName("Update User Updates Fields Correctly")
+    void updateUser() {
         User existing = new User();
         existing.setName("Old");
         existing.setEmail("old@test.com");
@@ -166,7 +173,8 @@ class UserServiceTest {
     // Deletion tests
 
     @Test
-    void deleteUser_callsRepositoryAndPublishesEvent() {
+    @DisplayName("Delete User Calls Repository and Publishes Event")
+    void deleteUser() {
         userService.deleteUser("123", new AuthDetails("123", Role.SELLER));
 
         verify(userRepository).deleteById("123");

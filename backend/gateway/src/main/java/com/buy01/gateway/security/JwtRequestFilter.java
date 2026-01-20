@@ -1,5 +1,7 @@
 package com.buy01.gateway.security;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -20,6 +22,7 @@ public class JwtRequestFilter implements WebFilter {
 
     @Autowired
     private JwtUtil jwtUtil;
+    private static final Logger log = LoggerFactory.getLogger(JwtRequestFilter.class);
 
     private static final List<String> EXCLUDE_URLS = List.of(
             "/api/auth/login",
@@ -32,18 +35,14 @@ public class JwtRequestFilter implements WebFilter {
         String path = exchange.getRequest().getPath().toString();
         HttpMethod method = exchange.getRequest().getMethod();
 
-        System.out.println("[DEBUG] Incoming request: " + exchange.getRequest().getMethod() + " " + path);
-
         boolean isExcluded = EXCLUDE_URLS.stream().anyMatch(path::startsWith)
                 || ((path.startsWith("/api/products") || path.startsWith("/api/media")) && (method == HttpMethod.GET || method == HttpMethod.OPTIONS));
 
         if (isExcluded) {
-            System.out.println("[DEBUG] Excluded URL, skipping JWT: " + path);
             return chain.filter(exchange);
         }
 
         String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-        System.out.println("[DEBUG] Authorization header: " + authHeader);
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
@@ -52,23 +51,21 @@ public class JwtRequestFilter implements WebFilter {
                 String userId = claims.getSubject();
                 String role = claims.get("role", String.class);
 
-                System.out.println("[DEBUG] JWT claims extracted: userId=" + userId + ", role=" + role);
-
                 if (userId != null) {
                     var authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
                     var auth = new UsernamePasswordAuthenticationToken(userId, null, authorities);
                     return chain.filter(exchange)
                             .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
                 } else {
-                    System.out.println("[DEBUG] JWT has no subject");
+                    log.info("[DEBUG] JWT has no subject");
                 }
             } catch (Exception e) {
-                System.out.println("[DEBUG] JWT validation failed: " + e.getMessage());
+                log.error("[DEBUG] JWT validation failed: {}", e.getMessage());
                 exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
                 return exchange.getResponse().setComplete();
             }
         } else {
-            System.out.println("[DEBUG] No JWT token found");
+            log.info("[DEBUG] No JWT token found");
         }
 
         return chain.filter(exchange);

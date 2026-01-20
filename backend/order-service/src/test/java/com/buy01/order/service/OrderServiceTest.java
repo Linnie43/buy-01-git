@@ -16,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.buy01.order.exception.BadRequestException;
 import com.buy01.order.service.TestAuthFactory.TestCart;
 import com.buy01.order.service.TestAuthFactory.TestOrder;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -23,6 +24,7 @@ import static com.buy01.order.service.TestAuthFactory.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@Service
 @ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
 

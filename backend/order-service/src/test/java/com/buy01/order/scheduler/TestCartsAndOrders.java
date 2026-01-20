@@ -1,14 +1,15 @@
-package com.buy01.order.service;
+package com.buy01.order.scheduler;
 
 import com.buy01.order.model.*;
 import com.buy01.order.security.AuthDetails;
+import com.buy01.order.service.TestAuthFactory;
 
 import java.util.Date;
 import java.util.List;
 
-public class TestAuthFactory {
+public class TestCartsAndOrders {
 
-    private TestAuthFactory() {}
+    private TestCartsAndOrders() {}
 
     public static AuthDetails clientUser() {
         return new AuthDetails("user1", Role.CLIENT);
@@ -79,6 +80,31 @@ public class TestAuthFactory {
                 ),
                 130.0,
                 CartStatus.ACTIVE
+        );
+    }
+
+    public static TestCart cart2() {
+        return new TestCart(
+                "cart2",
+                clientUser().getCurrentUserId(),
+                List.of(
+                        product3()
+                ),
+                60.0,
+                CartStatus.CHECKOUT
+        );
+    }
+
+    public static TestCart cart3() {
+        return new TestCart(
+                "cart3",
+                "user2",
+                List.of(
+                        product1(),
+                        product3()
+                ),
+                150.0,
+                CartStatus.ABANDONED
         );
     }
 

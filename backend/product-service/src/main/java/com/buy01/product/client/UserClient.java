@@ -11,18 +11,16 @@ import org.springframework.web.client.RestTemplate;
 public class UserClient {
 
     private final RestTemplate restTemplate;
-    private final String userServiceBaseUrl;
+    private static final String USER_SERVICE_BASE_URL = "http://user-service:8080/api/users";
 
     public UserClient() {
         this.restTemplate = new RestTemplate();
-        // Local dev URL; will switch to container name in Docker
-        this.userServiceBaseUrl = "http://user-service:8080/api/users";
     }
 
     public Role getRoleIfUserExists(String userId){
         try {
             UserDTO user = restTemplate.getForObject(
-                    userServiceBaseUrl + "/internal/user/" + userId,
+                    USER_SERVICE_BASE_URL + "/internal/user/" + userId,
                     UserDTO.class
             );
 

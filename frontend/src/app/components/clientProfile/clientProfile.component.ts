@@ -16,7 +16,7 @@ export class ClientProfileComponent implements OnInit {
   user: User | null = null;
   isLoggedIn = false;
 
-  constructor(private authService: AuthService, private userService: UserService) {}
+  constructor(private readonly authService: AuthService, private readonly userService: UserService) {}
 
   ngOnInit() {
     this.isLoggedIn = this.authService.isLoggedIn?.() ?? false;

@@ -20,10 +20,10 @@ export interface User {
 
 export class UserService {
 
-  private window = inject(WINDOW);
-  private apiUrl = `${USER_BASE_URL}/me`; // endpoint
+  private readonly window = inject(WINDOW);
+  private readonly apiUrl = `${USER_BASE_URL}/me`; // endpoint
 
-  constructor(private http: HttpClient) {}
+  constructor(private readonly http: HttpClient) {}
 
     getMe(): Observable<User> {
       return this.http.get<User>(this.apiUrl);

@@ -24,7 +24,7 @@ export class AppComponent implements OnInit {
   cartItemCount = 0;
 
 
-  constructor(private auth: AuthService, private router: Router, private cartService: CartService) {
+  constructor(private readonly auth: AuthService, private readonly router: Router, private readonly cartService: CartService) {
     this.updateProfileState();
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {

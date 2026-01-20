@@ -8,9 +8,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class SessionGuard implements CanActivate {
   constructor(
-    private authService: AuthService,
-    private router: Router,
-    private snackBar: MatSnackBar
+    private readonly authService: AuthService,
+    private readonly router: Router,
+    private readonly snackBar: MatSnackBar
     ) {}
 
   canActivate(): boolean {

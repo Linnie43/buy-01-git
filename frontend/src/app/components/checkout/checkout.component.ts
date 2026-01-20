@@ -21,11 +21,11 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   createdOrder: OrderResponseDTO | null = null;
 
   constructor(
-    private fb: FormBuilder,
-    private cartService: CartService,
-    private orderService: OrderService,
-    private router: Router,
-    private snackBar: MatSnackBar
+    private readonly fb: FormBuilder,
+    private readonly cartService: CartService,
+    private readonly orderService: OrderService,
+    private readonly router: Router,
+    private readonly snackBar: MatSnackBar
   ) {
 
     this.checkoutForm = this.fb.group({

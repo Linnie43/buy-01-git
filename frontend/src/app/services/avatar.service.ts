@@ -9,9 +9,9 @@ interface AvatarResponse { avatarUrl: string; }
 
 @Injectable({ providedIn: 'root' })
 export class AvatarService {
-  private apiUrl = `${AVATAR_BASE_URL}`;
+  private readonly apiUrl = `${AVATAR_BASE_URL}`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private readonly http: HttpClient) {}
 
   uploadAvatar(file: File, userId: string): Observable<AvatarResponse> {
     const form = new FormData();

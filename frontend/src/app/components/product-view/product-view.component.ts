@@ -29,12 +29,12 @@ export class ProductViewComponent implements OnInit {
   updating = false;
 
   constructor(
-    private route: ActivatedRoute,
-    private productService: ProductService,
-    private cartService: CartService,
-    private authService: AuthService,
-    private router: Router,
-    private snackBar: MatSnackBar
+    private readonly route: ActivatedRoute,
+    private readonly productService: ProductService,
+    private readonly cartService: CartService,
+    private readonly authService: AuthService,
+    private readonly router: Router,
+    private readonly snackBar: MatSnackBar
 
   ) {}
 

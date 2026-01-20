@@ -37,9 +37,9 @@ export class DashboardComponent implements OnInit {
   totalPages: number = 0;
 
   constructor(
-    private productService: ProductService,
-    private authService: AuthService,
-    private router: Router
+    private readonly productService: ProductService,
+    private readonly authService: AuthService,
+    private readonly router: Router
   ) {}
 
   ngOnInit() {
@@ -76,7 +76,7 @@ export class DashboardComponent implements OnInit {
   }
 
   get pagesArray(): number[] {
-    return Array(this.totalPages).fill(0).map((x, i) => i);
+    return new Array(this.totalPages).fill(0).map((x, i) => i);
   }
 
   private loadProducts() {

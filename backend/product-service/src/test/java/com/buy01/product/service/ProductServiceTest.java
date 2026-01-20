@@ -22,7 +22,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
-import org.springframework.data.web.PageableDefault;
 
 import java.io.IOException;
 import java.util.List;
@@ -56,8 +55,8 @@ class ProductServiceTest {
         }
     }
 
-    private static Product product1 = new TestProduct("prod-1", "Product 1", "Description 1", 10.0, 5, ProductCategory.OTHER, "user-1");
-    private static Product product2 = new TestProduct("prod-2", "Product 2", "Description 2", 20.0, 3, ProductCategory.OTHER, "user-2");
+    private static final Product product1 = new TestProduct("prod-1", "Product 1", "Description 1", 10.0, 5, ProductCategory.OTHER, "user-1");
+    private static final Product product2 = new TestProduct("prod-2", "Product 2", "Description 2", 20.0, 3, ProductCategory.OTHER, "user-2");
 
     @BeforeEach
     void setUp() {

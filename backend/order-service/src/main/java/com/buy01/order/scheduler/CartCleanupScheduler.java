@@ -5,13 +5,10 @@ import com.buy01.order.model.Cart;
 import com.buy01.order.model.CartStatus;
 import com.buy01.order.model.OrderItem;
 import com.buy01.order.repository.CartRepository;
-import com.buy01.order.service.CartService;
-import com.buy01.order.service.OrderService;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;

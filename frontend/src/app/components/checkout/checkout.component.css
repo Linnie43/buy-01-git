@@ -1,0 +1,19 @@
+.cart-timer {
+  padding: 0.4rem 0.7rem;
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: 999px;
+  font-size: 0.95rem;
+  background: var(--background-color, #fff);
+  color: var(--text-color, #222);
+}
+
+.cart-timer__time {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  margin-left: 0.25rem;
+}
+
+.cart-timer--warn {
+  border-color: #ef9611;
+  color: #ef9611;
+}

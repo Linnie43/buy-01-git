@@ -54,10 +54,9 @@ public class CartService {
         }
 
         if (cart.getCartStatus() == CartStatus.ABANDONED || (cart.getExpiryTime()) != null && cart.getExpiryTime().before(new Date())) {
-            if (cart.getCartStatus().equals(CartStatus.ACTIVE)) {
-                for (OrderItem item : cart.getItems()) {
-                    productClient.updateQuantity(item.getProductId(), item.getQuantity());
-                }
+            log.info("Cart is already expired {}", cart.getCartStatus());
+            for (OrderItem item : cart.getItems()) {
+                productClient.updateQuantity(item.getProductId(), item.getQuantity());
             }
             cartRepository.delete(cart);
             return null;

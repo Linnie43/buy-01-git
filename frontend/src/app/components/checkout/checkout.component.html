@@ -29,13 +29,16 @@
       <!-- FORM -->
       <div class="card bg-transparent" *ngIf="!createdOrder">
         <div class="card-body p-4">
-          <h2 class="text-center mb-4 fw-bold">Checkout</h2>
+          <div class="d-flex align-items-center justify-content-between mb-4">
+            <h2 class="fw-bold mb-0 me-3">Checkout</h2>
 
-          <!-- TIMER DISPLAY -->
-          <div class="alert alert-warning text-center d-flex justify-content-between align-items-center mb-4"
-               *ngIf="timeLeftSeconds > 0 && timeLeftSeconds <= 300">
-            <span>Time remaining to complete purchase:</span>
-            <span class="fw-bold fs-5">{{ timerDisplay }}</span>
+            <!-- TIMER DISPLAY -->
+            <div class="cart-timer m-0"
+                 [class.cart-timer--warn]="isExpiringSoon"
+                 *ngIf="timeLeftSeconds > 0 && timeLeftSeconds <= 300">
+              On hold for:
+              <span class="cart-timer__time">{{ timerDisplay }}</span>
+            </div>
           </div>
 
           <form [formGroup]="checkoutForm" (ngSubmit)="onSubmit()">

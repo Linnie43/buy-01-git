@@ -42,7 +42,7 @@ public class Cart {
         this.cartStatus = cartStatus;
         this.createTime = new Date();
         this.updateTime = new Date();
-        this.expiryTime = new Date(this.createTime.getTime() + (2 * 60 * 1000)); // 15 minutes from creation
+        this.expiryTime = new Date(this.createTime.getTime() + (15 * 60 * 1000)); // 15 minutes from creation
     }
 
     protected Cart(String id, String userId, List<OrderItem> items, double totalPrice, CartStatus cartStatus) {

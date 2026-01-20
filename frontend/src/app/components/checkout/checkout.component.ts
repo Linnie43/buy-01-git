@@ -21,7 +21,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   createdOrder: OrderResponseDTO | null = null;
 
   // Timer properties
-  timeLeftSeconds = 60; // 5 minutes
+  timeLeftSeconds = 300; // 5 minutes
   timerDisplay = '05:00';
   private timerInterval: any;
   private cartExpiry: Date | null = null;
@@ -43,6 +43,11 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       country: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
       payOnDelivery: [false, Validators.requiredTrue]
     });
+  }
+
+  // Helper for styling
+  get isExpiringSoon(): boolean {
+    return this.timeLeftSeconds > 0 && this.timeLeftSeconds <= 60;
   }
 
   ngOnInit(): void {
@@ -68,7 +73,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
 
     // Only call the backend to revert status if an order wasn't placed
-    if (!this.createdOrder && this.cartExpiry > now) {
+    if (!this.createdOrder && !this.shouldAbandon) {
       // If we flagged as abandoned (timeout + expiry), send ABANDONED. Else ACTIVE.
       const targetStatus = this.shouldAbandon ? CartStatus.ABANDONED : CartStatus.ACTIVE;
 

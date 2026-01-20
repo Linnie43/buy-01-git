@@ -7,6 +7,8 @@ import com.buy01.order.model.OrderItem;
 import com.buy01.order.repository.CartRepository;
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -19,13 +21,14 @@ public class CartCleanupScheduler {
 
     private final CartRepository cartRepository;
     private final ProductClient productClient;
+    private final static Logger log =  LoggerFactory.getLogger(CartCleanupScheduler.class);
 
     // Run every 30 seconds to catch the 1-minute and 15-minute windows
     @Scheduled(fixedRate = 30000)
     public void processCartExpirations() {
         Date now =  new Date();
         Date oneMinAgo = new Date(now.getTime() - (60 * 1000));
-        Date fiveMinAgo = new Date(now.getTime() - (60 * 1000));
+        Date fiveMinAgo = new Date(now.getTime() - (5 * 60 * 1000));
 
         // Mark ACTIVE Carts started 15min ago to ABANDONED
         List<Cart> toAbandon = cartRepository.findExpiredActiveCarts(now);
@@ -58,16 +61,19 @@ public class CartCleanupScheduler {
     private void abandonCart(Cart cart) {
         cart.setCartStatus(CartStatus.ABANDONED);
         cart.setUpdateTime(new Date());
-        cartRepository.save(cart);
 
         for(OrderItem item : cart.getItems()) {
+            log.info("abandon cart item: {} with quantity {}", item.getProductId(), item.getQuantity());
             productClient.updateQuantity(item.getProductId(), item.getQuantity());
         }
+        cartRepository.delete(cart);
     }
 
     private void activateCart(Cart cart) {
-        cart.setCartStatus(CartStatus.ACTIVE);
-        cart.setUpdateTime(new Date());
-        cartRepository.save(cart);
+        if (cart.getCartStatus() != CartStatus.ACTIVE) {
+                cart.setCartStatus(CartStatus.ACTIVE);
+                cart.setUpdateTime(new Date());
+                cartRepository.save(cart);
+        }
     }
 }

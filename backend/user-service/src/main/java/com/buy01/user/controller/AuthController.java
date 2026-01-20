@@ -68,8 +68,6 @@ public class AuthController {
                     .body("Logged-in users cannot create new accounts");
         }
 
-        System.out.println("Received DTO: " + request);
-
         // Save the user and avatar
         User created = userService.createUser(request);
 

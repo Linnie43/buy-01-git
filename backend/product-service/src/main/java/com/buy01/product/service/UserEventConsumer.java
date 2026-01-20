@@ -18,7 +18,6 @@ public class UserEventConsumer {
 
     @KafkaListener(topics = "${kafka.topic.user-deleted}", groupId = "product-service-group")
     public void handleUserDeleted(String userId) {
-        System.out.println("Received user deleted event for userId: " + userId);
 
         // Call service to delete all products for this user
         productService.deleteProductsByUserId(userId);

@@ -4,6 +4,8 @@ import com.buy01.user.dto.AvatarCreateDTO;
 import com.buy01.user.dto.AvatarResponseDTO;
 import com.buy01.user.dto.AvatarUpdateRequest;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.*;
@@ -21,18 +23,17 @@ import java.io.IOException;
 public class MediaClient {
 
     private final RestTemplate restTemplate;
-    private final String mediaServiceBaseUrl;
+    private static final String MEDIA_SERVICE_BASE_URL = "http://media-service:8082/api/media";
+    private static final Logger log = LoggerFactory.getLogger(MediaClient.class);
 
-    public MediaClient(RestTemplate restTemplate, RestTemplateBuilder builder) {
+    public MediaClient(RestTemplateBuilder builder) {
         this.restTemplate = builder.build();
-        // Local dev URL; will switch to container name in Docker
-        this.mediaServiceBaseUrl = "http://media-service:8082/api/media";
     }
 
     // send avatar to media service and get back the URL path
     public AvatarResponseDTO saveAvatar(AvatarCreateDTO avatarCreateDTO) throws IOException {
-        String url = mediaServiceBaseUrl + "/internal/avatar";
-        System.out.println("Request url: " + url);
+        String url = MEDIA_SERVICE_BASE_URL + "/internal/avatar";
+
         MultipartFile avatar = avatarCreateDTO.getAvatar();
 
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
@@ -56,7 +57,7 @@ public class MediaClient {
         );
 
         if (!response.getStatusCode().is2xxSuccessful()) {
-            System.out.println("Avatar download failed, response code: " + response.getStatusCode());
+            log.error("Avatar download failed, response code: {}", response.getStatusCode());
             throw new FileUploadException("Failed to upload avatar: " + response.getStatusCode());
         }
 
@@ -64,8 +65,8 @@ public class MediaClient {
     }
 
     public AvatarResponseDTO updateAvatar(AvatarUpdateRequest avatarUpdateRequest) throws IOException, FileUploadException {
-        String url = mediaServiceBaseUrl + "/internal/avatar";
-        System.out.println("Request url: " + url);
+        String url = MEDIA_SERVICE_BASE_URL + "/internal/avatar";
+
         MultipartFile avatar = avatarUpdateRequest.getNewAvatar();
 
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();

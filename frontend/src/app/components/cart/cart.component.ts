@@ -21,10 +21,10 @@ export class CartComponent implements OnInit, OnDestroy {
   timeLeftMs = 0;
 
   constructor(
-    private cartService: CartService,
-    private authService: AuthService,
-    private snackBar: MatSnackBar,
-    private router: Router
+    private readonly cartService: CartService,
+    private readonly authService: AuthService,
+    private readonly snackBar: MatSnackBar,
+    private readonly router: Router
   ) {}
 
   ngOnInit(): void {

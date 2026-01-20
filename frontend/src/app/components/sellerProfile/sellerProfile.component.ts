@@ -18,16 +18,16 @@ import { WINDOW } from '../../window.token';
   styleUrl: './sellerProfile.component.css'
 })
 export class SellerProfileComponent implements OnInit {
-  private window = inject(WINDOW); // <-- inject token here
+  private readonly window = inject(WINDOW); // <-- inject token here
   user: User | null = null;
   isLoggedIn = false;
   profileImageUrl: string | null = null;
 
   constructor(
-    private authService: AuthService,
-    private userService: UserService,
-    private avatarService: AvatarService,
-    private router: Router,
+    private readonly authService: AuthService,
+    private readonly userService: UserService,
+    private readonly avatarService: AvatarService,
+    private readonly router: Router,
   ) {}
 
   ngOnInit() {
@@ -41,7 +41,7 @@ export class SellerProfileComponent implements OnInit {
 
     this.userService.getMe().subscribe({
       next: (data: User) => {
-        if (data && data.products) {
+        if (data?.products) {
                   data.products.reverse();
                 }
         this.user = data;

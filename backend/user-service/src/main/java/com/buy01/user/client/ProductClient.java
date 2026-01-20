@@ -13,17 +13,15 @@ import java.util.List;
 public class ProductClient {
 
     private final RestTemplate restTemplate;
-    private final String productServiceBaseUrl;
+    private static final String PRODUCT_SERVICE_BASE_URL = "http://product-service:8081/api/products";
 
     public ProductClient(RestTemplateBuilder builder) {
         this.restTemplate = builder.build();
-        // Local dev URL; will switch to container name in Docker
-        this.productServiceBaseUrl = "http://product-service:8081/api/products";
     }
 
     public List<ProductDTO> getUsersProducts(String userId) {
         try {
-            String url = productServiceBaseUrl + "/internal/my-products/" + userId;
+            String url = PRODUCT_SERVICE_BASE_URL + "/internal/my-products/" + userId;
 
             List<ProductDTO> products = restTemplate.getForObject(url, List.class);
 

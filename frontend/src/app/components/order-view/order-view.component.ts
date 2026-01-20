@@ -22,11 +22,11 @@ export class OrderViewComponent implements OnInit {
   isSeller: boolean = false;
 
   constructor(
-    private route: ActivatedRoute,
-    private orderService: OrderService,
-    private cartService: CartService,
-    private authService: AuthService,
-    private router: Router
+    private readonly route: ActivatedRoute,
+    private readonly orderService: OrderService,
+    private readonly cartService: CartService,
+    private readonly authService: AuthService,
+    private readonly router: Router
   ) {}
 
   ngOnInit(): void {
@@ -50,9 +50,9 @@ export class OrderViewComponent implements OnInit {
 
   // Helper to determine if a step in the visual tracker should be green
   isStatusReached(step: string): boolean {
-    if (!this.order || !this.order.status) return false;
+    if (!this.order?.status) return false;
 
-    // We cast to 'any' here because sometimes the DTO status is an Enum 
+    // We cast to 'any' here because sometimes the DTO status is an Enum
     // and the list is Strings, causing TypeScript to block the indexOf check.
     const currentIdx = this.statusSteps.indexOf(this.order.status as any);
     const stepIdx = this.statusSteps.indexOf(step);

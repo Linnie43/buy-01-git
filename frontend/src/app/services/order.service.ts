@@ -1,18 +1,17 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
-import { OrderResponseDTO, Status } from '../models/order.model';
+import { OrderResponseDTO, Status , OrderDashboardDTO } from '../models/order.model';
 import { ORDER_BASE_URL } from '../constants/constants';
-import { OrderDashboardDTO } from '../models/order.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class OrderService {
 
-  private apiUrl = `${ORDER_BASE_URL}`;
+  private readonly apiUrl = `${ORDER_BASE_URL}`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private readonly http: HttpClient) {}
 
   private mapOrder(item: any): OrderResponseDTO {
     return {

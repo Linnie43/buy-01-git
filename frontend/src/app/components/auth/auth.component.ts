@@ -18,7 +18,7 @@ export function passwordsMatchValidator(group: AbstractControl): ValidationError
 }
 
 export function noWhitespaceValidator(control: AbstractControl): ValidationErrors | null {
-  if (control.value && control.value.trim().length === 0) {
+  if (control.value?.trim().length === 0) {
     return { whitespace: true };
   }
   return null;
@@ -61,7 +61,7 @@ export class AuthComponent implements OnInit {
     { validators: passwordsMatchValidator }
   );
 
-  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {}
+  constructor(private readonly fb: FormBuilder, private readonly authService: AuthService, private router: Router) {}
 
   ngOnInit(): void {
     // Reset avatar when switching role to CLIENT

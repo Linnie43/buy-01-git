@@ -1,18 +1,17 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of, map } from 'rxjs';
-import { Product } from '../models/product.model';
+import { Product , Category } from '../models/product.model';
 import { PRODUCT_BASE_URL } from '../constants/constants';
 import { tap } from 'rxjs/operators';
-import { Category } from '../models/product.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ProductService {
-  private apiUrl = `${PRODUCT_BASE_URL}`;
+  private readonly apiUrl = `${PRODUCT_BASE_URL}`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private readonly http: HttpClient) {}
 
   private mapProduct(item: any): Product {
     const imagePaths = (item?.images || [])

@@ -14,8 +14,8 @@ import { AuthService } from '../services/auth.service';
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
   constructor(
-    private snackBar: MatSnackBar,
-    private authService: AuthService
+    private readonly snackBar: MatSnackBar,
+    private readonly authService: AuthService
     ) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {

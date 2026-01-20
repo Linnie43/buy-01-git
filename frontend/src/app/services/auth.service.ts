@@ -12,15 +12,15 @@ interface DecodedToken { sub?: string; userId?: string; id?: string; role: strin
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private apiUrl = `${AUTH_BASE_URL}`;
+  private readonly apiUrl = `${AUTH_BASE_URL}`;
   private decodedToken: DecodedToken | null = null;
   private avatarUrl: string | null = null;
-  private window = inject(WINDOW);
+  private readonly window = inject(WINDOW);
 
   constructor(
-    private http: HttpClient,
-    private router: Router,
-    
+    private readonly http: HttpClient,
+    private readonly router: Router,
+
   ) {
     const token = localStorage.getItem('token');
     if (token) this.safeDecode(token);

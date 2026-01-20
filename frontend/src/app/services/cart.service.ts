@@ -9,11 +9,11 @@ import { BASE_URL } from '../constants/constants';
 })
 export class CartService {
 
-  private apiUrl = `${BASE_URL}/api/cart`;
-  private cartSubject = new BehaviorSubject<CartResponseDTO | null>(null);
+  private readonly apiUrl = `${BASE_URL}/api/cart`;
+  private readonly cartSubject = new BehaviorSubject<CartResponseDTO | null>(null);
   cart$ = this.cartSubject.asObservable();
 
-  constructor(private http: HttpClient) {}
+  constructor(private readonly http: HttpClient) {}
 
   loadCart(): void {
     this.getCart().subscribe();

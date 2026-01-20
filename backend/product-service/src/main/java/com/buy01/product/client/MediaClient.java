@@ -1,6 +1,5 @@
 package com.buy01.product.client;
 
-import com.buy01.product.controller.ProductController;
 import com.buy01.product.dto.MediaResponseDTO;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.slf4j.Logger;
@@ -25,18 +24,16 @@ import java.util.stream.Collectors;
 public class MediaClient {
 
     private final RestTemplate restTemplate;
-    private final String mediaServiceBaseUrl;
+    private static final String MEDIA_SERVICE_BASE_URL = "http://media-service:8082/api/media";
     private static final Logger log = LoggerFactory.getLogger(MediaClient.class);
 
 
     public MediaClient() {
         this.restTemplate = new RestTemplate();
-        // Local dev URL; will switch to container name in Docker
-        this.mediaServiceBaseUrl = "http://media-service:8082/api/media";
     }
 
     public List<String> getProductImageIds(String productId) {
-        String url = mediaServiceBaseUrl + "/internal/images/productId/" + productId;
+        String url = MEDIA_SERVICE_BASE_URL + "/internal/images/productId/" + productId;
 
         try {
             ResponseEntity<List<MediaResponseDTO>> response = restTemplate.exchange(
@@ -64,8 +61,7 @@ public class MediaClient {
     }
 
     public List<String> postProductImages(String productId, List<MultipartFile> images) throws IOException {
-        String url = mediaServiceBaseUrl + "/internal/images";
-        System.out.println("Request url: " + url);
+        String url = MEDIA_SERVICE_BASE_URL + "/internal/images";
 
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         body.add("productId", productId);
@@ -93,10 +89,13 @@ public class MediaClient {
         );
 
         List<MediaResponseDTO> mediaIds = response.getBody();
-        System.out.println("Uploaded product images: " + mediaIds);
+        if (mediaIds == null) {
+            log.info("No media IDs returned from media service");
+            mediaIds = List.of();
+        }
 
         if (!response.getStatusCode().is2xxSuccessful()) {
-            System.out.println("Failed to save images: " + response.getStatusCode());
+            log.error("Failed to save images: {}", response.getStatusCode());
             throw new FileUploadException("Failed to upload images: " + response.getStatusCode());
         }
 
@@ -111,8 +110,7 @@ public class MediaClient {
             List<String> imagesToDelete,
             List<MultipartFile> newImages
     ) throws IOException {
-        String url = mediaServiceBaseUrl + "/internal/images/productId/" + productId;
-        System.out.println("Request url: " + url);
+        String url = MEDIA_SERVICE_BASE_URL + "/internal/images/productId/" + productId;
 
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         for (String id : imagesToDelete) {
@@ -144,11 +142,15 @@ public class MediaClient {
             );
 
             List<MediaResponseDTO> mediaIds = response.getBody();
+            if (mediaIds == null) {
+                log.info("No media IDs returned from media service after update");
+                mediaIds = List.of();
+            }
             return mediaIds.stream()
                     .map(MediaResponseDTO::getId)
                     .collect(Collectors.toList());
         } catch (HttpClientErrorException e) {
-            System.out.println("Error updating product images: " + e.getStatusCode() + " - " + e.getResponseBodyAsString());
+            log.error("Error updating product images: {} - {} - {}", e.getStatusCode(), e.getResponseBodyAsString(), e.getResponseBodyAsString());
             throw new ResponseStatusException(e.getStatusCode(), e.getResponseBodyAsString(), e);
         }
     }

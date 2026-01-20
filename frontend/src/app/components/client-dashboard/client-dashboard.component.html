@@ -66,7 +66,7 @@
           </div>
         </div>
 
-        <div *ngIf="dashboardData.orders.length > 0; else noOrders" class="card overflow-hidden">
+        <div *ngIf="dashboardData.orders.length > 0; else noOrders" class="card overflow-hidden mb-4">
           <div class="card-body p-0">
             <div class="table-responsive">
               <table class="table table-striped table-hover mb-0">
@@ -83,12 +83,17 @@
                   <td>{{ order.orderId }}</td>
                   <td>{{ order.createdAt | date:'mediumDate' }}</td>
                   <td>
-                      <span class="badge text-uppercase" [ngClass]="{
-                        'bg-secondary': order.status === 'CREATED' || order.status === 'CONFIRMED',
-                        'bg-warning': order.status === 'SHIPPED',
-                        'bg-success': order.status === 'DELIVERED',
-                        'bg-danger': order.status === 'CANCELLED'
-                      }">{{ order.status }}</span>
+                      <span class="badge rounded-pill text-uppercase"
+                            [style.background-color]="
+                              order.status === 'CREATED' ? 'var(--light-color)' :
+                              order.status === 'CONFIRMED' ? 'var(--primary-color)' :
+                              order.status === 'SHIPPED' ? 'var(--dark-color)' :
+                              order.status === 'DELIVERED' ? 'var(--success-color)' :
+                              order.status === 'CANCELLED' ? 'var(--danger-color)' : 'gray'"
+                            [style.color]="order.status === 'CREATED' ? 'var(--text-color)' : '#fff'"
+                            [style.border]="order.status === 'CREATED' ? '1px solid var(--border-color)' : 'none'">
+                        {{ order.status }}
+                      </span>
                   </td>
                   <td class="text-end">{{ order.totalPrice | currency:'EUR' }}</td>
                 </tr>

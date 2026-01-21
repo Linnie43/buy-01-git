@@ -40,31 +40,32 @@ export class AuthInterceptor implements HttpInterceptor {
     return next.handle(authReq).pipe(
       catchError((error: HttpErrorResponse) => {
         let errorMsg = 'Something went wrong';
-        const errorBody = error.error.error;
+        const errorBody = error.error;
+
+        const getSpringErrorMessage = (body: any): string | null => {
+            if (body && typeof body === 'object') {
+              const values = Object.values(body);
+              return values.length > 0 ? String(values[0]) : null;
+            }
+            return null;
+          };
+
+        const serverSpecificMsg = getSpringErrorMessage(errorBody);
 
         if (error.status === 401 && !req.url.includes('/api/auth/login')) {
-          errorMsg = 'Please log in to continue.';
-          this.authService.logout();
-          } else if (error.status === 404 && !req.url.includes('/api/auth/login')) {
-          errorMsg = 'Resource not found';
-        } else if (error.status === 403) {
-          if (errorBody && typeof errorBody === 'string' && errorBody.includes('Invalid JWT token')) {
-             errorMsg = 'Your session is invalid. Please log in again.';
-             this.authService.logout();
-          } else {
-             errorMsg = 'Access Denied: You do not have permission to perform this action.';
+            errorMsg = 'Please log in to continue.';
+            this.authService.logout();
+          } else if (error.status === 404) {
+            errorMsg = serverSpecificMsg || 'Resource not found';
+          } else if (error.status === 403) {
+            errorMsg = serverSpecificMsg || 'Access Denied: You do not have permission.';
+          } else if (error.status === 0) {
+            errorMsg = 'Cannot reach server';
+          } else if (error.status >= 400 && error.status < 500) {
+            errorMsg = serverSpecificMsg || 'Client error';
+          } else if (error.status >= 500) {
+            errorMsg = 'Oops, try again later';
           }
-        } else if (error.status === 0) {
-          errorMsg = 'Cannot reach server';
-        } else if (error.status >= 400 && error.status < 500) {
-          if (typeof errorBody === 'string' && (errorBody === 'Invalid credentials' || errorBody === 'User not found')) {
-            errorMsg = 'Invalid email or password';
-          } else {
-            errorMsg = errorBody ? errorBody : 'Client error';
-          }
-        } else if (error.status >= 500) {
-          errorMsg = 'Oops, try again later';
-        }
 
         this.snackBar.open(errorMsg, 'Close', { duration: 5000 });
 

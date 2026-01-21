@@ -20,7 +20,7 @@ import { CheckoutComponent } from './components/checkout/checkout.component';
 export const routes: Routes = [
   { path: '', component: DashboardComponent },
   { path: 'auth', component: AuthComponent, canActivate: [SessionGuard] },
-  { path: 'products/manage', component: ManageProductsComponent, canActivate: [AuthGuard]  },
+  { path: 'products/manage', component: ManageProductsComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'SELLER' }  },
   { path: 'products/update/:id', component: ManageProductsComponent, canActivate: [productOwnerGuard] },
   { path: 'products/:id', component: ProductViewComponent },
   { path: 'seller-profile', component: SellerProfileComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'SELLER' }  },
@@ -28,8 +28,8 @@ export const routes: Routes = [
   { path: 'sales-dashboard', component: SalesDashboardComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'SELLER' } },
   { path: 'my-dashboard', component: ClientDashboardComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'CLIENT' } },
   { path: 'order/:id', component: OrderViewComponent, canActivate: [AuthGuard]},
-  { path: 'cart', component: CartComponent },
-  { path: 'checkout', component: CheckoutComponent},
+  { path: 'cart', component: CartComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'CLIENT' } },
+  { path: 'checkout', component: CheckoutComponent, canActivate: [AuthGuard, RoleGuard], data: { role: 'CLIENT' } },
   { path: '404', component: NotFoundComponent },
   { path: '**', redirectTo: '' }
 ];

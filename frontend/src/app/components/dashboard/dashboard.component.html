@@ -94,7 +94,7 @@
     <p class="mb-0">No products match your search criteria.</p>
   </div>
 
-  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 pb-4">
     <div class="col" *ngFor="let product of products">
       <div class="product-card-uniform" [ngClass]="{'sold-out-card': product.quantity === 0}" (click)="goToProduct(product.productId)" style="cursor: pointer;">
         <div class="card-img-container">
@@ -116,7 +116,7 @@
     </div>
   </div>
   <!-- Pagination Controls -->
-  <div *ngIf="products.length > 0 && totalPages > 1" class="d-flex justify-content-center align-items-center mt-5 mb-5 pb-5 gap-3">
+  <div *ngIf="products.length > 0 && totalPages > 1" class="d-flex justify-content-center align-items-center mt-4 pb-5 gap-3">
 
     <!-- Previous Arrow -->
     <button

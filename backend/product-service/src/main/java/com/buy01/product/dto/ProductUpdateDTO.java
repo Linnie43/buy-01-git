@@ -8,7 +8,7 @@ public class ProductUpdateDTO {
     @NotBlank(message = "Product ID cannot be empty")
     private String productId;
     @NotBlank(message = "Name cannot be empty")
-    @Pattern(regexp = "^[A-Za-z0-9 ]+$", message = "Product name can only contain letters, numbers, and spaces")
+    @Pattern(regexp = "^[A-Za-z0-9 +\\-/]+$", message = "Product name can only contain letters, numbers, and spaces")
     private String name;
     @NotNull(message = "Price is required")
     @Positive(message = "Price must be over 0")

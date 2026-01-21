@@ -12,7 +12,7 @@ import java.util.List;
 public class ProductUpdateRequest {
 
     @NotBlank(message = "Product name cannot be blank")
-    @Pattern(regexp = "^[A-Za-z0-9 ]+$", message = "Product name can only contain letters, numbers, and spaces")
+    @Pattern(regexp = "^[A-Za-z0-9 +\\-/]+$", message = "Product name can only contain letters, numbers, and spaces")
     private String name;
 
     @NotBlank(message = "Description cannot be empty")

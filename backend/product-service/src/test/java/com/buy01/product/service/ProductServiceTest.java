@@ -227,7 +227,7 @@ class ProductServiceTest {
     @DisplayName("createProduct with name too short throws IllegalArgumentException")
     void createProductBadRequest() {
         ProductCreateDTO request = mock(ProductCreateDTO.class);
-        when(request.getName()).thenReturn("abc"); // only stub used by validation
+        when(request.getName()).thenReturn("abc?!"); // only stub used by validation
         assertThrows(IllegalArgumentException.class,
                 () -> productService.createProduct(request, new AuthDetails("current-user", Role.SELLER)));
     }

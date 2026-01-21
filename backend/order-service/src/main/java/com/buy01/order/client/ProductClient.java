@@ -76,12 +76,7 @@ public class ProductClient {
             String url = PRODUCT_SERVICE_BASE_URL + "/internal/cancel/" + productId;
             restTemplate.put(url, quantity);
         } catch (HttpClientErrorException e) {
-
-            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
-                throw new NotFoundException("Product not found with ID: " + productId);
-            }
-
-            throw e;
+            log.error("Error when returning item to stock for productId: {}", productId, e);
         }
     }
 }

@@ -307,11 +307,11 @@ public class ProductService {
         if (productName == null || productName.isBlank()) {
             throw new IllegalArgumentException("Product name is required");
         }
-        if (productName.length() < 5 || productName.length() > 255) {
+        if (productName.length() < 3 || productName.length() > 255) {
             throw new IllegalArgumentException("Product name must be between 5 and 255 characters");
         }
 
-        if (!productName.matches("^[A-Za-z0-9 ]+$")) {
+        if (!productName.matches("^[A-Za-z0-9 +\\-/]+$")) {
             throw new IllegalArgumentException("Product name must contain only alphanumeric characters");
         }
     }

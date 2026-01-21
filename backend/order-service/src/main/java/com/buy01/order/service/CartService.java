@@ -189,7 +189,8 @@ public class CartService {
     public CartResponseDTO updateCartStatus(AuthDetails currentUser, CartStatus newStatus) {
         Cart cart = getCurrentCart(currentUser);
         if (cart == null) {
-            throw new NotFoundException("Cart not found");
+            log.info("Cart not found with userId: {}", currentUser.getCurrentUserId());
+            return null;
         }
 
         if (cart.getCartStatus() == CartStatus.ABANDONED && newStatus != CartStatus.ABANDONED) {

@@ -1,21 +1,206 @@
 <?xml version="1.0"?>
-<testsuite name="Chrome Headless 143.0.0.0 (Mac OS 10.15.7)" package="" timestamp="2026-01-19T08:51:40" id="0" hostname="fanni.vesanen" tests="7" errors="0" failures="0" time="0.084">
+<testsuite name="Chrome Headless 143.0.0.0 (Mac OS 10.15.7)" package="" timestamp="2026-01-21T13:48:45" id="0" hostname="fanni.vesanen" tests="138" errors="0" failures="0" time="0.349">
   <properties>
     <property name="browser.fullName" value="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/143.0.0.0 Safari/537.36"/>
   </properties>
-  <testcase name="ManageProductsComponent in Update Mode should call deleteProduct when onDelete is confirmed" time="0.062" classname="ManageProductsComponent in Update Mode"/>
-  <testcase name="ManageProductsComponent in Update Mode should submit valid form data to updateProduct" time="0.005" classname="ManageProductsComponent in Update Mode"/>
-  <testcase name="ManageProductsComponent in Update Mode should NOT call deleteProduct when onDelete is cancelled" time="0.004" classname="ManageProductsComponent in Update Mode"/>
-  <testcase name="ManageProductsComponent in Update Mode should initialize in update mode and load product data" time="0.004" classname="ManageProductsComponent in Update Mode"/>
-  <testcase name="ManageProductsComponent in Create Mode should not submit if form is invalid" time="0.003" classname="ManageProductsComponent in Create Mode"/>
-  <testcase name="ManageProductsComponent in Create Mode should initialize successfully in create mode" time="0.003" classname="ManageProductsComponent in Create Mode"/>
-  <testcase name="ManageProductsComponent in Create Mode should submit valid form data to createProduct" time="0.003" classname="ManageProductsComponent in Create Mode"/>
+  <testcase name="ClientProfileComponent should create" time="0.026" classname="ClientProfileComponent"/>
+  <testcase name="ClientProfileComponent when user is logged in should load and display user data on init" time="0.006" classname="ClientProfileComponent when user is logged in"/>
+  <testcase name="ClientProfileComponent when user is logged in should have a link to the user dashboard" time="0.002" classname="ClientProfileComponent when user is logged in"/>
+  <testcase name="ClientProfileComponent when user is logged in should set isLoggedIn to true" time="0.002" classname="ClientProfileComponent when user is logged in"/>
+  <testcase name="ClientProfileComponent when user service fails should log an error and not display user info" time="0.002" classname="ClientProfileComponent when user service fails"/>
+  <testcase name="ClientProfileComponent when user is not logged in should show loading message and not fetch user" time="0.001" classname="ClientProfileComponent when user is not logged in"/>
+  <testcase name="ClientDashboardComponent should create" time="0.012" classname="ClientDashboardComponent"/>
+  <testcase name="ClientDashboardComponent filtering should clear filters and show all orders" time="0.011" classname="ClientDashboardComponent filtering"/>
+  <testcase name="ClientDashboardComponent filtering should filter orders by date" time="0.004" classname="ClientDashboardComponent filtering"/>
+  <testcase name="ClientDashboardComponent filtering should filter orders by status" time="0.002" classname="ClientDashboardComponent filtering"/>
+  <testcase name="ClientDashboardComponent on initialization should show loading state initially" time="0.002" classname="ClientDashboardComponent on initialization"/>
+  <testcase name="ClientDashboardComponent on initialization should display an error message if fetching data fails" time="0.007" classname="ClientDashboardComponent on initialization"/>
+  <testcase name="ClientDashboardComponent on initialization should fetch and display dashboard data on success" time="0.003" classname="ClientDashboardComponent on initialization"/>
+  <testcase name="ClientDashboardComponent navigation should navigate to order details page on viewOrder()" time="0.003" classname="ClientDashboardComponent navigation"/>
+  <testcase name="ClientDashboardComponent navigation should navigate to product page on goToProduct()" time="0.001" classname="ClientDashboardComponent navigation"/>
+  <testcase name="CheckoutComponent Navigation should navigate to home on continue shopping" time="0.01" classname="CheckoutComponent Navigation"/>
+  <testcase name="CheckoutComponent Initialization should create" time="0.001" classname="CheckoutComponent Initialization"/>
+  <testcase name="CheckoutComponent Initialization should update cart status to CHECKOUT on init" time="0.002" classname="CheckoutComponent Initialization"/>
+  <testcase name="CheckoutComponent onSubmit (Essentials) should handle API errors" time="0.002" classname="CheckoutComponent onSubmit (Essentials)"/>
+  <testcase name="CheckoutComponent onSubmit (Essentials) should do nothing if form is invalid" time="0.002" classname="CheckoutComponent onSubmit (Essentials)"/>
+  <testcase name="CheckoutComponent onSubmit (Essentials) should call createOrder and show success snackbar" time="0.001" classname="CheckoutComponent onSubmit (Essentials)"/>
+  <testcase name="CheckoutComponent Form Validation should be invalid when empty" time="0.002" classname="CheckoutComponent Form Validation"/>
+  <testcase name="CheckoutComponent Form Validation should require payOnDelivery to be true" time="0.002" classname="CheckoutComponent Form Validation"/>
+  <testcase name="CheckoutComponent Form Validation should be valid when all fields are filled correctly" time="0.001" classname="CheckoutComponent Form Validation"/>
+  <testcase name="CheckoutComponent ngOnDestroy test should NOT revert cart status if order WAS placed" time="0.002" classname="CheckoutComponent ngOnDestroy test"/>
+  <testcase name="CheckoutComponent ngOnDestroy test should revert cart status to ACTIVE if order was NOT placed" time="0.001" classname="CheckoutComponent ngOnDestroy test"/>
+  <testcase name="SellerProfileComponent should update avatar when file selected" time="0.01" classname="SellerProfileComponent"/>
+  <testcase name="SellerProfileComponent should create" time="0.002" classname="SellerProfileComponent"/>
+  <testcase name="SellerProfileComponent should navigate to product" time="0.001" classname="SellerProfileComponent"/>
+  <testcase name="SellerProfileComponent should load user data on init" time="0.001" classname="SellerProfileComponent"/>
+  <testcase name="DashboardComponent ngOnInit should set isLoggedIn to true if the user is authenticated" time="0.011" classname="DashboardComponent ngOnInit"/>
+  <testcase name="DashboardComponent ngOnInit should fetch products and reverse them on initialization" time="0.002" classname="DashboardComponent ngOnInit"/>
+  <testcase name="DashboardComponent ngOnInit should log an error if fetching products fails" time="0.002" classname="DashboardComponent ngOnInit"/>
+  <testcase name="DashboardComponent ngOnInit should set isLoggedIn to false if the user is not authenticated" time="0.001" classname="DashboardComponent ngOnInit"/>
+  <testcase name="DashboardComponent should create" time="0.001" classname="DashboardComponent"/>
+  <testcase name="DashboardComponent should navigate to the product page when goToProduct is called" time="0.001" classname="DashboardComponent"/>
+  <testcase name="ProductViewComponent ngOnInit should log an error if fetching product fails" time="0.007" classname="ProductViewComponent ngOnInit"/>
+  <testcase name="ProductViewComponent ngOnInit should fetch product and set login status when productId exists" time="0.002" classname="ProductViewComponent ngOnInit"/>
+  <testcase name="ProductViewComponent ngOnInit should navigate to home if productId is null" time="0.001" classname="ProductViewComponent ngOnInit"/>
+  <testcase name="ProductViewComponent should create" time="0" classname="ProductViewComponent"/>
+  <testcase name="ProductViewComponent should navigate to update page when goToUpdateProduct is called" time="0.001" classname="ProductViewComponent"/>
+  <testcase name="OrderService should be created" time="0.001" classname="OrderService"/>
+  <testcase name="AuthService should call login endpoint, store token/avatar and reload" time="0.003" classname="AuthService"/>
+  <testcase name="AuthService loginNoReload should store token without navigating" time="0.001" classname="AuthService"/>
+  <testcase name="AuthService should be created" time="0.004" classname="AuthService"/>
+  <testcase name="AuthService should return true when token is valid" time="0.001" classname="AuthService"/>
+  <testcase name="AuthService should set and get avatar" time="0" classname="AuthService"/>
+  <testcase name="AuthService should decode token on login" time="0" classname="AuthService"/>
+  <testcase name="AuthService should clear token on logout" time="0.001" classname="AuthService"/>
+  <testcase name="AuthService getUserId should prefer userId, then id, then sub" time="0" classname="AuthService"/>
+  <testcase name="AuthService should return null userId if no token" time="0.001" classname="AuthService"/>
+  <testcase name="AuthService getCurrentUser should call users/me endpoint" time="0" classname="AuthService"/>
+  <testcase name="AuthService should call signup endpoint" time="0" classname="AuthService"/>
+  <testcase name="AuthService safeDecode should not throw on invalid token and should clear decodedToken" time="0.001" classname="AuthService"/>
+  <testcase name="AuthService should return false when token expired" time="0" classname="AuthService"/>
+  <testcase name="UserService should be created" time="0" classname="UserService"/>
+  <testcase name="UserService should get current user info via getMe" time="0.001" classname="UserService"/>
+  <testcase name="UserService should update user info via putMe" time="0.001" classname="UserService"/>
+  <testcase name="OrderViewComponent should call cancelOrder and update the order status" time="0.008" classname="OrderViewComponent"/>
+  <testcase name="OrderViewComponent should fetch order details on init" time="0.001" classname="OrderViewComponent"/>
+  <testcase name="OrderViewComponent should navigate to home if orderId is not present" time="0.001" classname="OrderViewComponent"/>
+  <testcase name="OrderViewComponent should navigate to product page on goToProduct" time="0.001" classname="OrderViewComponent"/>
+  <testcase name="OrderViewComponent should create" time="0" classname="OrderViewComponent"/>
+  <testcase name="OrderViewComponent should handle error when fetching order fails" time="0.001" classname="OrderViewComponent"/>
+  <testcase name="OrderViewComponent should call reorderItems and navigate to cart on confirmReorder" time="0" classname="OrderViewComponent"/>
+  <testcase name="AppComponent should create the app" time="0.004" classname="AppComponent"/>
+  <testcase name="AppComponent should update state on NavigationEnd event" time="0.005" classname="AppComponent"/>
+  <testcase name="AppComponent when user is logged in as CLIENT should update state correctly" time="0.002" classname="AppComponent when user is logged in as CLIENT"/>
+  <testcase name="AppComponent should call auth.logout() and reset state when logout() is called" time="0.001" classname="AppComponent"/>
+  <testcase name="AppComponent when user is not logged in should initialize with correct default values" time="0.001" classname="AppComponent when user is not logged in"/>
+  <testcase name="AppComponent when user is logged in as SELLER should update state correctly" time="0.001" classname="AppComponent when user is logged in as SELLER"/>
+  <testcase name="CartComponent should create" time="0.004" classname="CartComponent"/>
+  <testcase name="CartComponent when user is logged in should display empty cart message if cart has no items" time="0" classname="CartComponent when user is logged in"/>
+  <testcase name="CartComponent when user is logged in should display and update the cart timer" time="0.002" classname="CartComponent when user is logged in"/>
+  <testcase name="CartComponent when user is logged in should display cart items" time="0.001" classname="CartComponent when user is logged in"/>
+  <testcase name="CartComponent when user is logged in should remove an item from the cart" time="0.001" classname="CartComponent when user is logged in"/>
+  <testcase name="CartComponent when user is logged in should update item quantity successfully" time="0.001" classname="CartComponent when user is logged in"/>
+  <testcase name="CartComponent when user is logged in should navigate to checkout" time="0" classname="CartComponent when user is logged in"/>
+  <testcase name="CartComponent when user is logged in should load cart on init" time="0.001" classname="CartComponent when user is logged in"/>
+  <testcase name="CartComponent when user is logged in should show snackbar on quantity update error" time="0.001" classname="CartComponent when user is logged in"/>
+  <testcase name="CartComponent when user is not logged in should not load cart on init" time="0.001" classname="CartComponent when user is not logged in"/>
+  <testcase name="SalesDashboardComponent should handle error when loading sales data" time="0.006" classname="SalesDashboardComponent"/>
+  <testcase name="SalesDashboardComponent should filter orders by status" time="0.001" classname="SalesDashboardComponent"/>
+  <testcase name="SalesDashboardComponent should create" time="0" classname="SalesDashboardComponent"/>
+  <testcase name="SalesDashboardComponent should load sales data on initialization" time="0.002" classname="SalesDashboardComponent"/>
+  <testcase name="SalesDashboardComponent should clear filters and show all orders" time="0.001" classname="SalesDashboardComponent"/>
+  <testcase name="SalesDashboardComponent should navigate to order view on viewOrder" time="0.001" classname="SalesDashboardComponent"/>
+  <testcase name="SalesDashboardComponent should filter orders by date" time="0.001" classname="SalesDashboardComponent"/>
+  <testcase name="SalesDashboardComponent should navigate to product page on goToProduct" time="0" classname="SalesDashboardComponent"/>
+  <testcase name="CartService should delete item by id and reload cart" time="0" classname="CartService"/>
+  <testcase name="CartService should update cart status" time="0" classname="CartService"/>
+  <testcase name="CartService should be created" time="0.001" classname="CartService"/>
+  <testcase name="CartService should delete entire cart and clear subject" time="0" classname="CartService"/>
+  <testcase name="CartService should reorder items" time="0" classname="CartService"/>
+  <testcase name="CartService should load cart and update subject" time="0" classname="CartService"/>
+  <testcase name="CartService should add item to cart" time="0.001" classname="CartService"/>
+  <testcase name="CartService should clear cart manually" time="0" classname="CartService"/>
+  <testcase name="CartService should get cart directly" time="0" classname="CartService"/>
+  <testcase name="CartService should update cart item" time="0.001" classname="CartService"/>
+  <testcase name="ManageProductsComponent in Create Mode should initialize in create mode and load user products" time="0.018" classname="ManageProductsComponent in Create Mode"/>
+  <testcase name="ManageProductsComponent in Create Mode should call createProduct on valid form submission" time="0.01" classname="ManageProductsComponent in Create Mode"/>
+  <testcase name="ManageProductsComponent General Functionality should not submit an invalid form" time="0.004" classname="ManageProductsComponent General Functionality"/>
+  <testcase name="ManageProductsComponent General Functionality should navigate when edit is called" time="0.039" classname="ManageProductsComponent General Functionality"/>
+  <testcase name="ManageProductsComponent in Update Mode should call deleteProduct when onDelete is confirmed" time="0.006" classname="ManageProductsComponent in Update Mode"/>
+  <testcase name="ManageProductsComponent in Update Mode should call updateProduct on valid form submission" time="0.005" classname="ManageProductsComponent in Update Mode"/>
+  <testcase name="ManageProductsComponent in Update Mode should initialize in update mode, load product data, and load user products" time="0.004" classname="ManageProductsComponent in Update Mode"/>
+  <testcase name="ProductService getAllProducts should return an array of mapped products" time="0.001" classname="ProductService getAllProducts"/>
+  <testcase name="ProductService deleteProduct should send a DELETE request to the correct URL" time="0.001" classname="ProductService deleteProduct"/>
+  <testcase name="ProductService updateProduct should PUT data and return the updated mapped product" time="0" classname="ProductService updateProduct"/>
+  <testcase name="ProductService createProduct should POST data and return the new mapped product" time="0.001" classname="ProductService createProduct"/>
+  <testcase name="ProductService should be created" time="0" classname="ProductService"/>
+  <testcase name="ProductService getProductById should map product with no images to use a placeholder" time="0" classname="ProductService getProductById"/>
+  <testcase name="ProductService getProductById should return a single mapped product" time="0.001" classname="ProductService getProductById"/>
+  <testcase name="AuthGuard should be created" time="0" classname="AuthGuard"/>
+  <testcase name="AuthGuard should prevent activation and show snackbar when user is not logged in" time="0" classname="AuthGuard"/>
+  <testcase name="AuthGuard should allow activation when user is logged in" time="0.001" classname="AuthGuard"/>
+  <testcase name="AvatarService should build default avatar url when filename is null" time="0" classname="AvatarService"/>
+  <testcase name="AvatarService should build default avatar url when filename is undefined" time="0" classname="AvatarService"/>
+  <testcase name="AvatarService should build correct avatar url when filename is provided" time="0" classname="AvatarService"/>
+  <testcase name="AvatarService should upload avatar" time="0.001" classname="AvatarService"/>
+  <testcase name="AvatarService should update my avatar" time="0.001" classname="AvatarService"/>
+  <testcase name="AvatarService should be created" time="0" classname="AvatarService"/>
+  <testcase name="AuthComponent Avatar Handling should set avatarError for invalid file type" time="0.014" classname="AuthComponent Avatar Handling"/>
+  <testcase name="AuthComponent Avatar Handling should set avatarFile for a valid file when role is SELLER" time="0.001" classname="AuthComponent Avatar Handling"/>
+  <testcase name="AuthComponent Avatar Handling should reset avatar when role changes from SELLER" time="0.001" classname="AuthComponent Avatar Handling"/>
+  <testcase name="AuthComponent should create" time="0.001" classname="AuthComponent"/>
+  <testcase name="AuthComponent should toggle between login and signup forms" time="0.001" classname="AuthComponent"/>
+  <testcase name="AuthComponent should initialize in login mode" time="0.001" classname="AuthComponent"/>
+  <testcase name="AuthComponent Signup Form should not call authService.signup if form is invalid" time="0.001" classname="AuthComponent Signup Form"/>
+  <testcase name="AuthComponent Signup Form should call authService.signup for a CLIENT role on valid submission" time="0.001" classname="AuthComponent Signup Form"/>
+  <testcase name="AuthComponent Signup Form should switch to login view on successful signup" time="0.001" classname="AuthComponent Signup Form"/>
+  <testcase name="AuthComponent Signup Form should have passwordsMismatch error if passwords do not match" time="0.001" classname="AuthComponent Signup Form"/>
+  <testcase name="AuthComponent Login Form should call authService.login on valid submission" time="0.006" classname="AuthComponent Login Form"/>
+  <testcase name="AuthComponent Login Form should not call authService.login if form is invalid" time="0.002" classname="AuthComponent Login Form"/>
+  <testcase name="RoleGuard should redirect a user with the wrong role to /" time="0.001" classname="RoleGuard"/>
+  <testcase name="RoleGuard should redirect an unauthenticated user to /" time="0" classname="RoleGuard"/>
+  <testcase name="RoleGuard should allow a user with the correct role to access the route" time="0" classname="RoleGuard"/>
+  <testcase name="RoleGuard should be created" time="0.003" classname="RoleGuard"/>
   <system-out>
-    <![CDATA[Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Product loaded:', Object{productId: 'prod-123', name: 'Test Product', description: 'A test description', price: 10, quantity: 5, category: 'OTHER', userId: 'user-1', images: ['image1.jpg']}
+    <![CDATA[Chrome Headless 143.0.0.0 (Mac OS 10.15.7) ERROR: Error: Fetch error
+Error: Fetch error
+    at errorFactory (http://localhost:9876/_karma_webpack_/webpack:/src/app/components/client-dashboard/client-dashboard.component.spec.ts:127:66)
+    at Observable._subscribe (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/observable/throwError.js:5:51)
+    at Observable._trySubscribe (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/Observable.js:37:25)
+    at cb (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/Observable.js:31:30)
+    at errorContext (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/util/errorContext.js:19:9)
+    at Observable.subscribe (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/Observable.js:22:21)
+    at ClientDashboardComponent.call [as ngOnInit] (http://localhost:9876/_karma_webpack_/webpack:/src/app/components/client-dashboard/client-dashboard.component.ts:29:35)
+    at callHookInternal (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/core.mjs:5136:14)
+    at callHook (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/core.mjs:5163:13)
+    at callHooks (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/core.mjs:5118:17)
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Cart status reverted to ACTIVE'
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Cart status reverted to ACTIVE'
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Cart status updated to CHECKOUT'
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Cart status reverted to ACTIVE'
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Cart status updated to CHECKOUT'
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Cart status reverted to ACTIVE'
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Cart status updated to CHECKOUT'
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Cart status reverted to ACTIVE'
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Cart status updated to CHECKOUT'
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Cart status updated to CHECKOUT'
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Cart status reverted to ACTIVE'
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Cart status updated to CHECKOUT'
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Cart status reverted to ACTIVE'
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Cart status updated to CHECKOUT'
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Cart status reverted to ACTIVE'
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Cart status updated to CHECKOUT'
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Cart status updated to CHECKOUT'
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Cart status reverted to ACTIVE'
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Cart status reverted to ACTIVE'
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Transforming imageId:', 'img1.jpg'
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) DEBUG: '[SellerProfile] Avatar updated:', 'new-avatar.png'
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Transforming imageId:', 'img1.jpg'
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Transforming imageId:', 'img1.jpg'
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Transforming imageId:', 'img1.jpg'
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Order details:', Object{orderId: 'order-123', items: [Object{productId: ..., productName: ..., quantity: ..., price: ..., subtotal: ..., sellerId: ...}], totalPrice: 20, status: 'CREATED', shippingAddress: Object{fullName: 'Test User', street: '123 Test St', city: 'Testville', postalCode: '12345', country: 'Testland'}, paid: true, deliveryDate: Wed Jan 21 2026 15:48:44 GMT+0200 (Eastern European Standard Time), trackingNumber: 'TRACK123', createdAt: Wed Jan 21 2026 15:48:44 GMT+0200 (Eastern European Standard Time), updatedAt: null}
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Items added to cart:', Object{}
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) ERROR: 'Failed to load sales data', Error: API Error
+Error: API Error
+    at errorFactory (http://localhost:9876/_karma_webpack_/webpack:/src/app/components/sales-dashboard/sales-dashboard.component.spec.ts:89:64)
+    at Observable._subscribe (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/observable/throwError.js:5:51)
+    at Observable._trySubscribe (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/Observable.js:37:25)
+    at cb (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/Observable.js:31:30)
+    at errorContext (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/util/errorContext.js:19:9)
+    at Observable.subscribe (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/Observable.js:22:21)
+    at SalesDashboardComponent.loadSalesData (http://localhost:9876/_karma_webpack_/webpack:/src/app/components/sales-dashboard/sales-dashboard.component.ts:40:35)
+    at SalesDashboardComponent.call [as ngOnInit] (http://localhost:9876/_karma_webpack_/webpack:/src/app/components/sales-dashboard/sales-dashboard.component.ts:33:10)
+    at callHookInternal (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/core.mjs:5136:14)
+    at callHook (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/core.mjs:5163:13)
 ,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'getMyProducts: success', [Object{productId: 'prod-123', name: 'Test Product', description: 'A test description', price: 10, quantity: 5, category: 'OTHER', userId: 'user-1', images: [...]}]
 ,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Transforming imageId:', 'image1.jpg'
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'getMyProducts: success', [Object{productId: 'prod-123', name: 'Test Product', description: 'A test description', price: 10, quantity: 5, category: 'OTHER', userId: 'user-1', images: [...]}]
 ,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Transforming imageId:', 'image1.jpg'
 ,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'getMyProducts: success', [Object{productId: 'prod-123', name: 'Test Product', description: 'A test description', price: 10, quantity: 5, category: 'OTHER', userId: 'user-1', images: [...]}]
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'getMyProducts: success', [Object{productId: 'prod-123', name: 'Test Product', description: 'A test description', price: 10, quantity: 5, category: 'OTHER', userId: 'user-1', images: [...]}]
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Transforming imageId:', 'image1.jpg'
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'getMyProducts: success', [Object{productId: 'prod-123', name: 'Test Product', description: 'A test description', price: 10, quantity: 5, category: 'OTHER', userId: 'user-1', images: [...]}]
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Transforming imageId:', 'image1.jpg'
 ,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Product loaded:', Object{productId: 'prod-123', name: 'Test Product', description: 'A test description', price: 10, quantity: 5, category: 'OTHER', userId: 'user-1', images: ['image1.jpg']}
 ,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'getMyProducts: success', [Object{productId: 'prod-123', name: 'Test Product', description: 'A test description', price: 10, quantity: 5, category: 'OTHER', userId: 'user-1', images: [...]}]
 ,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Transforming imageId:', 'image1.jpg'
@@ -25,17 +210,11 @@
 ,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'getMyProducts: success', [Object{productId: 'prod-123', name: 'Test Product', description: 'A test description', price: 10, quantity: 5, category: 'OTHER', userId: 'user-1', images: [...]}]
 ,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Transforming imageId:', 'image1.jpg'
 ,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Transforming imageId:', 'image1.jpg'
+,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'getMyProducts: success', [Object{productId: 'prod-123', name: 'Test Product', description: 'A test description', price: 10, quantity: 5, category: 'OTHER', userId: 'user-1', images: [...]}]
 ,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Product loaded:', Object{productId: 'prod-123', name: 'Test Product', description: 'A test description', price: 10, quantity: 5, category: 'OTHER', userId: 'user-1', images: ['image1.jpg']}
 ,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'getMyProducts: success', [Object{productId: 'prod-123', name: 'Test Product', description: 'A test description', price: 10, quantity: 5, category: 'OTHER', userId: 'user-1', images: [...]}]
 ,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Transforming imageId:', 'image1.jpg'
 ,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Transforming imageId:', 'image1.jpg'
-,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'getMyProducts: success', [Object{productId: 'prod-123', name: 'Test Product', description: 'A test description', price: 10, quantity: 5, category: 'OTHER', userId: 'user-1', images: [...]}]
-,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Transforming imageId:', 'image1.jpg'
-,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'getMyProducts: success', [Object{productId: 'prod-123', name: 'Test Product', description: 'A test description', price: 10, quantity: 5, category: 'OTHER', userId: 'user-1', images: [...]}]
-,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Transforming imageId:', 'image1.jpg'
-,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'getMyProducts: success', [Object{productId: 'prod-123', name: 'Test Product', description: 'A test description', price: 10, quantity: 5, category: 'OTHER', userId: 'user-1', images: [...]}]
-,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'Transforming imageId:', 'image1.jpg'
-,Chrome Headless 143.0.0.0 (Mac OS 10.15.7) LOG: 'getMyProducts: success', [Object{productId: 'prod-123', name: 'Test Product', description: 'A test description', price: 10, quantity: 5, category: 'OTHER', userId: 'user-1', images: [...]}]
 
 ]]>
   </system-out>

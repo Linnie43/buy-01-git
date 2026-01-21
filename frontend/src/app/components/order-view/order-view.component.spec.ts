@@ -113,9 +113,11 @@ describe('OrderViewComponent', () => {
   });
 
   it('should call cancelOrder and update the order status', () => {
-    spyOn(window, 'confirm').and.returnValue(true);
-    component.order = { ...mockOrder };
-    const cancelledOrder = { ...mockOrder, status: Status.CANCELLED };
+    const dialogRefSpyObj = jasmine.createSpyObj({ afterClosed: of(true), close: null });
+    spyOn(component['dialog'], 'open').and.returnValue(dialogRefSpyObj);
+
+    component.order = { ...mockOrder, orderId: 'order-123' };
+    const cancelledOrder = { ...mockOrder, status: 'CANCELLED' as any };
     orderServiceSpy.cancelOrder.and.returnValue(of(cancelledOrder));
 
     component.cancelOrder();

@@ -53,12 +53,6 @@ server:
     key-store-password: password
     key-store-type: PKCS12
 
-jwt:
-  secret: very-long-secret-key-string-with-at-least-32-chars
-
-#jwt:
-#  secret: ${JWT_SECRET}
-
 eureka:
   instance:
     hostname: ${HOSTNAME}
@@ -77,6 +71,10 @@ management:
   endpoint:
     health:
       show-details: always
+
+
+jwt:
+  secret: ${JWT_SECRET}
 
 logging:
   level:

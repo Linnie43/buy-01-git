@@ -34,7 +34,6 @@ server:
   ssl:
     enabled: false
   error:
-    # This will send the Java Exception trace to your frontend/Postman
     include-stacktrace: always
     include-message: always
 management:
@@ -56,18 +55,12 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
 
-#jwt:
-#  secret: very-long-secret-key-string-with-at-least-32-chars
-#
 jwt:
   secret: ${JWT_SECRET}
 
 logging:
   level:
     root: INFO
-    # Change your project package to DEBUG to see more flow
     com.buy01.order: DEBUG
-    # See exactly what Spring Web is doing when it fails
     org.springframework.web: DEBUG
-    # See MongoDB interactions
     org.springframework.data.mongodb: DEBUG

@@ -54,7 +54,7 @@ export class ManageProductsComponent implements OnInit {
       this.productForm = this.fb.group({
             name: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(255)]],
             description: ['', [Validators.required, Validators.maxLength(2000)]],
-            price: [null, [Validators.required, Validators.min(0.01)]],
+            price: [null, [Validators.required, Validators.min(0.01), Validators.max(100000)]],
             quantity: [0, [Validators.required, Validators.min(0), Validators.max(1000), Validators.pattern("^[0-9]*$")]],
             category: [null, [Validators.required]]
           });
@@ -186,6 +186,8 @@ export class ManageProductsComponent implements OnInit {
                    descriptionControl.setValue(cleanedDescription);
                   }
 
+              this.productForm.markAllAsTouched();
+
               if (this.productForm.invalid) {
                 return;
               }
@@ -241,7 +243,7 @@ export class ManageProductsComponent implements OnInit {
           data: {
             title: 'Delete Product',
             message: 'Are you sure you want to delete this product?'
-          }
+          },
         });
 
         dialogRef.afterClosed().subscribe(result => {

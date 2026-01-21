@@ -35,7 +35,7 @@
           <h3>{{ mode === 'create' ? 'Create Product' : 'Update Product' }}</h3>
           <form [formGroup]="productForm" (ngSubmit)="submit()">
             <div class="mb-3">
-              <label for="name" class="form-label">Name</label>
+              <label for="name" class="form-label">Name *</label>
               <input id="name" class="form-control" formControlName="name" [class.is-invalid]="(productForm.get('name')?.invalid && (productForm.get('name')?.dirty || productForm.get('name')?.touched)) || formErrors['name']">
               <div *ngIf="(productForm.get('name')?.invalid && (productForm.get('name')?.dirty || productForm.get('name')?.touched)) || formErrors['name']" class="invalid-feedback">
                 <div *ngIf="productForm.get('name')?.errors?.['required']">Name is required.</div>
@@ -46,7 +46,7 @@
             </div>
 
             <div class="mb-3">
-              <label for="description" class="form-label">Description</label>
+              <label for="description" class="form-label">Description *</label>
               <textarea id="description" class="form-control" formControlName="description" rows="3" [class.is-invalid]="(productForm.get('description')?.invalid && (productForm.get('description')?.dirty || productForm.get('description')?.touched)) || formErrors['description']"></textarea>
               <div *ngIf="(productForm.get('description')?.invalid && (productForm.get('description')?.dirty || productForm.get('description')?.touched)) || formErrors['description']" class="invalid-feedback">
                 <div *ngIf="productForm.get('description')?.errors?.['required']">Description is required.</div>
@@ -55,17 +55,18 @@
             </div>
 
             <div class="mb-3">
-              <label for="price" class="form-label">Price (€)</label>
+              <label for="price" class="form-label">Price (€) *</label>
               <input id="price" type="number" class="form-control" formControlName="price" step="0.01" [class.is-invalid]="(productForm.get('price')?.invalid && (productForm.get('price')?.dirty || productForm.get('price')?.touched)) || formErrors['price']">
               <div *ngIf="(productForm.get('price')?.invalid && (productForm.get('price')?.dirty || productForm.get('price')?.touched)) || formErrors['price']" class="invalid-feedback">
                 <div *ngIf="productForm.get('price')?.errors?.['required']">Price is required.</div>
                 <div *ngIf="productForm.get('price')?.errors?.['min']">Price must be over 0.</div>
+                <div *ngIf="productForm.get('price')?.errors?.['max']">Price cannot exceed 100,000.</div>
                 <div *ngIf="formErrors['price']">{{ formErrors['price'] }}</div>
               </div>
             </div>
 
             <div class="mb-3">
-              <label for="quantity" class="form-label">Quantity</label>
+              <label for="quantity" class="form-label">Quantity *</label>
               <input id="quantity" type="number" class="form-control" formControlName="quantity" [class.is-invalid]="(productForm.get('quantity')?.invalid && (productForm.get('quantity')?.dirty || productForm.get('quantity')?.touched)) || formErrors['quantity']">
               <div *ngIf="(productForm.get('quantity')?.invalid && (productForm.get('quantity')?.dirty || productForm.get('quantity')?.touched)) || formErrors['quantity']" class="invalid-feedback">
                 <div *ngIf="productForm.get('quantity')?.errors?.['required']">Quantity is required.</div>
@@ -75,7 +76,7 @@
             </div>
 
             <div class="mb-3">
-              <label for="category" class="form-label">Category</label>
+              <label for="category" class="form-label">Category *</label>
               <select id="category" class="form-select" formControlName="category" [class.is-invalid]="(productForm.get('category')?.invalid && (productForm.get('category')?.dirty || productForm.get('category')?.touched)) || formErrors['category']">
                 <option [ngValue]="null" disabled>Select a category</option>
                 <option *ngFor="let cat of categories" [ngValue]="cat">{{ cat }}</option>
@@ -84,6 +85,9 @@
                 <div *ngIf="productForm.get('category')?.errors?.['required']">Category is required.</div>
                 <div *ngIf="formErrors['category']">{{ formErrors['category'] }}</div>
               </div>
+              <div class="required-field-note mt-1">
+                <small class="text-muted">* Required fields</small>
+                </div>
             </div>
 
             <input id="images" type="file" class="d-none" multiple accept="image/*" (change)="onFileSelected($event)" #fileInput>
@@ -91,7 +95,7 @@
         </div>
 
         <div class="col-12 d-flex justify-content-end mt-4">
-          <button type="button" [disabled]="productForm.invalid" (click)="submit()">
+          <button class="btn" type="submit" [disabled]="productForm.invalid" (click)="submit()">
             {{ mode === 'create' ? 'Create Product' : 'Update Product' }}
           </button>
 

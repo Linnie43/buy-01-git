@@ -149,3 +149,68 @@ button:hover, .btn:hover, .btn:active, button:active, .btn:focus-visible, button
   color: #ffcdd2;
   background-color: var(--border-color);
 }
+
+.confirmation-dialog {
+  background-color: #fff;
+  max-width: 420px;
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  box-shadow: none !important;
+  border: 1px solid rgba(0,0,0,0.04);
+  color: var(--text-color);
+}
+
+.cdk-overlay-pane .confirmation-dialog {
+  box-shadow: none !important;
+}
+
+.confirmation-dialog .dialog-title {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.confirmation-dialog .dialog-body {
+  margin: 0;
+  padding: 0;
+  color: var(--dark-color);
+  line-height: 1.4;
+}
+
+.confirmation-dialog .dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.confirmation-dialog .btn {
+  padding: 0.35rem 0.7rem;
+  font-size: 0.875rem;
+  min-width: 88px;
+  border-radius: 6px;
+}
+
+.confirmation-dialog .btn-primary {
+  background: transparent;
+  border: none;
+  color: var(--dark-color);
+  padding: 0.35rem 0.7rem;
+  transition: background-color .12s ease, color .12s ease;
+}
+.confirmation-dialog .btn-primary:hover,
+.confirmation-dialog .btn-primary:focus {
+  background: rgba(0,0,0,0.04);
+  outline: none;
+}
+
+.confirmation-dialog .btn-danger {
+  background-color: var(--danger-color);
+  border: none;
+  color: #fff;
+}
+.confirmation-dialog .btn-danger:hover,
+.confirmation-dialog .btn-danger:focus {
+  background-color: var(--danger-hover-color);
+  filter: none;
+}

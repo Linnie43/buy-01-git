@@ -19,8 +19,8 @@ export const productOwnerGuard: CanActivateFn = (route: ActivatedRouteSnapshot) 
       if (product.isProductOwner) {
         return true; // Allow access
       }
-      // Not the owner, redirect to 404 page
-      return router.createUrlTree(['/404']);
+      // Not the owner, redirect home
+      return router.createUrlTree(['/']);
     }),
     catchError((err: unknown) => {
       // If product is not found (404) or access is forbidden (403), redirect

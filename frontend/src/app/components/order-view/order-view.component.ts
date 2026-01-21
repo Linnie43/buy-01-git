@@ -5,6 +5,9 @@ import { OrderService } from '../../services/order.service';
 import { CartService } from '../../services/cart.service';
 import { OrderResponseDTO, OrderStatusList } from '../../models/order.model';
 import { Component, OnInit } from '@angular/core';
+import { CartResponseDTO } from '../../models/cart.model';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmationDialogComponent } from '../shared/confirmation-dialog.component';
 
 
 @Component({
@@ -26,7 +29,9 @@ export class OrderViewComponent implements OnInit {
     private readonly orderService: OrderService,
     private readonly cartService: CartService,
     private readonly authService: AuthService,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly dialog: MatDialog
+
   ) {}
 
   ngOnInit(): void {
@@ -74,20 +79,24 @@ export class OrderViewComponent implements OnInit {
   cancelOrder() {
     if (!this.order) return;
 
-    if(confirm('Are you sure you want to cancel this order?')) {
-      // Call service to cancel order
-      this.orderService.cancelOrder(this.order.orderId).subscribe({
-        next: (updatedOrder) => {
-          this.order = updatedOrder;
-          console.log('Order cancelled successfully.');
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      width: '350px',
+      data: {
+        title: 'Cancel Order',
+        message: 'Are you sure you want to cancel this order?'
+      },
+    });
 
-        },
-        error: (err: unknown) => {
-          console.error('Error cancelling order:', err);
-        }
-      });
-    }
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.orderService.cancelOrder(this.order!.orderId).subscribe({
+          next: (updatedOrder) => this.order = updatedOrder,
+          error: (err) => console.error(err)
+        });
+      }
+    });
   }
+
 
     goToProduct(productId: string) {
       this.router.navigate(['/products', productId]);

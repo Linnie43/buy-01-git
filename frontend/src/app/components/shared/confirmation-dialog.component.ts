@@ -11,17 +11,20 @@ export interface DialogData {
   selector: 'app-confirmation-dialog',
   standalone: true,
   imports: [MatDialogModule, MatButtonModule],
-  template: `
-    <h1 mat-dialog-title>{{ data.title }}</h1>
-    <div mat-dialog-content>
-      <p>{{ data.message }}</p>
+    template: `
+    <div class="confirmation-dialog">
+       <h1 class="dialog-title">{{ data.title }}</h1>
+          <div class="dialog-body">
+            <p>{{ data.message }}</p>
+          </div>
+          <div class="dialog-actions">
+            <button type="button" class="btn btn-primary" (click)="onCancel()">Cancel</button>
+            <button type="button" class="btn btn-danger" [mat-dialog-close]="true" cdkFocusInitial>Delete</button>
+          </div>
     </div>
-    <div mat-dialog-actions align="end">
-      <button mat-button (click)="onCancel()">Cancel</button>
-      <button mat-button color="warn" [mat-dialog-close]="true" cdkFocusInitial>Delete</button>
-    </div>
-  `,
-})
+    `
+  })
+
 export class ConfirmationDialogComponent {
   constructor(
     public dialogRef: MatDialogRef<ConfirmationDialogComponent>,

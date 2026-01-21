@@ -74,6 +74,8 @@ export class ProductViewComponent implements OnInit {
       }).subscribe({
         next: (res: CartResponseDTO) => {
           console.log('Added to cart', res);
+          this.product!.quantity -= this.selectedQuantity;
+          this.selectedQuantity = 1;
           this.cart = res;
            this.snackBar.open('Product added to cart!', 'Close', {
                   duration: 3000,

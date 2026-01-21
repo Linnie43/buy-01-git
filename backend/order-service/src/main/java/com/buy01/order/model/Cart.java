@@ -53,6 +53,7 @@ public class Cart {
         this.cartStatus = cartStatus;
         this.createTime = new Date();
         this.updateTime = new Date();
+        this.expiryTime = new Date(this.createTime.getTime() + (60 * 1000));
     }
 
     public String getId() {return id;}

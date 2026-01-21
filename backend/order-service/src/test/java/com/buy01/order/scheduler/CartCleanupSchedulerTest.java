@@ -45,7 +45,7 @@ class CartCleanupSchedulerTest {
 
         // Force updateTime to be 2 minutes ago
         Date twoMinutesAgo = new Date(System.currentTimeMillis() - (2 * 60 * 1000));
-        ReflectionTestUtils.setField(staleActiveCart, "updateTime", twoMinutesAgo);
+        ReflectionTestUtils.setField(staleActiveCart, "expiryTime", twoMinutesAgo);
         ReflectionTestUtils.setField(staleActiveCart, "cartStatus", CartStatus.ACTIVE);
 
         when(cartRepository.findExpiredActiveCarts(any(Date.class)))
@@ -55,8 +55,7 @@ class CartCleanupSchedulerTest {
 
         scheduler.processCartExpirations();
 
-        verify(cartRepository).save(cartCaptor.capture());
-        assertEquals(CartStatus.ABANDONED, cartCaptor.getValue().getCartStatus());
+        verify(cartRepository).delete(cartCaptor.capture());
         verify(productClient).updateQuantity(product1().getProductId(), product1().getQuantity());
     }
 
@@ -78,7 +77,7 @@ class CartCleanupSchedulerTest {
 
         scheduler.processCartExpirations();
 
-        verify(cartRepository).save(any(Cart.class));
+        verify(cartRepository).delete(any(Cart.class));
     }
 
     @Test

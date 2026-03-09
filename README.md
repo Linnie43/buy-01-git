@@ -1,6 +1,6 @@
 # Buy-01 E‑Commerce Platform
 
-End‑to‑end e‑commerce system built with Spring Boot microservices and an Angular frontend. Clients browse products; sellers manage their catalog.
+End‑to‑end e‑commerce system built with Spring Boot microservices and an Angular frontend. Clients browse products; sellers manage their catalog!
 
 ## Architecture
 
